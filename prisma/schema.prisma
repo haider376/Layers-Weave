@@ -336,11 +336,28 @@ model CallLog {
   number      String
   direction   String   @default("outbound")
   via         String   @default("Zoom Phone")
-  outcome     String? // Connected | No answer | Left voicemail | Meeting Booked | Not Interested | ...
+  connected   Boolean  @default(false)
+  outcome     String? // sentiment: SQL Booked | Interested / Follow up | Left Voicemail | No Answer | ...
   notes       String?
+  transcript  String?
   durationSec Int?
   agent       String?
   createdAt   DateTime @default(now())
+}
+
+// Tasks / to-dos for the sales floor.
+model Task {
+  id        String   @id @default(cuid())
+  title     String
+  type      String   @default("To-do") // To-do | Call | Email | Follow-up | Meeting
+  priority  String   @default("Medium") // High | Medium | Low
+  done      Boolean  @default(false)
+  dueDate   DateTime?
+  ownerId   String?
+  companyId String?
+  contactId String?
+  dealId    String?
+  createdAt DateTime @default(now())
 }
 
 // Supply's answer to consolidated demand — Shahiq sources an item from a

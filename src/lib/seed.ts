@@ -314,9 +314,14 @@ export async function seedDatabase(prisma: PrismaClient) {
     }
   }
 
-  // ── Call logs with outcomes (powers the Call Outcomes report) ──
-  const CALL_OUTCOMES = ["Connected", "No answer", "Left voicemail", "Meeting Booked", "Not Interested", "Busy", "Wrong number", "Call Back Later"];
-  // weight distribution per rep (calls, and skew)
+  // ── Call logs: two-step disposition (connected + sentiment) ──
+  const NOT_CONNECTED = ["No Answer", "Left Voicemail", "Stopped at Gatekeeper", "Wrong Number"];
+  const CONNECTED = ["Call Back Later", "Interested / Follow up", "Not Interested", "SQL Booked"];
+  const TRANSCRIPTS = [
+    "AE: Hey, it's Layers Wholesale — quick one on your vintage sourcing.\nClient: Go on.\nAE: We can land A-grade Carhartt at a price that protects your margin. Worth a 15-min demo?\nClient: Yeah, book it in.",
+    "AE: Calling about your bulk denim needs.\nClient: We're sorted for this quarter.\nAE: No worries — can I follow up before your next drop?\nClient: Sure, ping me in three weeks.",
+    "AE: Hi, is this the buyer for the vintage line?\nGatekeeper: She's in a meeting.\nAE: When's a good time?\nGatekeeper: Try tomorrow AM.",
+  ];
   const CALL_AGENTS: Array<[string, number]> = [
     ["huzaifa", 2271], ["fatima", 1840], ["hilmand", 1690], ["asjad", 1420],
     ["kamila", 1390], ["rija", 823], ["zikriya", 238], ["haider", 6],
@@ -324,23 +329,47 @@ export async function seedDatabase(prisma: PrismaClient) {
   const anyContact = await prisma.contact.findFirst();
   for (const [key, total] of CALL_AGENTS) {
     const agent = USERS.find((u) => u.email.startsWith(key))?.name ?? key;
-    // create a representative sample (scaled down 1/25) so the DB stays light but ratios hold
     const n = Math.max(1, Math.round(total / 25));
     const rows = Array.from({ length: n }, () => {
-      const r = Math.random();
-      const outcome = r < 0.4 ? "No answer" : r < 0.62 ? "Left voicemail" : r < 0.74 ? "Connected" : r < 0.8 ? "Meeting Booked" : CALL_OUTCOMES[Math.floor(Math.random() * CALL_OUTCOMES.length)];
+      const connected = Math.random() < 0.32; // ~32% connect
+      const outcome = connected
+        ? CONNECTED[Math.random() < 0.25 ? 3 : Math.floor(Math.random() * CONNECTED.length)] // bias to SQL Booked
+        : NOT_CONNECTED[Math.random() < 0.55 ? 0 : Math.floor(Math.random() * NOT_CONNECTED.length)];
       return {
         contactId: anyContact!.id,
         number: "+44 20 7946 0000",
         direction: "outbound",
+        connected,
         outcome,
+        transcript: connected && Math.random() < 0.5 ? TRANSCRIPTS[Math.floor(Math.random() * TRANSCRIPTS.length)] : null,
         agent,
-        durationSec: outcome === "Connected" || outcome === "Meeting Booked" ? 60 + Math.floor(Math.random() * 600) : Math.floor(Math.random() * 30),
+        durationSec: connected ? 60 + Math.floor(Math.random() * 600) : Math.floor(Math.random() * 25),
         createdAt: new Date(Date.now() - Math.floor(Math.random() * 28) * 86400000),
       };
     });
-    // weight count by scaling repeated inserts via createMany batches
     await prisma.callLog.createMany({ data: rows });
+  }
+
+  // ── Tasks for the sales floor ──
+  const TASK_TITLES = [
+    ["Follow up on Carhartt quote", "Follow-up", "High"], ["Send picking list to Proud Vintage", "Email", "High"],
+    ["Call back Menace Vintage", "Call", "Medium"], ["Prep demo for World Vintage", "To-do", "Medium"],
+    ["Chase signed PO from Camden Thrift", "Follow-up", "High"], ["Qualify inbound from Leeds reseller", "Call", "Low"],
+    ["Confirm grade A with buyer", "To-do", "Medium"], ["Book Q3 review with Aimee Campbell", "Meeting", "Low"],
+  ] as const;
+  const aeKeys = ["rija", "kamila", "asjad", "hilmand"];
+  const allDeals = await prisma.deal.findMany({ take: 20 });
+  for (let i = 0; i < TASK_TITLES.length; i++) {
+    const [title, type, priority] = TASK_TITLES[i];
+    const d = allDeals[i % allDeals.length];
+    await prisma.task.create({
+      data: {
+        title, type, priority, done: i % 5 === 0,
+        dueDate: new Date(Date.now() + (i - 2) * 86400000),
+        ownerId: userByKey[aeKeys[i % aeKeys.length]],
+        companyId: d?.companyId, dealId: d?.id,
+      },
+    });
   }
 
   await prisma.activity.createMany({

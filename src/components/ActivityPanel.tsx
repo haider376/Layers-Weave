@@ -21,7 +21,19 @@ const ICONS: Record<string, React.ReactNode> = {
   system: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>,
 };
 
-const CALL_OUTCOMES = ["Connected", "No answer", "Left voicemail", "Meeting Booked", "Not Interested", "Call Back Later"];
+// Two-step disposition (tones map to brand badge colours)
+const CONNECTED_SENT = [
+  { k: "SQL Booked", tone: "go" },
+  { k: "Interested / Follow up", tone: "go" },
+  { k: "Call Back Later", tone: "warn" },
+  { k: "Not Interested", tone: "bad" },
+];
+const NOT_CONNECTED_SENT = [
+  { k: "Left Voicemail", tone: "violet" },
+  { k: "No Answer", tone: "neutral" },
+  { k: "Stopped at Gatekeeper", tone: "warn" },
+  { k: "Wrong Number", tone: "bad" },
+];
 
 function timeAgo(d: Date) {
   const mins = Math.round((Date.now() - d.getTime()) / 60000);
@@ -49,7 +61,8 @@ export default function ActivityPanel({
   const [note, setNote] = useState("");
   const [subject, setSubject] = useState("");
   const [emailBody, setEmailBody] = useState("");
-  const [callOutcome, setCallOutcome] = useState("Connected");
+  const [callConnected, setCallConnected] = useState<boolean | null>(null);
+  const [callSentiment, setCallSentiment] = useState<string | null>(null);
   const [callNotes, setCallNotes] = useState("");
 
   function run(fn: () => Promise<unknown>, after?: () => void, toast?: string) {
@@ -114,13 +127,35 @@ export default function ActivityPanel({
               <a className="dial-btn" href={contact?.phone ? `tel:${contact.phone}` : undefined} onClick={() => showToast(`Dialing ${contact?.phone ?? ""} via Zoom Phone…`)}>
                 <span className="dot" /> Dial {contact?.phone ?? "—"} via Zoom
               </a>
-              <select className="ed" style={{ border: "1px solid var(--line-2)" }} value={callOutcome} onChange={(e) => setCallOutcome(e.target.value)}>
-                {CALL_OUTCOMES.map((o) => <option key={o}>{o}</option>)}
-              </select>
             </div>
-            <textarea className="compose-input" rows={2} placeholder="Call notes…" value={callNotes} onChange={(e) => setCallNotes(e.target.value)} />
+            {/* Step 1 — outcome */}
+            <div className="disp-label">Outcome</div>
+            <div className="disp-step">
+              {([["Connected", true], ["Not connected", false]] as const).map(([lbl, val]) => (
+                <button key={lbl} className={`disp-pill${callConnected === val ? (val ? " on-go" : " on-bad") : ""}`} onClick={() => { setCallConnected(val); setCallSentiment(null); }}>{lbl}</button>
+              ))}
+            </div>
+            {/* Step 2 — sentiment (depends on outcome) */}
+            {callConnected !== null && (
+              <>
+                <div className="disp-label">Disposition</div>
+                <div className="disp-step wrap">
+                  {(callConnected ? CONNECTED_SENT : NOT_CONNECTED_SENT).map((s) => (
+                    <button key={s.k} className={`disp-pill sent ${s.tone}${callSentiment === s.k ? " on" : ""}`} onClick={() => setCallSentiment(s.k)}>{s.k}</button>
+                  ))}
+                </div>
+              </>
+            )}
+            <textarea className="compose-input" style={{ marginTop: 10 }} rows={2} placeholder="Call notes…" value={callNotes} onChange={(e) => setCallNotes(e.target.value)} />
             <div className="compose-actions">
-              <button className="btn primary" disabled={pending || !contact} onClick={() => run(() => logCallAction({ companyId, dealId, contactId: contact!.id, number: contact?.phone ?? "", outcome: callOutcome, notes: callNotes }), () => setCallNotes(""), "Call logged")}>Log call</button>
+              <button className="btn primary" disabled={pending || !contact || callConnected === null || !callSentiment}
+                onClick={() => run(
+                  () => logCallAction({ companyId, dealId, contactId: contact!.id, number: contact?.phone ?? "", connected: callConnected!, sentiment: callSentiment!, notes: callNotes }),
+                  () => { if (callSentiment === "SQL Booked") celebrate("sql"); setCallNotes(""); setCallConnected(null); setCallSentiment(null); },
+                  callSentiment === "SQL Booked" ? undefined : "Call logged",
+                )}>
+                Log call
+              </button>
             </div>
           </>
         )}

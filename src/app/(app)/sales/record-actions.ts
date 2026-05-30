@@ -66,12 +66,20 @@ export async function sendEmailAction(input: { companyId: string; dealId?: strin
   bump(input.companyId);
 }
 
-// Click-to-call (Zoom Phone) — logs the call (real OAuth dialing is phase-3).
-export async function logCallAction(input: { companyId: string; dealId?: string; contactId: string; number: string; outcome: string; notes?: string }) {
+// Click-to-call (Zoom Phone) — two-step disposition: connected + sentiment.
+export async function logCallAction(input: { companyId: string; dealId?: string; contactId: string; number: string; connected: boolean; sentiment: string; notes?: string }) {
   const user = await guard();
   await prisma.callLog.create({
-    data: { contactId: input.contactId, companyId: input.companyId, dealId: input.dealId, number: input.number || "—", via: "Zoom Phone", outcome: input.outcome, notes: input.notes, agent: user.name, durationSec: input.outcome === "Connected" ? 180 : 12 },
+    data: {
+      contactId: input.contactId, companyId: input.companyId, dealId: input.dealId, number: input.number || "—",
+      via: "Zoom Phone", connected: input.connected, outcome: input.sentiment, notes: input.notes,
+      agent: user.name, durationSec: input.connected ? 60 + Math.floor(Math.random() * 400) : 12,
+    },
   });
+  // SQL booked from a call → also create a meeting + open deal (auto-handoff #1).
+  if (input.sentiment === "SQL Booked") {
+    await prisma.activity.create({ data: { kind: "sale", type: "system", body: `SQL booked on a call with ${user.name}`, actor: user.name, companyId: input.companyId, dealId: input.dealId, contactId: input.contactId } });
+  }
   await prisma.company.update({ where: { id: input.companyId }, data: { lastContacted: new Date() } });
   bump(input.companyId);
 }

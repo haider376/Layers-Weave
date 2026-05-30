@@ -264,13 +264,32 @@ CREATE TABLE "CallLog" (
     "number" TEXT NOT NULL,
     "direction" TEXT NOT NULL DEFAULT 'outbound',
     "via" TEXT NOT NULL DEFAULT 'Zoom Phone',
+    "connected" BOOLEAN NOT NULL DEFAULT false,
     "outcome" TEXT,
     "notes" TEXT,
+    "transcript" TEXT,
     "durationSec" INTEGER,
     "agent" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "CallLog_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Task" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'To-do',
+    "priority" TEXT NOT NULL DEFAULT 'Medium',
+    "done" BOOLEAN NOT NULL DEFAULT false,
+    "dueDate" TIMESTAMP(3),
+    "ownerId" TEXT,
+    "companyId" TEXT,
+    "contactId" TEXT,
+    "dealId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
