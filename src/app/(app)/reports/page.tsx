@@ -7,12 +7,12 @@ import PeriodTabs from "./PeriodTabs";
 
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
 const OUTCOME_COLORS: Record<string, string> = {
-  "No answer": "#EDD9A3", "Left voicemail": "#1f9e8f", Connected: "#A0FD3A", "Meeting Booked": "#7F77DD",
-  "Not Interested": "#9C95F2", Busy: "#EF9F27", "Wrong number": "#E24B4A", "Call Back Later": "#566872",
+  "No answer": "#EDD9A3", "Left voicemail": "#1f9e8f", Connected: "#A5EB00", "Meeting Booked": "#6D19FF",
+  "Not Interested": "#A47BFF", Busy: "#EF9F27", "Wrong number": "#E24B4A", "Call Back Later": "#566872",
 };
 const LEAD_COLORS: Record<string, string> = {
-  New: "#1f9e8f", "In Progress": "#9C95F2", "Open Deal": "#EF9F27", "Cool Off": "#E24B4A",
-  "Data Quality": "#7F77DD", "Do Not Contact": "#566872",
+  New: "#1f9e8f", "In Progress": "#A47BFF", "Open Deal": "#EF9F27", "Cool Off": "#E24B4A",
+  "Data Quality": "#6D19FF", "Do Not Contact": "#566872",
 };
 
 function money(n: number) { return "$" + Math.round(n).toLocaleString("en-US"); }

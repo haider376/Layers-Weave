@@ -15,14 +15,22 @@ export default async function SupplyPage() {
   const showMargin = canSeeMargin(user.role);
   const handpickOnly = user.role === "Womenswear";
 
-  const [quotesRaw, raghouses, sourcedRaw] = await Promise.all([
+  const [quotesRaw, raghouses] = await Promise.all([
     prisma.quote.findMany({
       orderBy: { dateStarted: "desc" },
       include: { items: { orderBy: { position: "asc" } }, raghouse: true, bulkDetail: true },
     }),
     prisma.raghouse.findMany({ where: { active: true }, orderBy: { reliability: "desc" } }),
-    prisma.sourcingResponse.findMany({ orderBy: { createdAt: "desc" }, take: 30 }),
   ]);
+
+  // Resilient: if the SourcingResponse table isn't migrated yet on a deployment,
+  // don't blank the whole page — just show no answered demand.
+  let sourcedRaw: Awaited<ReturnType<typeof prisma.sourcingResponse.findMany>> = [];
+  try {
+    sourcedRaw = await prisma.sourcingResponse.findMany({ orderBy: { createdAt: "desc" }, take: 30 });
+  } catch {
+    sourcedRaw = [];
+  }
 
   const responses = sourcedRaw.map((r) => ({
     id: r.id, itemName: r.itemName, quoteRefs: r.quoteRefs, totalQty: r.totalQty, availabilityQty: r.availabilityQty,

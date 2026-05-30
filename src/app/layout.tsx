@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
+import { Anton, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const anton = Anton({ variable: "--font-anton", weight: "400", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "Layers Weave",
@@ -8,15 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${anton.variable}`}>
       <body>{children}</body>
     </html>
   );
