@@ -1,5 +1,20 @@
 import { prisma } from "./db";
 
+// AE (deals won) + BDR (SQLs booked) leaderboards for the sales right-rail.
+export async function salesLeaderboards() {
+  const [deals, meetings] = await Promise.all([
+    prisma.deal.findMany({ where: { stage: "Closed Won" }, include: { owner: true } }),
+    prisma.salesMeeting.findMany({ include: { bdr: true } }),
+  ]);
+  const ae = new Map<string, number>();
+  for (const d of deals) if (d.owner) ae.set(d.owner.name, (ae.get(d.owner.name) ?? 0) + 1);
+  const bdr = new Map<string, number>();
+  for (const m of meetings) if (m.bdr) bdr.set(m.bdr.name, (bdr.get(m.bdr.name) ?? 0) + 1);
+  const top = (m: Map<string, number>, sub: string) =>
+    [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([label, n]) => ({ label, value: String(n), pct: n, sub }));
+  return { aeRows: top(ae, "deals won"), bdrRows: top(bdr, "SQLs booked") };
+}
+
 export type TimelineEvent = {
   id: string;
   kind: "note" | "email" | "call" | "meeting" | "system";

@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import { initials } from "@/components/Logo";
 import Topbar from "@/components/Topbar";
+import { RailPanel, RailLeaderboard } from "@/components/Rail";
+import { salesLeaderboards } from "@/lib/sales";
 
 function statusCls(s: string) {
   if (s === "Open Deal") return "go";
@@ -19,14 +21,19 @@ export default async function CompaniesPage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const companies = await prisma.company.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { owner: true, _count: { select: { deals: true, contacts: true } } },
-  });
+  const [companies, lb] = await Promise.all([
+    prisma.company.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { owner: true, _count: { select: { deals: true, contacts: true } } },
+    }),
+    salesLeaderboards(),
+  ]);
 
   return (
     <>
       <Topbar title="Companies" sub={`${companies.length} accounts across your book of business`} />
+      <div className="with-rail">
+       <div style={{ minWidth: 0 }}>
       <section className="panel">
         <div className="panel-h"><h2>All companies</h2><span className="count">click a row to open</span></div>
         <table>
@@ -53,6 +60,12 @@ export default async function CompaniesPage() {
           </tbody>
         </table>
       </section>
+       </div>
+       <aside className="rail">
+         <RailPanel title="AE leaderboard" hint="deals won"><RailLeaderboard rows={lb.aeRows} avatars /></RailPanel>
+         <RailPanel title="BDR leaderboard" hint="SQLs booked"><RailLeaderboard rows={lb.bdrRows} avatars /></RailPanel>
+       </aside>
+      </div>
     </>
   );
 }

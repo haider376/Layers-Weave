@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import Logo, { initials } from "./Logo";
 import { logoutAction, updateAvatarAction, setViewAsAction } from "@/app/actions/session";
 import { ROLE_LABEL, type Role } from "@/lib/permissions";
+import AvatarCropper from "./AvatarCropper";
+import { showToast } from "./Toast";
 
 type NavItem = { href: string; label: string; icon: React.ReactNode; pill?: number; show: boolean };
 
@@ -25,6 +27,7 @@ export default function Sidebar({
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState(user.avatarUrl);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
 
   async function onViewAs(role: string) {
     await setViewAsAction(role === user.realRole ? null : role);
@@ -83,20 +86,24 @@ export default function Sidebar({
     },
   ];
 
-  async function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
     const reader = new FileReader();
-    reader.onload = async () => {
-      const url = String(reader.result);
-      setAvatar(url);
-      try {
-        await updateAvatarAction(url);
-      } catch {
-        /* ignore in demo */
-      }
-    };
+    reader.onload = () => setCropSrc(String(reader.result)); // open cropper
     reader.readAsDataURL(f);
+    e.target.value = "";
+  }
+
+  async function onCropSave(dataUrl: string) {
+    setAvatar(dataUrl);
+    setCropSrc(null);
+    try {
+      await updateAvatarAction(dataUrl);
+      showToast("Profile photo updated");
+    } catch {
+      showToast("Couldn't save photo");
+    }
   }
 
   const roleLabel = ROLE_LABEL[user.role as Role] ?? user.role;
@@ -188,6 +195,8 @@ export default function Sidebar({
           <div className="rl">{roleLabel}</div>
         </div>
       </div>
+
+      {cropSrc && <AvatarCropper src={cropSrc} onCancel={() => setCropSrc(null)} onSave={onCropSave} />}
     </aside>
   );
 }

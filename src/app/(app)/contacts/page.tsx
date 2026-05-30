@@ -4,21 +4,24 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
+import { RailPanel, RailLeaderboard } from "@/components/Rail";
+import { salesLeaderboards } from "@/lib/sales";
 
 export default async function ContactsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const contacts = await prisma.contact.findMany({
-    orderBy: { name: "asc" },
-    include: { company: true },
-    take: 500,
-  });
+  const [contacts, lb] = await Promise.all([
+    prisma.contact.findMany({ orderBy: { name: "asc" }, include: { company: true }, take: 500 }),
+    salesLeaderboards(),
+  ]);
 
   return (
     <>
       <Topbar title="Contacts" sub={`${contacts.length} people across your accounts`} />
+      <div className="with-rail">
+       <div style={{ minWidth: 0 }}>
       <section className="panel">
         <div className="panel-h"><h2>All contacts</h2><span className="count">click a row to open</span></div>
         <table>
@@ -41,6 +44,12 @@ export default async function ContactsPage() {
           </tbody>
         </table>
       </section>
+       </div>
+       <aside className="rail">
+         <RailPanel title="AE leaderboard" hint="deals won"><RailLeaderboard rows={lb.aeRows} avatars /></RailPanel>
+         <RailPanel title="BDR leaderboard" hint="SQLs booked"><RailLeaderboard rows={lb.bdrRows} avatars /></RailPanel>
+       </aside>
+      </div>
     </>
   );
 }

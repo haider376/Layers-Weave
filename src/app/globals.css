@@ -279,6 +279,36 @@ select.ed option{background:var(--panel-2);color:var(--text)}
 .os-step{display:flex;flex-direction:column;gap:5px}
 .os-k{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700}
 
+/* ── Avatar cropper ──────────────────────────────────────────── */
+.cropper-overlay{position:fixed;inset:0;z-index:130;background:rgba(4,4,6,.78);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .2s ease both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.cropper{background:var(--panel);border:1px solid var(--line-2);border-radius:16px;padding:22px;width:auto;animation:pop .35s cubic-bezier(.18,.89,.32,1.28) both}
+.cropper-h{font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-align:center;margin-bottom:16px}
+.cropper-stage{position:relative;overflow:hidden;border-radius:12px;background:var(--bg);cursor:grab;touch-action:none;margin:0 auto}
+.cropper-stage:active{cursor:grabbing}
+.cropper-ring{position:absolute;inset:0;pointer-events:none;border-radius:12px;box-shadow:0 0 0 9999px rgba(8,8,10,.55) inset}
+.cropper-ring::after{content:'';position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 9999px rgba(8,8,10,.55);border:2px solid var(--neon)}
+.cropper-zoom{display:flex;align-items:center;gap:12px;margin:16px 4px 18px;color:var(--muted);font-size:16px;font-weight:700}
+.cropper-zoom input[type=range]{flex:1;accent-color:var(--neon);height:4px}
+.cropper-actions{display:flex;gap:10px}
+.cropper-actions .btn{flex:1;padding:11px}
+
+/* ── Integrations (phone / email connect) ────────────────────── */
+.integrations{display:flex;gap:8px;position:relative}
+.itg-btn{width:38px;height:38px;border-radius:10px;background:var(--panel);border:1px solid var(--line);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.itg-btn svg{width:17px;height:17px;stroke:currentColor}
+.itg-btn:hover{color:var(--text);border-color:var(--line-2)}
+.itg-btn.on{color:var(--neon);border-color:rgba(160,253,58,.4);background:var(--neon-soft)}
+.itg-pop{position:absolute;top:46px;right:0;width:248px;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:8px;z-index:40;box-shadow:0 24px 60px -24px rgba(0,0,0,.9);animation:rise .18s ease both}
+.itg-h{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:700;padding:6px 8px}
+.itg-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 8px;border-radius:9px;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:.14s}
+.itg-row:hover{background:var(--panel-2)}
+.itg-ic{width:30px;height:30px;border-radius:8px;background:var(--raise);color:var(--text);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.itg-ic.zoom{background:#2D8CFF;color:#fff}.itg-ic.gmail{background:#EA4335;color:#fff}.itg-ic.outlook{background:#0078D4;color:#fff}
+.itg-nm{flex:1;text-align:left;font-size:12.5px;font-weight:600;color:var(--text)}
+.itg-nm small{display:block;color:var(--faint);font-size:10px;font-weight:500;margin-top:1px}
+.itg-cta{font-size:11px;font-weight:700;color:var(--neon-ink);background:var(--neon);border-radius:6px;padding:4px 10px;flex:none}
+
 a{color:inherit}
 
 /* ── v2 aesthetic pass ─────────────────────────────────────── */
