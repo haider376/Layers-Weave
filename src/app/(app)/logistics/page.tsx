@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { canAccessLogistics } from "@/lib/permissions";
+import { canAccessLogistics, canSeeRaghouse } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
 import ShipmentTable, { type Shipment } from "./ShipmentTable";
 
@@ -15,8 +15,10 @@ export default async function LogisticsPage() {
   if (!user) redirect("/login");
   if (!canAccessLogistics(user.role)) redirect("/dashboard");
 
+  const showRag = canSeeRaghouse(user.role);
+
   const fulfilments = await prisma.fulfilment.findMany({
-    include: { quote: true, carrier: true },
+    include: { quote: true, carrier: true, raghouse: true },
     orderBy: { expectedFulfilment: "asc" },
   });
 
@@ -31,6 +33,9 @@ export default async function LogisticsPage() {
     orderStage: f.orderStage,
     statusNote: f.statusNote ?? "",
     eta: fmtDate(f.expectedFulfilment),
+    // Pickup source — only included in the payload for roles allowed to see it.
+    raghouse: showRag ? f.raghouse?.name ?? null : null,
+    lastMileCourier: f.lastMileCourier ?? null,
   }));
 
   return (

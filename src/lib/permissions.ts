@@ -34,9 +34,13 @@ const ADMIN_ROLES: Role[] = ["CRO", "Sales Manager", "AE/QA"];
 // CRO, Sales Manager, Head of Supply, and Rija (AE/QA).
 const MARGIN_ROLES: Role[] = ["CRO", "Sales Manager", "Head of Supply", "AE/QA"];
 
-// §3.5 Raghouse visibility: only Supply (Shahiq), Womenswear (Myra) and CRO
-// (plus the AE/QA admin) can see/set the raghouse source.
-const RAGHOUSE_ROLES: Role[] = ["CRO", "Head of Supply", "Womenswear", "AE/QA"];
+// §3.5 Raghouse visibility: hidden from Sales (AEs/BDRs). Supply (Shahiq),
+// Womenswear (Myra), CRO and the AE/QA admin can see/set it. The Logistics
+// Coordinator also sees the raghouse on the fulfilment record so they can
+// arrange a safe pickup (§3.8 — logistics co-owns fulfilment).
+const RAGHOUSE_ROLES: Role[] = [
+  "CRO", "Head of Supply", "Womenswear", "AE/QA", "Logistics Coordinator",
+];
 
 // Module access for navigation / route guards.
 const SUPPLY_ROLES: Role[] = ["CRO", "Sales Manager", "AE/QA", "Head of Supply", "Womenswear"];

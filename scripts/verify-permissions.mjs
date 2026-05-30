@@ -71,6 +71,7 @@ function check(name, cond) {
   const r2 = await fetchAs("/logistics", users.waris.id);
   check("Logistics coord can load /logistics", r2.status === 200);
   check("Logistics shows auto freight badge (LCL/Air/FCL)", /Air|LCL|FCL/.test(r2.body));
+  check("Logistics coord sees pickup source (raghouse) on shipments", /Pickup source/.test(r2.body) && /Italian Dreams|Imperial|Global Bags|Vintage Wholesale/.test(r2.body));
 }
 // No cookie -> redirect to login
 {

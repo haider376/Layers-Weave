@@ -16,6 +16,8 @@ export type Shipment = {
   orderStage: string;
   statusNote: string;
   eta: string;
+  raghouse: string | null;
+  lastMileCourier: string | null;
 };
 
 // Spec §3.8 order stages
@@ -109,6 +111,33 @@ export default function ShipmentTable({ shipments }: { shipments: Shipment[] }) 
               <tr className={`detail${isOpen ? " open" : ""}`}>
                 <td colSpan={7}>
                   <div className="tl-wrap">
+                    <div className="ship-detail">
+                      <div className="sd-item">
+                        <span className="sd-k">Pickup source</span>
+                        <span className="sd-v">
+                          {s.raghouse ? (
+                            <>
+                              <svg fill="none" strokeWidth={2} viewBox="0 0 24 24" style={{ width: 13, height: 13, stroke: "var(--neon)" }}><path d="M20 7l-8-4-8 4 8 4 8-4z" /><path d="M4 7v10l8 4 8-4V7" /></svg>
+                              {s.raghouse}
+                            </>
+                          ) : (
+                            <span style={{ color: "var(--faint)" }}>hidden</span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="sd-item">
+                        <span className="sd-k">Units</span>
+                        <span className="sd-v">{s.totalUnits.toLocaleString("en-US")}</span>
+                      </div>
+                      <div className="sd-item">
+                        <span className="sd-k">Freight</span>
+                        <span className="sd-v">{s.orderType}</span>
+                      </div>
+                      <div className="sd-item">
+                        <span className="sd-k">Last-mile</span>
+                        <span className="sd-v">{s.lastMileCourier ?? "—"}</span>
+                      </div>
+                    </div>
                     <div className="tl">
                       {STAGES.map((st, i) => {
                         const cls = i < cur ? "ok" : i === cur ? "cur" : "";
