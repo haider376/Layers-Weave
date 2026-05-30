@@ -22,6 +22,7 @@ export default async function LogisticsPage() {
     orderBy: { expectedFulfilment: "asc" },
   });
 
+  const numOrEmpty = (n: number | null) => (n == null ? "" : String(n));
   const shipments: Shipment[] = fulfilments.map((f) => ({
     id: f.id,
     quoteId: f.quote.quoteId,
@@ -35,9 +36,21 @@ export default async function LogisticsPage() {
     eta: fmtDate(f.expectedFulfilment),
     // Pickup source — only included in the payload for roles allowed to see it.
     raghouse: showRag ? f.raghouse?.name ?? null : null,
-    lastMileCourier: f.lastMileCourier ?? null,
+    lastMileCourier: f.lastMileCourier ?? "",
     purchaseOrderUrl: f.purchaseOrderUrl ?? "",
     consigneeAddress: f.consigneeAddress ?? "",
+    awbNo: f.awbNo ?? "",
+    invoiceNo3pl: f.invoiceNo3pl ?? "",
+    layersOrderId: f.layersOrderId ?? "",
+    paymentStatus: f.paymentStatus ?? "",
+    goodsDescription: f.goodsDescription ?? "",
+    boxesBales: numOrEmpty(f.boxesBales),
+    estimateWeight: numOrEmpty(f.estimateWeight),
+    chargeableWeight: numOrEmpty(f.chargeableWeight),
+    totalChargedAmount: numOrEmpty(f.totalChargedAmount),
+    perKgAmount: numOrEmpty(f.perKgAmount),
+    perKgPkr: numOrEmpty(f.perKgPkr),
+    lmTid: f.lmTid ?? "",
   }));
 
   return (

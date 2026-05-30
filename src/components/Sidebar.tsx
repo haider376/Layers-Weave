@@ -42,8 +42,24 @@ export default function Sidebar({
     },
     {
       href: "/sales",
-      label: "Sales",
+      label: "Pipeline",
       pill: salesCount,
+      show: access.sales,
+      icon: (
+        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="13" width="3" height="4" /></svg>
+      ),
+    },
+    {
+      href: "/companies",
+      label: "Companies",
+      show: access.sales,
+      icon: (
+        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-4" /><path d="M9 9v0M9 13v0M9 17v0" /></svg>
+      ),
+    },
+    {
+      href: "/contacts",
+      label: "Contacts",
       show: access.sales,
       icon: (
         <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" /><path d="M4 21v-1a6 6 0 0112 0v1" /></svg>
@@ -98,6 +114,10 @@ export default function Sidebar({
           <Link href="/dashboard" className={pathname === "/dashboard" ? "active" : ""}>
             {items[0].icon}
             Dashboard
+          </Link>
+          <Link href="/reports" className={pathname.startsWith("/reports") ? "active" : ""}>
+            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M18 9l-5 5-3-3-4 4" /></svg>
+            Reports
           </Link>
         </nav>
       </div>

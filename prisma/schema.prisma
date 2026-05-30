@@ -84,6 +84,7 @@ model Contact {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   calls CallLog[]
+  deals Deal[]
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -101,6 +102,8 @@ model Deal {
 
   companyId String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
   ownerId   String?
   owner     User?   @relation("DealOwner", fields: [ownerId], references: [id])
   bdrId     String?
@@ -244,6 +247,17 @@ model Fulfilment {
   totalUnits       Int      @default(0)
   destination      String? // e.g. "London, UK"
   statusNote       String? // e.g. "on schedule", "2 days overdue"
+  // Rich logistics fields (from the ops sheet)
+  awbNo            String?
+  invoiceNo3pl     String?
+  layersOrderId    String?
+  paymentStatus    String? // Paid | Pending | Partial
+  goodsDescription String?
+  boxesBales       Int?
+  totalChargedAmount Float?
+  perKgAmount      Float? // GBP
+  perKgPkr         Float? // PKR
+  lmTid            String?
 
   quoteId String @unique
   quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
@@ -303,19 +317,42 @@ model PriceApproval {
 model Activity {
   id        String   @id @default(cuid())
   kind      String // sale | supply | ship
+  type      String   @default("note") // note | email | call | meeting | stage | system
   body      String
   actor     String?
   quoteRef  String?
+  companyId String?
+  contactId String?
+  dealId    String?
   createdAt DateTime @default(now())
 }
 
 model CallLog {
+  id          String   @id @default(cuid())
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  companyId   String?
+  dealId      String?
+  number      String
+  direction   String   @default("outbound")
+  via         String   @default("Zoom Phone")
+  outcome     String? // Connected | No answer | Left voicemail | Meeting Booked | Not Interested | ...
+  notes       String?
+  durationSec Int?
+  agent       String?
+  createdAt   DateTime @default(now())
+}
+
+model EmailMessage {
   id        String   @id @default(cuid())
-  contactId String
-  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  number    String
-  direction String   @default("outbound")
-  via       String   @default("Zoom Phone")
+  direction String   @default("outbound") // outbound | inbound
+  subject   String
+  body      String
+  fromAddr  String
+  toAddr    String
+  companyId String?
+  contactId String?
+  dealId    String?
   createdAt DateTime @default(now())
 }
 

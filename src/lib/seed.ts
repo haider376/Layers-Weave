@@ -135,6 +135,7 @@ export async function seedDatabase(prisma: PrismaClient) {
 
   const dealByQuoteId: Record<string, string> = {};
   const companyByClient: Record<string, string> = {};
+  const dealRows: { id: string; companyId: string; contactId: string; name: string; stage: string; ownerKey: string }[] = [];
 
   for (const [name, ownerKey, amount, stage, quoteId] of DEALS) {
     const country = COUNTRY_BY_CLIENT[name] ?? "United Kingdom";
@@ -153,12 +154,12 @@ export async function seedDatabase(prisma: PrismaClient) {
       },
     });
     companyByClient[name] = company.id;
-    await prisma.contact.create({
+    const contact = await prisma.contact.create({
       data: {
-        name: `${name.split(" ")[0]} (primary)`,
-        title: "Founder",
+        name: `${name.split(" ")[0]} ${["Buyer", "Director", "Owner"][Math.floor(Math.random() * 3)]}`,
+        title: ["Founder", "Head Buyer", "Owner", "Procurement Lead"][Math.floor(Math.random() * 4)],
         email: `buyer@${company.domain}`,
-        phone: "+44 20 7946 0000",
+        phone: `+44 20 7946 0${String(100 + Math.floor(Math.random() * 900))}`,
         primary: true,
         companyId: company.id,
       },
@@ -170,11 +171,13 @@ export async function seedDatabase(prisma: PrismaClient) {
         stage,
         amount,
         companyId: company.id,
+        contactId: contact.id,
         ownerId: userByKey[ownerKey],
         bdrId: userByKey["huzaifa"],
         closeDate: stage.startsWith("Closed") ? new Date() : null,
       },
     });
+    dealRows.push({ id: deal.id, companyId: company.id, contactId: contact.id, name, stage, ownerKey });
     await prisma.salesMeeting.create({
       data: {
         title: `${name} × Layers`,
@@ -242,11 +245,15 @@ export async function seedDatabase(prisma: PrismaClient) {
     }
   }
 
+  let shipSeq = 70190800;
   for (const s of SHIPS) {
     const quote = await prisma.quote.findUnique({ where: { quoteId: s.quoteId }, include: { items: true } });
     if (!quote) continue;
     const units = quote.items.reduce((sum, i) => sum + i.quantity, 0);
     const orderType = units < 1000 ? "Air" : units <= 5000 ? "LCL" : "FCL";
+    const boxes = Math.max(1, Math.round(units / 120));
+    const weight = Math.round(units * 0.55);
+    const perKg = 4.33;
     await prisma.fulfilment.create({
       data: {
         quoteId: quote.id,
@@ -263,15 +270,87 @@ export async function seedDatabase(prisma: PrismaClient) {
         lastMileCourier: s.lastMile,
         deliveredDate: s.orderStage === "Delivered" ? new Date(s.eta) : null,
         notifiedClient: s.orderStage === "Delivered",
+        awbNo: String(shipSeq++),
+        invoiceNo3pl: `1198${17 + (shipSeq % 90)}`,
+        layersOrderId: quote.quoteId,
+        paymentStatus: s.orderStage === "Delivered" ? "Paid" : Math.random() > 0.5 ? "Paid" : "Pending",
+        goodsDescription: quote.items.map((i) => i.item).join(", "),
+        boxesBales: boxes,
+        estimateWeight: weight,
+        chargeableWeight: weight,
+        totalChargedAmount: Math.round(weight * perKg * 100) / 100,
+        perKgAmount: perKg,
+        perKgPkr: 1625,
+        lmTid: `1Z${Math.random().toString(36).slice(2, 12).toUpperCase()}`,
       },
     });
   }
 
+  // ── Sales activity: emails, calls, notes, meetings threaded to records ──
+  const EMAIL_SUBJECTS = [
+    "Intro — Layers Wholesale sourcing",
+    "Your vintage sourcing quote",
+    "Following up on our call",
+    "Samples & moodboard",
+    "Pricing for your next order",
+  ];
+  const NOTE_BODIES = [
+    "Spoke with buyer — keen on Carhartt + denim, wants A-grade only.",
+    "Budget confirmed for next drop. Sending picking list.",
+    "Asked for video before committing. Following up Friday.",
+    "Great call — booking a follow-up to review samples.",
+    "Price sensitive; negotiating shipping hike down.",
+  ];
+  for (const d of dealRows) {
+    const owner = USERS.find((u) => u.email.startsWith(d.ownerKey))?.name ?? "AE";
+    const daysAgo = (n: number) => new Date(Date.now() - n * 86400000);
+    await prisma.activity.create({
+      data: { kind: "sale", type: "note", body: NOTE_BODIES[Math.floor(Math.random() * NOTE_BODIES.length)], actor: owner, companyId: d.companyId, dealId: d.id, contactId: d.contactId, createdAt: daysAgo(Math.floor(Math.random() * 20) + 1) },
+    });
+    await prisma.emailMessage.create({
+      data: { direction: "outbound", subject: EMAIL_SUBJECTS[Math.floor(Math.random() * EMAIL_SUBJECTS.length)], body: "Hi — great speaking earlier. Here are the details we discussed. Let me know your thoughts and we can lock in the order.\n\nBest,\n" + owner, fromAddr: `${d.ownerKey}@layerswholesale.co`, toAddr: "buyer@client.com", companyId: d.companyId, dealId: d.id, contactId: d.contactId, createdAt: daysAgo(Math.floor(Math.random() * 15) + 1) },
+    });
+    if (Math.random() > 0.4) {
+      await prisma.emailMessage.create({
+        data: { direction: "inbound", subject: "Re: " + EMAIL_SUBJECTS[Math.floor(Math.random() * EMAIL_SUBJECTS.length)], body: "Thanks for this — looks good. Can you confirm lead time and grade before we proceed?", fromAddr: "buyer@client.com", toAddr: `${d.ownerKey}@layerswholesale.co`, companyId: d.companyId, dealId: d.id, contactId: d.contactId, createdAt: daysAgo(Math.floor(Math.random() * 10)) },
+      });
+    }
+  }
+
+  // ── Call logs with outcomes (powers the Call Outcomes report) ──
+  const CALL_OUTCOMES = ["Connected", "No answer", "Left voicemail", "Meeting Booked", "Not Interested", "Busy", "Wrong number", "Call Back Later"];
+  // weight distribution per rep (calls, and skew)
+  const CALL_AGENTS: Array<[string, number]> = [
+    ["huzaifa", 2271], ["fatima", 1840], ["hilmand", 1690], ["asjad", 1420],
+    ["kamila", 1390], ["rija", 823], ["zikriya", 238], ["haider", 6],
+  ];
+  const anyContact = await prisma.contact.findFirst();
+  for (const [key, total] of CALL_AGENTS) {
+    const agent = USERS.find((u) => u.email.startsWith(key))?.name ?? key;
+    // create a representative sample (scaled down 1/25) so the DB stays light but ratios hold
+    const n = Math.max(1, Math.round(total / 25));
+    const rows = Array.from({ length: n }, () => {
+      const r = Math.random();
+      const outcome = r < 0.4 ? "No answer" : r < 0.62 ? "Left voicemail" : r < 0.74 ? "Connected" : r < 0.8 ? "Meeting Booked" : CALL_OUTCOMES[Math.floor(Math.random() * CALL_OUTCOMES.length)];
+      return {
+        contactId: anyContact!.id,
+        number: "+44 20 7946 0000",
+        direction: "outbound",
+        outcome,
+        agent,
+        durationSec: outcome === "Connected" || outcome === "Meeting Booked" ? 60 + Math.floor(Math.random() * 600) : Math.floor(Math.random() * 30),
+        createdAt: new Date(Date.now() - Math.floor(Math.random() * 28) * 86400000),
+      };
+    });
+    // weight count by scaling repeated inserts via createMany batches
+    await prisma.callLog.createMany({ data: rows });
+  }
+
   await prisma.activity.createMany({
     data: [
-      { kind: "sale", body: "Deal won — LQ-48217 closed $18,400", actor: "Rija" },
-      { kind: "supply", body: "LQ-30912 ready — 1,200 pcs graded & listed", actor: "Shahiq" },
-      { kind: "ship", body: "LQ-33915 dispatched via Expost to London", actor: "Waris" },
+      { kind: "sale", type: "system", body: "Deal won — LQ-48217 closed $18,400", actor: "Rija" },
+      { kind: "supply", type: "system", body: "LQ-30912 ready — 1,200 pcs graded & listed", actor: "Shahiq" },
+      { kind: "ship", type: "system", body: "LQ-33915 dispatched via Expost to London", actor: "Waris" },
     ],
   });
 

@@ -71,6 +71,7 @@ CREATE TABLE "Deal" (
     "createDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "closeDate" TIMESTAMP(3),
     "companyId" TEXT NOT NULL,
+    "contactId" TEXT,
     "ownerId" TEXT,
     "bdrId" TEXT,
 
@@ -182,6 +183,16 @@ CREATE TABLE "Fulfilment" (
     "totalUnits" INTEGER NOT NULL DEFAULT 0,
     "destination" TEXT,
     "statusNote" TEXT,
+    "awbNo" TEXT,
+    "invoiceNo3pl" TEXT,
+    "layersOrderId" TEXT,
+    "paymentStatus" TEXT,
+    "goodsDescription" TEXT,
+    "boxesBales" INTEGER,
+    "totalChargedAmount" DOUBLE PRECISION,
+    "perKgAmount" DOUBLE PRECISION,
+    "perKgPkr" DOUBLE PRECISION,
+    "lmTid" TEXT,
     "quoteId" TEXT NOT NULL,
     "raghouseId" TEXT,
     "carrierId" TEXT,
@@ -232,9 +243,13 @@ CREATE TABLE "PriceApproval" (
 CREATE TABLE "Activity" (
     "id" TEXT NOT NULL,
     "kind" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'note',
     "body" TEXT NOT NULL,
     "actor" TEXT,
     "quoteRef" TEXT,
+    "companyId" TEXT,
+    "contactId" TEXT,
+    "dealId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Activity_pkey" PRIMARY KEY ("id")
@@ -244,12 +259,34 @@ CREATE TABLE "Activity" (
 CREATE TABLE "CallLog" (
     "id" TEXT NOT NULL,
     "contactId" TEXT NOT NULL,
+    "companyId" TEXT,
+    "dealId" TEXT,
     "number" TEXT NOT NULL,
     "direction" TEXT NOT NULL DEFAULT 'outbound',
     "via" TEXT NOT NULL DEFAULT 'Zoom Phone',
+    "outcome" TEXT,
+    "notes" TEXT,
+    "durationSec" INTEGER,
+    "agent" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "CallLog_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "EmailMessage" (
+    "id" TEXT NOT NULL,
+    "direction" TEXT NOT NULL DEFAULT 'outbound',
+    "subject" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "fromAddr" TEXT NOT NULL,
+    "toAddr" TEXT NOT NULL,
+    "companyId" TEXT,
+    "contactId" TEXT,
+    "dealId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "EmailMessage_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -301,6 +338,9 @@ ALTER TABLE "Contact" ADD CONSTRAINT "Contact_companyId_fkey" FOREIGN KEY ("comp
 
 -- AddForeignKey
 ALTER TABLE "Deal" ADD CONSTRAINT "Deal_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Deal" ADD CONSTRAINT "Deal_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Deal" ADD CONSTRAINT "Deal_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
