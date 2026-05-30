@@ -318,6 +318,15 @@ select.ed option{background:var(--panel-2);color:var(--text)}
 .note-body{flex:1;font-size:11.5px;line-height:1.4;color:var(--text)}
 .note-at{font-size:10px;color:var(--faint);flex:none;margin-top:1px}
 
+/* Sales quota widget */
+.quota{padding:6px 2px}
+.quota-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.quota-actual{font-family:var(--display);font-weight:900;font-size:26px;color:#fff}
+.quota-pct{font-size:14px;font-weight:800}
+.quota-track{position:relative;height:14px;background:var(--panel-2);border-radius:8px;overflow:hidden}
+.quota-track i{display:block;height:100%;background:linear-gradient(90deg,var(--neon),#7fd62b);border-radius:8px;transform-origin:left;animation:growBar 1s cubic-bezier(.22,.61,.36,1) both}
+.quota-foot{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:10px;font-weight:600}
+
 a{color:inherit}
 
 /* ── v2 aesthetic pass ─────────────────────────────────────── */

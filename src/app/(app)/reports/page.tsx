@@ -81,6 +81,8 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const leaderboard = [...winsByAe.values()].sort((a, b) => b.wins - a.wins).slice(0, 6);
 
   const periodLabel = period === "daily" ? "today" : period === "monthly" ? "this month" : "this week";
+  const quotaGoal = period === "daily" ? 1000 : period === "monthly" ? 30000 : 7000;
+  const quotaPct = Math.round((wonValue / quotaGoal) * 100);
 
   return (
     <>
@@ -142,6 +144,27 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             <StackRow key={r.o} label={r.o} total={r.total} max={leadMax} seg={r.seg} colors={LEAD_COLORS} />
           ))}
           <Legend colors={LEAD_COLORS} />
+        </Panel>
+
+        <Panel title={`Calls by rep`} count={periodLabel}>
+          {callRows.map((r) => (
+            <BarRow key={r.a} label={r.a} value={r.total.toLocaleString("en-US")} pct={(r.total / callMax) * 100} />
+          ))}
+          {callRows.length === 0 && <Empty />}
+        </Panel>
+
+        <Panel title="Sales quota" count={`${periodLabel} · goal $${quotaGoal.toLocaleString("en-US")}`}>
+          <div className="quota">
+            <div className="quota-top">
+              <span className="quota-actual">{money(wonValue)}</span>
+              <span className="quota-pct" style={{ color: quotaPct >= 100 ? "var(--neon)" : "var(--muted)" }}>{quotaPct}%</span>
+            </div>
+            <div className="quota-track"><i style={{ width: `${Math.min(100, quotaPct)}%` }} /><span className="quota-goal-mark" /></div>
+            <div className="quota-foot">
+              <span>{won.length} deals closed</span>
+              <span>{quotaPct >= 100 ? "🎯 Goal smashed" : `${money(Math.max(0, quotaGoal - wonValue))} to goal`}</span>
+            </div>
+          </div>
         </Panel>
       </div>
     </>
