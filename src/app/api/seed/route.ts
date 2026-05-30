@@ -34,15 +34,29 @@ async function ensureSchema() {
 }
 
 export async function GET(req: NextRequest) {
-  const secret = process.env.SEED_SECRET;
-  if (!secret) {
-    return NextResponse.json({ error: "SEED_SECRET not configured" }, { status: 500 });
-  }
-  if (req.nextUrl.searchParams.get("key") !== secret) {
-    return NextResponse.json({ error: "Invalid key" }, { status: 401 });
-  }
   try {
+    // Create the schema first (idempotent, DDL only — safe to run anytime).
     const statementsRun = await ensureSchema();
+
+    // First-run convenience: if the database has no users yet, allow seeding
+    // without a key. Once it has data, a re-seed requires ?key=SEED_SECRET so
+    // nobody can wipe live data.
+    const existing = await prisma.user.count();
+    if (existing > 0) {
+      const secret = process.env.SEED_SECRET;
+      const key = req.nextUrl.searchParams.get("key");
+      if (!secret || key !== secret) {
+        return NextResponse.json(
+          {
+            error:
+              "Database already seeded. To re-seed (this wipes data), set SEED_SECRET in Vercel and call /api/seed?key=YOUR_SEED_SECRET.",
+            users: existing,
+          },
+          { status: 401 },
+        );
+      }
+    }
+
     const result = await seedDatabase(prisma);
     return NextResponse.json({
       ok: true,
