@@ -1,0 +1,326 @@
+// Layers Wholesale CRM — data model (spec §3)
+// SQLite for zero-setup local testing. Enums are stored as strings.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// §6  Users & roles
+// ─────────────────────────────────────────────────────────────
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String // see Role enum in src/lib/permissions.ts
+  title        String
+  avatarUrl    String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  ownedCompanies  Company[] @relation("CompanyOwner")
+  bdrCompanies    Company[] @relation("BdrOwner")
+  ownedDeals      Deal[]    @relation("DealOwner")
+  bdrDeals        Deal[]    @relation("DealBdr")
+  meetingsAsAe    SalesMeeting[] @relation("MeetingAe")
+  meetingsAsBdr   SalesMeeting[] @relation("MeetingBdr")
+  quotesOwned     Quote[]   @relation("QuoteOwner")
+  quotesCollab    Quote[]   @relation("QuoteCollaborator")
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.1  Company (Account)
+// ─────────────────────────────────────────────────────────────
+model Company {
+  id              String   @id @default(cuid())
+  clientId        String   @unique // primary thread key
+  name            String
+  domain          String?
+  type            String? // Retailer | Wholesaler | Reseller
+  tier            String? // A | B | C
+  leadStatus      String   @default("New") // §5
+  outreachStatus  String?
+  isEligible      Boolean  @default(true)
+  email           String?
+  phone           String?
+  country         String?
+  state           String?
+  region          String?
+  timeZone        String?
+  numberEmployees Int?
+  lastContacted   DateTime?
+  aiNotes         String?
+  source          String?
+  createdAt       DateTime @default(now())
+
+  ownerId String?
+  owner   User?   @relation("CompanyOwner", fields: [ownerId], references: [id])
+  bdrId   String?
+  bdr     User?   @relation("BdrOwner", fields: [bdrId], references: [id])
+
+  contacts Contact[]
+  deals    Deal[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.2  Contact
+// ─────────────────────────────────────────────────────────────
+model Contact {
+  id        String  @id @default(cuid())
+  name      String
+  title     String?
+  email     String?
+  phone     String?
+  primary   Boolean @default(false)
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  calls CallLog[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.3  Deal (Sales)
+// ─────────────────────────────────────────────────────────────
+model Deal {
+  id          String    @id @default(cuid())
+  dealId      String    @unique
+  name        String
+  stage       String    @default("Appointment Scheduled") // §4
+  amount      Float     @default(500)
+  requestType String? // Bulk | Handpick (set at Initiation)
+  createDate  DateTime  @default(now())
+  closeDate   DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ownerId   String?
+  owner     User?   @relation("DealOwner", fields: [ownerId], references: [id])
+  bdrId     String?
+  bdr       User?   @relation("DealBdr", fields: [bdrId], references: [id])
+
+  meetings SalesMeeting[]
+  quotes   Quote[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.4  Sales Meeting
+// ─────────────────────────────────────────────────────────────
+model SalesMeeting {
+  id            String   @id @default(cuid())
+  title         String
+  status        String   @default("Booked") // Booked | Showed up | No Show | Unqualified
+  outcome       String? // Requested a Quote | Picking List Sent | No Show
+  meetingDate   DateTime?
+  bookedDate    DateTime @default(now())
+  googleMeetUrl String?
+  callRecording String?
+  whatsapp      Boolean  @default(false)
+  followUp      Boolean  @default(false)
+  moodboardUrl  String?
+  categories    String? // comma-separated
+  notes         String?
+  surgeSqm      Boolean  @default(false)
+
+  dealId String
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  aeId   String?
+  ae     User?  @relation("MeetingAe", fields: [aeId], references: [id])
+  bdrId  String?
+  bdr    User?  @relation("MeetingBdr", fields: [bdrId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.5  Quote (master tracker)
+// ─────────────────────────────────────────────────────────────
+model Quote {
+  id            String   @id @default(cuid())
+  quoteId       String   @unique // LQ-##### supplier-facing identity
+  type          String   @default("Bulk") // Bulk | Handpick
+  status        String   @default("In Progress")
+  priority      String   @default("Medium")
+  category      String?
+  quoteDocUrl   String?
+  invoiceUrl    String?
+  representativeImage String?
+  clientCountry String?
+  orderVideos   Boolean  @default(false)
+  dateStarted   DateTime @default(now())
+
+  // 🔒 margin-controlled (server-enforced — see src/lib/permissions.ts)
+  sellingPriceTotal Float?
+  buyingPriceTotal  Float?
+
+  dealId String?
+  deal   Deal?   @relation(fields: [dealId], references: [id])
+  // client name resolves via deal->company; cached here for convenience
+  clientName String
+
+  ownerId String?
+  owner   User?   @relation("QuoteOwner", fields: [ownerId], references: [id])
+  collaboratorId String?
+  collaborator   User? @relation("QuoteCollaborator", fields: [collaboratorId], references: [id])
+
+  // 🔒 raghouse hidden from Sales (server-enforced)
+  raghouseId String?
+  raghouse   Raghouse? @relation(fields: [raghouseId], references: [id])
+
+  items       QuoteLineItem[]
+  bulkDetail  BulkDetail?
+  handpickDetail HandpickDetail?
+  fulfilment  Fulfilment?
+  approvals   PriceApproval[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.5a  Quote line item
+// ─────────────────────────────────────────────────────────────
+model QuoteLineItem {
+  id          String @id @default(cuid())
+  item        String @default("")
+  quantity    Int    @default(0) // required
+  targetPrice Float  @default(0) // client target price/item — required
+  position    Int    @default(0)
+
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.6  Bulk / Vintage detail
+// ─────────────────────────────────────────────────────────────
+model BulkDetail {
+  id            String  @id @default(cuid())
+  grade         String  @default("A") // A | B
+  whatHowMuch   String?
+  videoRequired Boolean @default(false)
+
+  quoteId String @unique
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.7  Handpick detail
+// ─────────────────────────────────────────────────────────────
+model HandpickDetail {
+  id           String  @id @default(cuid())
+  moodboardUrl String?
+  wishlist     String?
+  budget       Float?
+  status       String  @default("Curating") // Curating | Confirmed | Done | Cancelled
+
+  quoteId String @unique
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.8  Fulfilment (Logistics)
+// ─────────────────────────────────────────────────────────────
+model Fulfilment {
+  id               String   @id @default(cuid())
+  orderStage       String   @default("Preparing") // Preparing → Under Quality Check → Partially Closed → Handed Over → Delivered
+  orderType        String   @default("Air") // Air | LCL | FCL — auto-derived
+  consigneeAddress String?
+  fromCity         String?
+  flightDay        DateTime?
+  shippingPaidByClient Boolean @default(false)
+  paidPartially    Boolean  @default(false)
+  paidFully        Boolean  @default(false)
+  purchaseOrderUrl String?
+  expectedFulfilment DateTime?
+  estimateWeight   Float?
+  chargeableWeight Float?
+  bolNumber        String?
+  lastMileCourier  String? // DPD | UPS | Van Delivery
+  deliveredDate    DateTime?
+  notifiedClient   Boolean  @default(false)
+  totalUnits       Int      @default(0)
+  destination      String? // e.g. "London, UK"
+  statusNote       String? // e.g. "on schedule", "2 days overdue"
+
+  quoteId String @unique
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  raghouseId String?
+  raghouse   Raghouse? @relation(fields: [raghouseId], references: [id])
+  carrierId  String?
+  carrier    Carrier?  @relation(fields: [carrierId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// §3.9  Reference tables
+// ─────────────────────────────────────────────────────────────
+model Raghouse {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  region      String?
+  reliability Int?
+  active      Boolean @default(true)
+
+  quotes      Quote[]
+  fulfilments Fulfilment[]
+}
+
+model Carrier {
+  id      String  @id @default(cuid())
+  name    String  @unique
+  mode    String? // 3PL | Last mile
+  onTime  Int?
+  active  Boolean @default(true)
+
+  fulfilments Fulfilment[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// §7  Price approval (5% tier → CRO approval)
+// ─────────────────────────────────────────────────────────────
+model PriceApproval {
+  id          String   @id @default(cuid())
+  markup      Int
+  buyingPrice Float
+  quantity    Int
+  shippingCost Float
+  shippingHike Int
+  clientTotal Float
+  status      String   @default("Pending") // Pending | Approved | Rejected
+  requestedBy String
+  createdAt   DateTime @default(now())
+
+  quoteId String?
+  quote   Quote?  @relation(fields: [quoteId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cross-team activity feed + call logs + notifications
+// ─────────────────────────────────────────────────────────────
+model Activity {
+  id        String   @id @default(cuid())
+  kind      String // sale | supply | ship
+  body      String
+  actor     String?
+  quoteRef  String?
+  createdAt DateTime @default(now())
+}
+
+model CallLog {
+  id        String   @id @default(cuid())
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  number    String
+  direction String   @default("outbound")
+  via       String   @default("Zoom Phone")
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  audience  String // Supply | Logistics | Client | All
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
