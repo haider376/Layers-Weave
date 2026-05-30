@@ -16,9 +16,16 @@ export default async function DealDetail({ params }: { params: Promise<{ id: str
 
   const deal = await prisma.deal.findUnique({
     where: { id },
-    include: { company: { include: { contacts: true } }, contact: true, owner: true, quotes: true },
+    include: {
+      company: { include: { contacts: true } },
+      contact: true,
+      owner: true,
+      quotes: { include: { bulkDetail: true, fulfilment: { include: { carrier: true } }, items: true } },
+    },
   });
   if (!deal) notFound();
+
+  function fmt(d: Date | null | undefined) { return d ? d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"; }
 
   const events = await getTimeline({ dealId: id });
 
@@ -49,14 +56,30 @@ export default async function DealDetail({ params }: { params: Promise<{ id: str
           </section>
           {deal.quotes.length > 0 && (
             <section className="panel">
-              <div className="panel-h"><h2>Quotes</h2></div>
-              <div style={{ padding: "6px 0" }}>
-                {deal.quotes.map((q) => (
-                  <div className="mini-row" key={q.id}>
-                    <span className="q-id">{q.quoteId}</span>
-                    <span style={{ flex: 1, marginLeft: 8 }}>{q.type}<small>{q.status}</small></span>
-                  </div>
-                ))}
+              <div className="panel-h"><h2>Supply &amp; Logistics status</h2><span className="count">for your client updates</span></div>
+              <div style={{ padding: "8px 0" }}>
+                {deal.quotes.map((q) => {
+                  const units = q.items.reduce((s, i) => s + i.quantity, 0);
+                  const f = q.fulfilment;
+                  return (
+                    <div key={q.id} className="order-status">
+                      <div className="os-head">
+                        <span className="q-id">{q.quoteId}</span>
+                        <span className="q-type">{q.type}</span>
+                        {q.bulkDetail?.grade && <span className="grade">Grade {q.bulkDetail.grade}</span>}
+                        <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--faint)" }}>{units.toLocaleString("en-US")} units</span>
+                      </div>
+                      <div className="os-track">
+                        <div className="os-step"><span className="os-k">Supply</span><span className={`st ${q.status === "Delivered" || q.status === "Closed/Won" ? "go" : "work"}`}><span className="d" />{q.status}</span></div>
+                        <div className="os-step"><span className="os-k">Freight</span><span className="grade">{f?.orderType ?? "—"}</span></div>
+                        <div className="os-step"><span className="os-k">Logistics</span>{f ? <span className={`st ${f.orderStage === "Delivered" ? "go" : "work"}`}><span className="d" />{f.orderStage}</span> : <span style={{ color: "var(--faint)", fontSize: 11 }}>not started</span>}</div>
+                        <div className="os-step"><span className="os-k">ETA</span><span style={{ fontSize: 11.5, fontWeight: 600 }}>{fmt(f?.expectedFulfilment)}</span></div>
+                        <div className="os-step"><span className="os-k">Carrier</span><span style={{ fontSize: 11.5 }}>{f?.carrier?.name ?? "—"}</span></div>
+                        <div className="os-step"><span className="os-k">Destination</span><span style={{ fontSize: 11.5 }}>{f?.destination ?? "—"}</span></div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </section>
           )}

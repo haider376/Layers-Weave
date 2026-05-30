@@ -15,13 +15,21 @@ export default async function SupplyPage() {
   const showMargin = canSeeMargin(user.role);
   const handpickOnly = user.role === "Womenswear";
 
-  const [quotesRaw, raghouses] = await Promise.all([
+  const [quotesRaw, raghouses, sourcedRaw] = await Promise.all([
     prisma.quote.findMany({
       orderBy: { dateStarted: "desc" },
       include: { items: { orderBy: { position: "asc" } }, raghouse: true, bulkDetail: true },
     }),
     prisma.raghouse.findMany({ where: { active: true }, orderBy: { reliability: "desc" } }),
+    prisma.sourcingResponse.findMany({ orderBy: { createdAt: "desc" }, take: 30 }),
   ]);
+
+  const responses = sourcedRaw.map((r) => ({
+    id: r.id, itemName: r.itemName, quoteRefs: r.quoteRefs, totalQty: r.totalQty, availabilityQty: r.availabilityQty,
+    buyingPricePerItem: showMargin ? r.buyingPricePerItem : null,
+    grade: r.grade, mixSpecs: r.mixSpecs, salesMessage: r.salesMessage, status: r.status,
+    createdBy: r.createdBy, createdAt: r.createdAt.toISOString(),
+  }));
 
   const quotes: SupplyQuote[] = quotesRaw.map((q) => ({
     quoteId: q.quoteId,
@@ -65,6 +73,7 @@ export default async function SupplyPage() {
             canMargin={showMargin}
             roleName={user.name.split(" ")[0]}
             handpickOnlyDemand={handpickOnly}
+            responses={responses}
           />
         </div>
         <aside className="rail">

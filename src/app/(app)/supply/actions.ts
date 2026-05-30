@@ -82,6 +82,63 @@ export async function removeLineItemAction(lineItemId: string) {
   revalidatePath("/supply");
 }
 
+// Shahiq answers consolidated demand: sources an item, records the supplier
+// buying price (margin-walled) + grade + specs, and notifies Sales with the
+// info they need to negotiate — WITHOUT exposing the buying price.
+export async function answerDemandAction(input: {
+  itemName: string;
+  quoteRefs: string[];
+  totalQty: number;
+  availabilityQty: number;
+  buyingPricePerItem: number;
+  grade: string;
+  mixSpecs: string;
+  salesMessage: string;
+  raghouseId?: string;
+}) {
+  const user = await guard();
+  const resp = await prisma.sourcingResponse.create({
+    data: {
+      itemName: input.itemName,
+      quoteRefs: input.quoteRefs.join(","),
+      totalQty: input.totalQty,
+      availabilityQty: input.availabilityQty || input.totalQty,
+      buyingPricePerItem: input.buyingPricePerItem || null,
+      grade: input.grade || null,
+      mixSpecs: input.mixSpecs || null,
+      salesMessage: input.salesMessage || null,
+      raghouseId: input.raghouseId || null,
+      createdBy: user.name,
+    },
+  });
+
+  // Thread a sales-safe activity onto every deal behind the covered quotes.
+  const quotes = await prisma.quote.findMany({
+    where: { quoteId: { in: input.quoteRefs } },
+    include: { deal: true },
+  });
+  const salesBody =
+    `Supply sourced ${input.itemName}` +
+    (input.grade ? ` · Grade ${input.grade}` : "") +
+    ` · ${(input.availabilityQty || input.totalQty).toLocaleString("en-US")} available` +
+    (input.mixSpecs ? ` · ${input.mixSpecs}` : "") +
+    ". Ready to negotiate with the client.";
+  for (const q of quotes) {
+    await prisma.activity.create({
+      data: {
+        kind: "supply", type: "system", body: salesBody, actor: user.name,
+        companyId: q.deal?.companyId, dealId: q.dealId, quoteRef: q.quoteId,
+      },
+    });
+  }
+  await prisma.notification.create({
+    data: { audience: "Sales", body: `${input.itemName} sourced for ${input.quoteRefs.join(", ")} — negotiate now` },
+  });
+  revalidatePath("/supply");
+  revalidatePath("/dashboard");
+  return { id: resp.id };
+}
+
 export async function addQuoteAction() {
   const user = await guard();
   const quoteId = await generateQuoteId();

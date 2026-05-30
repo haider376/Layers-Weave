@@ -271,6 +271,26 @@ CREATE TABLE "CallLog" (
 );
 
 -- CreateTable
+CREATE TABLE "SourcingResponse" (
+    "id" TEXT NOT NULL,
+    "itemName" TEXT NOT NULL,
+    "quoteRefs" TEXT NOT NULL,
+    "totalQty" INTEGER NOT NULL DEFAULT 0,
+    "availabilityQty" INTEGER NOT NULL DEFAULT 0,
+    "buyingPricePerItem" DOUBLE PRECISION,
+    "grade" TEXT,
+    "mixSpecs" TEXT,
+    "salesMessage" TEXT,
+    "notes" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'Sourced',
+    "raghouseId" TEXT,
+    "createdBy" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "SourcingResponse_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "EmailMessage" (
     "id" TEXT NOT NULL,
     "direction" TEXT NOT NULL DEFAULT 'outbound',

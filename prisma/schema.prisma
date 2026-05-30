@@ -343,6 +343,25 @@ model CallLog {
   createdAt   DateTime @default(now())
 }
 
+// Supply's answer to consolidated demand — Shahiq sources an item from a
+// raghouse and notifies Sales so they can negotiate with the client.
+model SourcingResponse {
+  id                String   @id @default(cuid())
+  itemName          String
+  quoteRefs         String // csv of Quote IDs this covers
+  totalQty          Int      @default(0)
+  availabilityQty   Int      @default(0)
+  buyingPricePerItem Float? // 🔒 margin-walled
+  grade             String? // A | B
+  mixSpecs          String? // mix / composition specs for sales
+  salesMessage      String? // note pushed to the sales team
+  notes             String?
+  status            String   @default("Sourced") // Sourced | Negotiating | Confirmed
+  raghouseId        String?
+  createdBy         String?
+  createdAt         DateTime @default(now())
+}
+
 model EmailMessage {
   id        String   @id @default(cuid())
   direction String   @default("outbound") // outbound | inbound
