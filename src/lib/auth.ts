@@ -5,11 +5,19 @@ import { prisma } from "./db";
 
 const COOKIE = "lw_session";
 const SECRET = process.env.SESSION_SECRET || "dev-secret";
-// One or more allowed domains, comma-separated (e.g. "layerswholesale.co,layerswholesale.com").
-const ALLOWED_DOMAINS = (process.env.ALLOWED_EMAIL_DOMAIN || "layerswholesale.co")
-  .split(",")
-  .map((d) => d.trim().toLowerCase())
-  .filter(Boolean);
+// The company's own domains are ALWAYS allowed, so a stale ALLOWED_EMAIL_DOMAIN
+// env var can never lock the real team out. Extra domains can be added via the
+// env var (comma-separated).
+const ALWAYS_ALLOWED = ["layerswholesale.co", "layerswholesale.com"];
+const ALLOWED_DOMAINS = Array.from(
+  new Set([
+    ...ALWAYS_ALLOWED,
+    ...(process.env.ALLOWED_EMAIL_DOMAIN || "")
+      .split(",")
+      .map((d) => d.trim().toLowerCase())
+      .filter(Boolean),
+  ]),
+);
 
 export function emailDomainAllowed(email: string): boolean {
   const at = email.trim().toLowerCase().split("@");
