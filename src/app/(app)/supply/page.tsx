@@ -45,6 +45,8 @@ export default async function SupplyPage() {
         canRag={showRag}
         canMargin={showMargin}
         roleName={user.name.split(" ")[0]}
+        // Womenswear (Myra) negotiates handpick sourcing — only her demand is shown.
+        handpickOnlyDemand={user.role === "Womenswear"}
       />
     </>
   );

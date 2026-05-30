@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { canSeeMargin } from "@/lib/permissions";
-import { randomQuoteIdSync } from "@/lib/quoteId";
 import Topbar from "@/components/Topbar";
 import Calculator from "./Calculator";
 
@@ -16,11 +15,8 @@ export default async function CalculatorPage({
 
   return (
     <>
-      <Topbar title="Price Calculator" sub="Price a quote with protected margin" />
-      <Calculator
-        quoteId={quote ?? randomQuoteIdSync()}
-        canMargin={canSeeMargin(user.role)}
-      />
+      <Topbar title="Price Calculator" sub="General pricing with protected margin — optionally attach to a quote" />
+      <Calculator quoteId={quote ?? null} canMargin={canSeeMargin(user.role)} />
     </>
   );
 }

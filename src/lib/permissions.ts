@@ -49,6 +49,18 @@ const SALES_ROLES: Role[] = [
   "CRO", "Sales Manager", "AE/QA", "AE", "AE (Probation)", "BDR", "Lead Gen/CRM",
 ];
 
+// Roles an admin can preview via "View as" (one representative per access level).
+export const VIEWABLE_ROLES: Role[] = [
+  "CRO",
+  "Sales Manager",
+  "AE",
+  "BDR",
+  "Head of Supply",
+  "Womenswear",
+  "Logistics Coordinator",
+  "Lead Gen/CRM",
+];
+
 export function isAdmin(role: string): boolean {
   return ADMIN_ROLES.includes(role as Role);
 }

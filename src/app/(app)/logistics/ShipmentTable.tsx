@@ -3,7 +3,7 @@
 import { Fragment, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
-import { setOrderStageAction } from "./actions";
+import { setOrderStageAction, setFulfilmentFieldAction } from "./actions";
 
 export type Shipment = {
   id: string;
@@ -18,6 +18,8 @@ export type Shipment = {
   eta: string;
   raghouse: string | null;
   lastMileCourier: string | null;
+  purchaseOrderUrl: string;
+  consigneeAddress: string;
 };
 
 // Spec §3.8 order stages
@@ -59,6 +61,18 @@ export default function ShipmentTable({ shipments }: { shipments: Shipment[] }) 
         router.refresh();
       } catch {
         showToast("Update failed");
+      }
+    });
+  }
+
+  function saveField(s: Shipment, field: "purchaseOrderUrl" | "consigneeAddress", value: string) {
+    startTransition(async () => {
+      try {
+        await setFulfilmentFieldAction(s.id, field, value);
+        showToast("Saved");
+        router.refresh();
+      } catch {
+        showToast("Save failed");
       }
     });
   }
@@ -136,6 +150,34 @@ export default function ShipmentTable({ shipments }: { shipments: Shipment[] }) 
                       <div className="sd-item">
                         <span className="sd-k">Last-mile</span>
                         <span className="sd-v">{s.lastMileCourier ?? "—"}</span>
+                      </div>
+                      <div className="sd-item" style={{ minWidth: 220 }}>
+                        <span className="sd-k">Purchase order (Supply)</span>
+                        <input
+                          className="ed"
+                          style={{ border: "1px solid var(--line-2)", minWidth: 200 }}
+                          defaultValue={s.purchaseOrderUrl}
+                          placeholder="PO number or document URL"
+                          onClick={(e) => e.stopPropagation()}
+                          onBlur={(e) =>
+                            e.target.value !== s.purchaseOrderUrl &&
+                            saveField(s, "purchaseOrderUrl", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="sd-item" style={{ minWidth: 220 }}>
+                        <span className="sd-k">Consignee address</span>
+                        <input
+                          className="ed"
+                          style={{ border: "1px solid var(--line-2)", minWidth: 200 }}
+                          defaultValue={s.consigneeAddress}
+                          placeholder="Delivery address"
+                          onClick={(e) => e.stopPropagation()}
+                          onBlur={(e) =>
+                            e.target.value !== s.consigneeAddress &&
+                            saveField(s, "consigneeAddress", e.target.value)
+                          }
+                        />
                       </div>
                     </div>
                     <div className="tl">

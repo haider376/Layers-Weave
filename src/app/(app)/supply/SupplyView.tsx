@@ -38,12 +38,14 @@ export default function SupplyView({
   canRag,
   canMargin,
   roleName,
+  handpickOnlyDemand = false,
 }: {
   quotes: SupplyQuote[];
   raghouses: { id: string; name: string }[];
   canRag: boolean;
   canMargin: boolean;
   roleName: string;
+  handpickOnlyDemand?: boolean;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -66,7 +68,8 @@ export default function SupplyView({
 
   const demand = useMemo(() => {
     const map = new Map<string, { name: string; total: number; refs: { id: string; qty: number }[]; tsum: number; tn: number }>();
-    for (const q of quotes) {
+    const source = handpickOnlyDemand ? quotes.filter((q) => q.type === "Handpick") : quotes;
+    for (const q of source) {
       for (const it of q.items) {
         const key = (it.item || "").trim().toLowerCase();
         if (!key || !it.quantity) continue;
@@ -81,7 +84,7 @@ export default function SupplyView({
       }
     }
     return [...map.values()].sort((a, b) => b.refs.length - a.refs.length || b.total - a.total);
-  }, [quotes]);
+  }, [quotes, handpickOnlyDemand]);
 
   return (
     <>
@@ -231,8 +234,12 @@ export default function SupplyView({
       {preview !== "sales" && (
         <section className="panel">
           <div className="panel-h">
-            <h2>Consolidated demand</h2>
-            <span className="count">grouped by item — negotiate multiple orders at once</span>
+            <h2>{handpickOnlyDemand ? "Handpick demand" : "Consolidated demand"}</h2>
+            <span className="count">
+              {handpickOnlyDemand
+                ? "handpick items only — your sourcing"
+                : "grouped by item — negotiate multiple orders at once"}
+            </span>
           </div>
           <div>
             {demand.map((m) => {

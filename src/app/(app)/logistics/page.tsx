@@ -36,6 +36,8 @@ export default async function LogisticsPage() {
     // Pickup source — only included in the payload for roles allowed to see it.
     raghouse: showRag ? f.raghouse?.name ?? null : null,
     lastMileCourier: f.lastMileCourier ?? null,
+    purchaseOrderUrl: f.purchaseOrderUrl ?? "",
+    consigneeAddress: f.consigneeAddress ?? "",
   }));
 
   return (

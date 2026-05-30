@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Logo, { initials } from "./Logo";
-import { logoutAction, updateAvatarAction } from "@/app/actions/session";
+import { logoutAction, updateAvatarAction, setViewAsAction } from "@/app/actions/session";
 import { ROLE_LABEL, type Role } from "@/lib/permissions";
 
 type NavItem = { href: string; label: string; icon: React.ReactNode; pill?: number; show: boolean };
@@ -13,14 +14,22 @@ export default function Sidebar({
   user,
   salesCount,
   access,
+  viewableRoles,
 }: {
-  user: { name: string; role: string; avatarUrl: string | null };
+  user: { name: string; role: string; realRole: string; isAdmin: boolean; viewingAs: string | null; avatarUrl: string | null };
   salesCount: number;
   access: { sales: boolean; supply: boolean; logistics: boolean };
+  viewableRoles: { value: string; label: string }[];
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState(user.avatarUrl);
+
+  async function onViewAs(role: string) {
+    await setViewAsAction(role === user.realRole ? null : role);
+    router.refresh();
+  }
 
   const items: NavItem[] = [
     {
@@ -123,6 +132,23 @@ export default function Sidebar({
           </button>
         </nav>
       </div>
+
+      {user.isAdmin && (
+        <div>
+          <div className="nav-label">View as</div>
+          <select
+            className="viewas-select"
+            value={user.viewingAs ?? user.realRole}
+            onChange={(e) => onViewAs(e.target.value)}
+          >
+            {viewableRoles.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.value === user.realRole ? `${r.label} (you)` : r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="side-foot">
         <label

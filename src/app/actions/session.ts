@@ -1,8 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { destroySession, requireUser } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+import { destroySession, requireUser, setViewAs } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+
+export async function setViewAsAction(role: string | null) {
+  await setViewAs(role);
+  revalidatePath("/", "layout");
+}
 
 export async function logoutAction() {
   await destroySession();

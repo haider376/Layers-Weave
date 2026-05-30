@@ -16,7 +16,7 @@ const MARKUPS = [
 ];
 const HIKES = [5, 10, 15];
 
-export default function Calculator({ quoteId, canMargin }: { quoteId: string; canMargin: boolean }) {
+export default function Calculator({ quoteId, canMargin }: { quoteId: string | null; canMargin: boolean }) {
   const [buy, setBuy] = useState(10);
   const [qty, setQty] = useState(100);
   const [ship, setShip] = useState(120);
@@ -43,7 +43,7 @@ export default function Calculator({ quoteId, canMargin }: { quoteId: string; ca
           shippingHike: sh,
         });
         if (r.approval) showToast("Approval request sent to CRO");
-        else showToast(r.saved ? `Saved to quote ${quoteId}` : "Calculated (no quote linked)");
+        else showToast(r.saved ? `Saved to quote ${quoteId}` : "Estimate calculated");
       } catch {
         showToast("Save failed");
       }
@@ -121,7 +121,9 @@ export default function Calculator({ quoteId, canMargin }: { quoteId: string; ca
       </div>
 
       <div className="sum">
-        <div className="sum-h">Quote summary · <span style={{ color: "var(--violet-br)" }}>{quoteId}</span></div>
+        <div className="sum-h">
+          {quoteId ? <>Quote summary · <span style={{ color: "var(--violet-br)" }}>{quoteId}</span></> : "General estimate"}
+        </div>
         <div className="lines">
           <div className="ln"><span className="k">Selling / item <small>(+{mk}%)</small></span><span className="v">{money(sell)}</span></div>
           <div className="ln"><span className="k">Items subtotal <small>× {qty.toLocaleString("en-US")}</small></span><span className="v">{money(itemsub)}</span></div>
@@ -139,7 +141,7 @@ export default function Calculator({ quoteId, canMargin }: { quoteId: string; ca
       <div className="cact">
         <button className="btn ghost" onClick={reset} disabled={pending}>Reset</button>
         <button className="btn primary" onClick={save} disabled={pending}>
-          {locked ? "Request CRO approval" : "Save to quote"}
+          {locked ? "Request CRO approval" : quoteId ? "Save to quote" : "Save estimate"}
         </button>
       </div>
 
