@@ -14,6 +14,7 @@ PP Monument Extended).
 You need a Postgres database. The repo ships a `docker-compose.yml` for one:
 
 ```bash
+cp .env.example .env   # local dev config (localhost Postgres + dev secrets)
 docker compose up -d   # Postgres on localhost:5432 (matches .env)
 npm install
 npm run setup          # prisma generate + db push + seed demo data

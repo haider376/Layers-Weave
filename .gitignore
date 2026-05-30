@@ -23,6 +23,6 @@ next-env.d.ts
 /prisma/dev.db
 /prisma/dev.db-journal
 
-# env (kept committed here so the app runs out-of-the-box for testing;
-# remove this exception and rotate secrets for any real deployment)
-# .env
+# env — never commit; Vercel/hosting injects these. Use .env.example locally.
+.env
+.env*.local
