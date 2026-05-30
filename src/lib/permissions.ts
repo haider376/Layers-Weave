@@ -80,6 +80,15 @@ export function canAccessLogistics(role: string): boolean {
   return LOGISTICS_ROLES.includes(role as Role);
 }
 
+// Which notification audiences a role should see.
+export function audiencesFor(role: string): string[] {
+  const base = ["All"];
+  if (isAdmin(role)) return ["All", "Sales", "Supply", "Logistics", "Client"];
+  if (canAccessSupply(role) && (role === "Head of Supply" || role === "Womenswear")) return [...base, "Supply"];
+  if (role === "Logistics Coordinator") return [...base, "Logistics"];
+  return [...base, "Sales"]; // AEs, BDRs, lead gen
+}
+
 // §7 Pricing authority — who can approve a sub-floor (5%) markup.
 export function canApprovePricing(role: string): boolean {
   return role === "CRO" || role === "AE/QA";
