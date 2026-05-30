@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import { initials } from "@/components/Logo";
@@ -18,7 +18,7 @@ export default async function CallsPage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const calls = await prisma.callLog.findMany({ take: 6000, orderBy: { createdAt: "desc" } });
+  const calls = await safe(prisma.callLog.findMany({ take: 6000, orderBy: { createdAt: "desc" } }), []);
   const total = calls.length;
   const connected = calls.filter((c) => c.connected).length;
   const sqls = calls.filter((c) => c.outcome === "SQL Booked").length;

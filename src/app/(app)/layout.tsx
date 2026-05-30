@@ -7,6 +7,7 @@ import Toaster from "@/components/Toast";
 import Celebration from "@/components/Celebration";
 import PageTransition from "@/components/PageTransition";
 import DealDrawer from "@/components/DealDrawer";
+import PreferencesInit from "@/components/PreferencesInit";
 import { Suspense } from "react";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -54,6 +55,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <Toaster />
       <Celebration />
       <Suspense fallback={null}><DealDrawer /></Suspense>
+      <PreferencesInit />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { canAccessSales, canReassignOwner } from "@/lib/permissions";
 import { automationBookMeeting } from "@/lib/automations";
@@ -129,7 +129,7 @@ export async function getDealDrawerAction(id: string) {
   if (!d) return null;
   const [activities, calls, emails] = await Promise.all([
     prisma.activity.findMany({ where: { dealId: id }, orderBy: { createdAt: "desc" }, take: 6 }),
-    prisma.callLog.findMany({ where: { dealId: id }, orderBy: { createdAt: "desc" }, take: 4 }),
+    safe(prisma.callLog.findMany({ where: { dealId: id }, orderBy: { createdAt: "desc" }, take: 4 }), []),
     prisma.emailMessage.findMany({ where: { dealId: id }, orderBy: { createdAt: "desc" }, take: 4 }),
   ]);
   const events = [
@@ -143,6 +143,47 @@ export async function getDealDrawerAction(id: string) {
     requestType: d.requestType ?? "", company: { id: d.companyId, name: d.company.name },
     contact: d.contact ? { id: d.contact.id, name: d.contact.name } : null,
     owner: d.owner?.name ?? "—", quotes: d.quotes, events,
+  };
+}
+
+async function recentEvents(where: { companyId?: string; contactId?: string }) {
+  const [activities, calls, emails] = await Promise.all([
+    prisma.activity.findMany({ where, orderBy: { createdAt: "desc" }, take: 6 }),
+    safe(prisma.callLog.findMany({ where, orderBy: { createdAt: "desc" }, take: 4 }), []),
+    prisma.emailMessage.findMany({ where, orderBy: { createdAt: "desc" }, take: 4 }),
+  ]);
+  return [
+    ...activities.filter((a) => a.type !== "call" && a.type !== "email").map((a) => ({ kind: a.type === "note" ? "note" : "system", text: a.body, at: a.createdAt.toISOString() })),
+    ...calls.map((c) => ({ kind: "call", text: `Call — ${c.outcome ?? "logged"}`, at: c.createdAt.toISOString() })),
+    ...emails.map((e) => ({ kind: "email", text: `${e.direction === "outbound" ? "Sent" : "Received"}: ${e.subject}`, at: e.createdAt.toISOString() })),
+  ].sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 8);
+}
+
+export async function getCompanyDrawerAction(id: string) {
+  await guard();
+  const c = await prisma.company.findUnique({
+    where: { id },
+    include: { owner: true, bdr: true, contacts: { take: 6 }, deals: { orderBy: { createDate: "desc" }, take: 6 } },
+  });
+  if (!c) return null;
+  return {
+    id: c.id, name: c.name, clientId: c.clientId, leadStatus: c.leadStatus, tier: c.tier ?? "—",
+    type: c.type ?? "—", country: c.country ?? "—", owner: c.owner?.name ?? "—", bdr: c.bdr?.name ?? "—",
+    contacts: c.contacts.map((x) => ({ id: x.id, name: x.name, title: x.title ?? "" })),
+    deals: c.deals.map((d) => ({ id: d.id, name: d.name.replace(/ × Layers$/, ""), stage: d.stage, amount: d.amount })),
+    events: await recentEvents({ companyId: id }),
+  };
+}
+
+export async function getContactDrawerAction(id: string) {
+  await guard();
+  const c = await prisma.contact.findUnique({ where: { id }, include: { company: true, deals: { take: 6 } } });
+  if (!c) return null;
+  return {
+    id: c.id, name: c.name, title: c.title ?? "—", email: c.email ?? "—", phone: c.phone ?? "—", primary: c.primary,
+    company: { id: c.companyId, name: c.company.name },
+    deals: c.deals.map((d) => ({ id: d.id, name: d.name.replace(/ × Layers$/, ""), stage: d.stage, amount: d.amount })),
+    events: await recentEvents({ contactId: id }),
   };
 }
 

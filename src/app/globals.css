@@ -784,3 +784,15 @@ select.se-input option{background:var(--panel-2)}
 .drawer-ev-dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--muted)}
 .drawer-ev-dot.note{background:var(--neon)}.drawer-ev-dot.email{background:var(--violet-br)}.drawer-ev-dot.call{background:var(--amber)}
 .drawer-ev-at{font-size:10px;color:var(--faint);flex:none}
+
+/* ── Appearance preferences ──────────────────────────────────── */
+html.no-grain body::before{display:none}
+html.reduce-motion *,html.reduce-motion *::before,html.reduce-motion *::after{animation:none !important;transition:none !important}
+html.compact .main{padding:14px 18px 40px}
+html.compact .panel-h{padding:10px 14px}
+html.compact .kpi{padding:12px 13px}
+html.compact .kpi .val{font-size:22px;margin-top:7px}
+html.compact tbody td{padding:8px 14px}
+html.compact .mini-row{padding:7px 14px}
+html.compact .kpis{gap:10px;margin-bottom:14px}
+html.compact .grid2,html.compact .an-grid,html.compact .with-rail{gap:12px}

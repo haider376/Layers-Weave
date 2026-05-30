@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
@@ -12,7 +12,7 @@ export default async function CalendarPage() {
 
   const [meetings, tasks] = await Promise.all([
     prisma.salesMeeting.findMany({ where: { meetingDate: { not: null } }, include: { deal: { include: { company: true } } }, take: 400 }),
-    prisma.task.findMany({ where: { dueDate: { not: null } }, take: 400 }),
+    safe(prisma.task.findMany({ where: { dueDate: { not: null } }, take: 400 }), []),
   ]);
 
   const events: CalEvent[] = [

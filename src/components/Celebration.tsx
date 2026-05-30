@@ -33,6 +33,11 @@ const VARIANTS: Record<CelebrationKind, { title: string; sub: string; colors: st
 };
 
 export function celebrate(kind: CelebrationKind) {
+  // respect the "celebrations" appearance preference
+  try {
+    const p = JSON.parse(localStorage.getItem("lw-prefs") || "{}");
+    if (p.celebrations === false) return;
+  } catch { /* ignore */ }
   window.dispatchEvent(new CustomEvent("lw-celebrate", { detail: kind }));
 }
 

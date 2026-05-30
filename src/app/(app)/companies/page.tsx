@@ -44,7 +44,7 @@ export default async function CompaniesPage() {
             {companies.map((c) => (
               <tr className="row" key={c.id}>
                 <td>
-                  <Link href={`/companies/${c.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>
+                  <Link href={`?company=${c.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>
                     {c.name}
                     <small style={{ display: "block", color: "var(--faint)", fontWeight: 500 }}>{c.clientId}</small>
                   </Link>

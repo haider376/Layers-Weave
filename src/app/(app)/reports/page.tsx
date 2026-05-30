@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import Topbar from "@/components/Topbar";
 import PeriodTabs from "./PeriodTabs";
@@ -23,7 +23,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     prisma.company.findMany({ include: { owner: true } }),
     prisma.quote.findMany(),
     prisma.fulfilment.findMany(),
-    prisma.callLog.findMany({ take: 5000 }),
+    safe(prisma.callLog.findMany({ take: 5000 }), []),
     prisma.emailMessage.count({ where: { createdAt: { gte: since }, direction: "outbound" } }),
     prisma.salesMeeting.count({ where: { bookedDate: { gte: since } } }),
   ]);

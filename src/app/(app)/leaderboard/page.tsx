@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
@@ -16,7 +16,7 @@ export default async function LeaderboardPage() {
     prisma.user.findMany(),
     prisma.deal.findMany({ include: { owner: true } }),
     prisma.salesMeeting.findMany({ include: { bdr: true } }),
-    prisma.callLog.findMany({ take: 5000 }),
+    safe(prisma.callLog.findMany({ take: 5000 }), []),
   ]);
 
   // AE board — ranked by won revenue

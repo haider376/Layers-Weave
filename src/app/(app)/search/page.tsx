@@ -33,12 +33,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {companies.length > 0 && (
           <Sec title="Companies" count={companies.length}>
-            {companies.map((c) => <Row key={c.id} href={`/companies/${c.id}`} main={c.name} sub={`${c.clientId} · ${c.country ?? ""}`} tag={c.leadStatus} />)}
+            {companies.map((c) => <Row key={c.id} href={`?company=${c.id}`} main={c.name} sub={`${c.clientId} · ${c.country ?? ""}`} tag={c.leadStatus} />)}
           </Sec>
         )}
         {contacts.length > 0 && (
           <Sec title="Contacts" count={contacts.length}>
-            {contacts.map((c) => <Row key={c.id} href={`/contacts/${c.id}`} main={c.name} sub={`${c.title ?? ""} · ${c.company.name}`} tag={c.email ?? undefined} />)}
+            {contacts.map((c) => <Row key={c.id} href={`?contact=${c.id}`} main={c.name} sub={`${c.title ?? ""} · ${c.company.name}`} tag={c.email ?? undefined} />)}
           </Sec>
         )}
         {deals.length > 0 && (

@@ -15,3 +15,14 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+// Resilient query wrapper — if a table/column isn't migrated yet on a lagging
+// deployment, degrade to a fallback instead of crashing the whole page.
+export async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await p;
+  } catch (e) {
+    console.error("[safe] query failed, using fallback:", e instanceof Error ? e.message : e);
+    return fallback;
+  }
+}

@@ -1,4 +1,4 @@
-import { prisma } from "./db";
+import { prisma, safe } from "./db";
 
 // AE (deals won) + BDR (SQLs booked) leaderboards for the sales right-rail.
 export async function salesLeaderboards() {
@@ -36,11 +36,7 @@ export async function getTimeline(opts: { companyId?: string; dealId?: string; c
   const [activities, emails, calls, meetings] = await Promise.all([
     prisma.activity.findMany({ where, orderBy: { createdAt: "desc" }, take: 50 }),
     prisma.emailMessage.findMany({ where, orderBy: { createdAt: "desc" }, take: 50 }),
-    prisma.callLog.findMany({
-      where: opts.contactId ? { contactId: opts.contactId } : opts.dealId ? { dealId: opts.dealId } : { companyId: opts.companyId },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    }),
+    safe(prisma.callLog.findMany({ where: opts.contactId ? { contactId: opts.contactId } : opts.dealId ? { dealId: opts.dealId } : { companyId: opts.companyId }, orderBy: { createdAt: "desc" }, take: 50 }), []),
     opts.dealId
       ? prisma.salesMeeting.findMany({ where: { dealId: opts.dealId }, orderBy: { bookedDate: "desc" }, take: 20 })
       : opts.companyId

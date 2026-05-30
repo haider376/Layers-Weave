@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
@@ -10,7 +10,7 @@ export default async function TasksPage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const tasks = await prisma.task.findMany({ orderBy: [{ done: "asc" }, { dueDate: "asc" }], take: 200 });
+  const tasks = await safe(prisma.task.findMany({ orderBy: [{ done: "asc" }, { dueDate: "asc" }], take: 200 }), []);
   const companyIds = [...new Set(tasks.map((t) => t.companyId).filter(Boolean) as string[])];
   const companies = companyIds.length ? await prisma.company.findMany({ where: { id: { in: companyIds } } }) : [];
   const cmap = Object.fromEntries(companies.map((c) => [c.id, c.name]));

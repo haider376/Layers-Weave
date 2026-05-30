@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { showToast } from "@/components/Toast";
 import { updateProfileAction } from "@/app/actions/session";
+import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
+import { useEffect } from "react";
 
 type Team = { name: string; email: string; role: string; active: boolean }[];
 const TABS = ["Profile", "Account", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
@@ -15,6 +17,17 @@ function Toggle({ label, sub, defaultOn = true }: { label: string; sub: string; 
   const [on, setOn] = useState(defaultOn);
   return (
     <div className="set-row" onClick={() => setOn((v) => !v)}>
+      <div><div className="set-row-t">{label}</div><div className="set-row-s">{sub}</div></div>
+      <span className={`switch${on ? " on" : ""}`}><span className="knob" /></span>
+    </div>
+  );
+}
+// Persisted appearance toggle (writes to localStorage + applies immediately)
+function PrefToggle({ pref, label, sub }: { pref: keyof Prefs; label: string; sub: string }) {
+  const [on, setOn] = useState(true);
+  useEffect(() => { setOn(getPrefs()[pref]); }, [pref]);
+  return (
+    <div className="set-row" onClick={() => { const v = !on; setOn(v); setPref(pref, v); }}>
       <div><div className="set-row-t">{label}</div><div className="set-row-s">{sub}</div></div>
       <span className={`switch${on ? " on" : ""}`}><span className="knob" /></span>
     </div>
@@ -94,10 +107,10 @@ export default function SettingsView({ me, isAdmin, team }: { me: { name: string
           )}
           {tab === "Appearance" && (
             <div className="set-list">
-              <Toggle label="Celebrations & confetti" sub="Hype animations on wins" />
-              <Toggle label="Reduced motion" sub="Minimise animations" defaultOn={false} />
-              <Toggle label="Compact density" sub="Tighter rows & spacing" defaultOn={false} />
-              <Toggle label="Grain texture" sub="Screen-print overlay" />
+              <PrefToggle pref="celebrations" label="Celebrations & confetti" sub="Hype animations on wins" />
+              <PrefToggle pref="reduceMotion" label="Reduced motion" sub="Minimise animations" />
+              <PrefToggle pref="compact" label="Compact density" sub="Tighter rows & spacing" />
+              <PrefToggle pref="grain" label="Grain texture" sub="Screen-print overlay" />
               <div className="set-row-s" style={{ marginTop: 6 }}>Accent</div>
               <div style={{ display: "flex", gap: 10 }}>
                 <span style={{ width: 28, height: 28, borderRadius: 8, background: "var(--neon)", border: "2px solid var(--text)" }} />

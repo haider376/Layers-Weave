@@ -30,13 +30,13 @@ export default async function ContactsPage() {
             {contacts.map((c) => (
               <tr className="row" key={c.id}>
                 <td>
-                  <Link href={`/contacts/${c.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>
+                  <Link href={`?contact=${c.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>
                     <span className="mini-av" style={{ marginRight: 8 }}>{c.name.slice(0, 2).toUpperCase()}</span>
                     {c.name}{c.primary ? <span className="q-type" style={{ marginLeft: 8 }}>PRIMARY</span> : null}
                   </Link>
                 </td>
                 <td>{c.title ?? "—"}</td>
-                <td><Link href={`/companies/${c.companyId}`} style={{ color: "var(--violet-br)", textDecoration: "none" }}>{c.company.name}</Link></td>
+                <td><Link href={`?company=${c.companyId}`} style={{ color: "var(--violet-br)", textDecoration: "none" }}>{c.company.name}</Link></td>
                 <td>{c.email ?? "—"}</td>
                 <td>{c.phone ?? "—"}</td>
               </tr>

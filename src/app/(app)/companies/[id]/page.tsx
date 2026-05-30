@@ -98,7 +98,7 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
             <div className="panel-h"><h2>Contacts</h2><span className="count">{company.contacts.length}</span></div>
             <div style={{ padding: "6px 0" }}>
               {company.contacts.map((c) => (
-                <Link href={`/contacts/${c.id}`} key={c.id} className="mini-row">
+                <Link href={`?contact=${c.id}`} key={c.id} className="mini-row">
                   <span className="mini-av">{c.name.slice(0, 2).toUpperCase()}</span>
                   <span style={{ flex: 1 }}>{c.name}<small>{c.title ?? ""}{c.primary ? " · primary" : ""}</small></span>
                 </Link>
