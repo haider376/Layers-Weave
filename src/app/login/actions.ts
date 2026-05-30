@@ -14,9 +14,9 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   if (!email || !password) {
     return { error: "Enter your company email and password." };
   }
-  // Auth restricted to @layerswholesale.com addresses (spec §6 / acceptance criteria).
+  // Auth restricted to the company domain(s) (spec §6 / acceptance criteria).
   if (!emailDomainAllowed(email)) {
-    return { error: "Sign-in is restricted to @layerswholesale.com addresses." };
+    return { error: "Sign-in is restricted to @layerswholesale.co addresses." };
   }
 
   const user = await prisma.user.findUnique({ where: { email } });

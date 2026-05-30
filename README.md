@@ -24,7 +24,7 @@ npm run dev            # http://localhost:3000
 No Docker? Point `DATABASE_URL` in `.env` at any Postgres instance (Neon, Supabase,
 Vercel Postgres, a local install), then `npm run setup && npm run dev`.
 
-Sign in with any seeded account (domain-restricted to `@layerswholesale.com`).
+Sign in with any seeded account (domain-restricted to `@layerswholesale.co`).
 **Password for every demo user: `password`.**
 
 ## Deploy a shareable URL
@@ -34,15 +34,15 @@ See **[`DEPLOY.md`](./DEPLOY.md)** — import the repo into Vercel, add a Postgr
 
 | Email | Role | Sees margin? | Sees raghouse? |
 |-------|------|:---:|:---:|
-| `haider@layerswholesale.com` | CRO (admin) | ✅ | ✅ |
-| `zikriya@layerswholesale.com` | Sales Manager (admin) | ✅ | ✅ |
-| `rija@layerswholesale.com` | AE / QA (admin) | ✅ | ✅ |
-| `shahiq@layerswholesale.com` | Head of Supply | ✅ | ✅ |
-| `myra@layerswholesale.com` | Womenswear | ❌ | ✅ |
-| `kamila@layerswholesale.com` | AE | ❌ | ❌ (no supply access) |
-| `huzaifa@layerswholesale.com` | BDR | ❌ | ❌ |
-| `waris@layerswholesale.com` | Logistics Coordinator | ❌ | ✅ (pickup source, logistics only) |
-| `shahzaib@layerswholesale.com` | Lead Gen / CRM | ❌ | ❌ |
+| `haider@layerswholesale.co` | CRO (admin) | ✅ | ✅ |
+| `zikriya@layerswholesale.co` | Sales Manager (admin) | ✅ | ✅ |
+| `rija@layerswholesale.co` | AE / QA (admin) | ✅ | ✅ |
+| `shahiq@layerswholesale.co` | Head of Supply | ✅ | ✅ |
+| `myra@layerswholesale.co` | Womenswear | ❌ | ✅ |
+| `kamila@layerswholesale.co` | AE | ❌ | ❌ (no supply access) |
+| `huzaifa@layerswholesale.co` | BDR | ❌ | ❌ |
+| `waris@layerswholesale.co` | Logistics Coordinator | ❌ | ✅ (pickup source, logistics only) |
+| `shahzaib@layerswholesale.co` | Lead Gen / CRM | ❌ | ❌ |
 
 ## What's implemented
 

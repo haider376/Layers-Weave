@@ -7,7 +7,7 @@ seedDatabase(prisma)
   .then((r) => {
     console.log("✅ Seed complete.");
     console.log(`   Users: ${r.users} (password for all: "${r.defaultPassword}")`);
-    console.log("   Sign in e.g. haider@layerswholesale.com / password");
+    console.log("   Sign in e.g. haider@layerswholesale.co / password");
   })
   .catch((e) => {
     console.error(e);

@@ -19,7 +19,7 @@ export default function LoginForm() {
           <div className="lfield">
             <label>Company email</label>
             <div className="inp">
-              <input name="email" type="email" placeholder="you@layerswholesale.com" autoComplete="username" />
+              <input name="email" type="email" placeholder="you@layerswholesale.co" autoComplete="username" />
             </div>
           </div>
           <div className="lfield">
@@ -34,7 +34,7 @@ export default function LoginForm() {
           <div className="lerr">{state.error}</div>
         </form>
         <div className="lhint">
-          Use your @layerswholesale.com address · demo password: <b>password</b>
+          Use your @layerswholesale.co address · demo password: <b>password</b>
         </div>
       </div>
     </div>

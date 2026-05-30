@@ -5,19 +5,19 @@ const DEFAULT_PASSWORD = "password";
 
 // §6 roster — role strings match src/lib/permissions.ts Role type.
 const USERS = [
-  { email: "haider@layerswholesale.com", name: "Haider Ali Rana", role: "CRO", title: "Chief Revenue Officer" },
-  { email: "zikriya@layerswholesale.com", name: "Zikriya Abbasi", role: "Sales Manager", title: "Sales Manager" },
-  { email: "rija@layerswholesale.com", name: "Rija Fatima", role: "AE/QA", title: "Account Executive / QA" },
-  { email: "kamila@layerswholesale.com", name: "Kamila Batool", role: "AE", title: "Account Executive" },
-  { email: "asjad@layerswholesale.com", name: "Asjad Malik", role: "AE", title: "Account Executive" },
-  { email: "hilmand@layerswholesale.com", name: "Hilmand Kamal", role: "AE", title: "Account Executive" },
-  { email: "adan@layerswholesale.com", name: "Adan Khalid", role: "AE (Probation)", title: "Account Executive (Probation)" },
-  { email: "huzaifa@layerswholesale.com", name: "Huzaifa Asad", role: "BDR", title: "Business Development Rep" },
-  { email: "fatima@layerswholesale.com", name: "Fatima Khan", role: "BDR", title: "Business Development Rep" },
-  { email: "shahzaib@layerswholesale.com", name: "Shahzaib Rana", role: "Lead Gen/CRM", title: "Lead Gen / CRM" },
-  { email: "shahiq@layerswholesale.com", name: "Shahiq Iqbal Tariq", role: "Head of Supply", title: "Head of Supply" },
-  { email: "myra@layerswholesale.com", name: "Myra Bukhari", role: "Womenswear", title: "Head of Womenswear" },
-  { email: "waris@layerswholesale.com", name: "Muhammad Waris", role: "Logistics Coordinator", title: "Logistics Coordinator" },
+  { email: "haider@layerswholesale.co", name: "Haider Ali Rana", role: "CRO", title: "Chief Revenue Officer" },
+  { email: "zikriya@layerswholesale.co", name: "Zikriya Abbasi", role: "Sales Manager", title: "Sales Manager" },
+  { email: "rija@layerswholesale.co", name: "Rija Fatima", role: "AE/QA", title: "Account Executive / QA" },
+  { email: "kamila@layerswholesale.co", name: "Kamila Batool", role: "AE", title: "Account Executive" },
+  { email: "asjad@layerswholesale.co", name: "Asjad Malik", role: "AE", title: "Account Executive" },
+  { email: "hilmand@layerswholesale.co", name: "Hilmand Kamal", role: "AE", title: "Account Executive" },
+  { email: "adan@layerswholesale.co", name: "Adan Khalid", role: "AE (Probation)", title: "Account Executive (Probation)" },
+  { email: "huzaifa@layerswholesale.co", name: "Huzaifa Asad", role: "BDR", title: "Business Development Rep" },
+  { email: "fatima@layerswholesale.co", name: "Fatima Khan", role: "BDR", title: "Business Development Rep" },
+  { email: "shahzaib@layerswholesale.co", name: "Shahzaib Rana", role: "Lead Gen/CRM", title: "Lead Gen / CRM" },
+  { email: "shahiq@layerswholesale.co", name: "Shahiq Iqbal Tariq", role: "Head of Supply", title: "Head of Supply" },
+  { email: "myra@layerswholesale.co", name: "Myra Bukhari", role: "Womenswear", title: "Head of Womenswear" },
+  { email: "waris@layerswholesale.co", name: "Muhammad Waris", role: "Logistics Coordinator", title: "Logistics Coordinator" },
 ];
 
 const RAGHOUSES = [

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       seeded: result,
-      message: 'Demo data loaded. Sign in with haider@layerswholesale.com / password',
+      message: 'Demo data loaded. Sign in with haider@layerswholesale.co / password',
     });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Seed failed" }, { status: 500 });

@@ -5,11 +5,15 @@ import { prisma } from "./db";
 
 const COOKIE = "lw_session";
 const SECRET = process.env.SESSION_SECRET || "dev-secret";
-const ALLOWED_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN || "layerswholesale.com";
+// One or more allowed domains, comma-separated (e.g. "layerswholesale.co,layerswholesale.com").
+const ALLOWED_DOMAINS = (process.env.ALLOWED_EMAIL_DOMAIN || "layerswholesale.co")
+  .split(",")
+  .map((d) => d.trim().toLowerCase())
+  .filter(Boolean);
 
 export function emailDomainAllowed(email: string): boolean {
   const at = email.trim().toLowerCase().split("@");
-  return at.length === 2 && at[1] === ALLOWED_DOMAIN;
+  return at.length === 2 && ALLOWED_DOMAINS.includes(at[1]);
 }
 
 function sign(value: string): string {

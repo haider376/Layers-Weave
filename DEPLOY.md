@@ -30,7 +30,7 @@ In the Vercel project → **Settings → Environment Variables**, add:
 |------|-------|
 | `DATABASE_URL` | your Postgres connection string from step 1 |
 | `SESSION_SECRET` | any long random string |
-| `ALLOWED_EMAIL_DOMAIN` | `layerswholesale.com` |
+| `ALLOWED_EMAIL_DOMAIN` | `layerswholesale.co` |
 | `SEED_SECRET` | any random string (used once, next step) |
 
 Then **Deploy**.
@@ -49,7 +49,7 @@ You should see `{"ok":true,...}`. That populates the 13 users, quotes, and shipm
 ## 5. Sign in
 
 Open `https://YOUR-APP.vercel.app` and log in with any seeded account, e.g.
-**`haider@layerswholesale.com` / `password`** (CRO — sees everything). See the table in
+**`haider@layerswholesale.co` / `password`** (CRO — sees everything). See the table in
 `README.md` for the other roles (AE, Supply, Logistics, etc.).
 
 ---
