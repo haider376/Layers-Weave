@@ -15,22 +15,53 @@ function isAlreadyExists(e: unknown): boolean {
   return msg.includes("already exists");
 }
 
-async function ensureSchema() {
-  // Split the baseline DDL into individual statements and apply each one,
-  // ignoring "already exists" so this is safe to run repeatedly.
-  const statements = INIT_SQL.split(";")
+// Pull "ALTER TABLE X ADD COLUMN IF NOT EXISTS <coldef>" out of each CREATE TABLE
+// so existing databases get newly-added columns too (non-destructive upgrade).
+function columnPatches(createStmt: string): string[] {
+  const m = createStmt.match(/CREATE TABLE\s+"([^"]+)"\s*\(([\s\S]*)\)\s*$/i);
+  if (!m) return [];
+  const table = m[1];
+  const body = m[2];
+  const parts: string[] = [];
+  let depth = 0, cur = "";
+  for (const ch of body) {
+    if (ch === "(") depth++;
+    else if (ch === ")") depth--;
+    if (ch === "," && depth === 0) { parts.push(cur); cur = ""; } else cur += ch;
+  }
+  if (cur.trim()) parts.push(cur);
+  return parts
     .map((s) => s.trim())
+    .filter((s) => s.startsWith('"') && !/^"?CONSTRAINT/i.test(s) && !/PRIMARY KEY/i.test(s))
+    .map((col) => `ALTER TABLE "${table}" ADD COLUMN IF NOT EXISTS ${col}`);
+}
+
+async function ensureSchema() {
+  const statements = INIT_SQL.split(";")
+    // strip leading `-- comment` lines so statements start with the real SQL keyword
+    .map((s) => s.split("\n").filter((l) => !l.trim().startsWith("--")).join("\n").trim())
     .filter(Boolean);
-  let created = 0;
-  for (const stmt of statements) {
-    try {
-      await prisma.$executeRawUnsafe(stmt);
-      created++;
-    } catch (e) {
-      if (!isAlreadyExists(e)) throw e;
+  const creates = statements.filter((s) => /^CREATE TABLE/i.test(s));
+  const rest = statements.filter((s) => !/^CREATE TABLE/i.test(s));
+  let applied = 0;
+
+  // 1) Create any missing tables.
+  for (const stmt of creates) {
+    try { await prisma.$executeRawUnsafe(stmt); applied++; }
+    catch (e) { if (!isAlreadyExists(e)) throw e; }
+  }
+  // 2) Add any missing columns to tables that already existed (schema upgrade).
+  for (const stmt of creates) {
+    for (const patch of columnPatches(stmt)) {
+      try { await prisma.$executeRawUnsafe(patch); applied++; } catch { /* best-effort */ }
     }
   }
-  return created;
+  // 3) Schema, indexes, foreign keys (skip ones that already exist).
+  for (const stmt of rest) {
+    try { await prisma.$executeRawUnsafe(stmt); applied++; }
+    catch (e) { if (!isAlreadyExists(e)) throw e; }
+  }
+  return applied;
 }
 
 export async function GET(req: NextRequest) {
