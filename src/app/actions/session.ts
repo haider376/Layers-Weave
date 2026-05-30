@@ -10,6 +10,15 @@ export async function setViewAsAction(role: string | null) {
   revalidatePath("/", "layout");
 }
 
+export async function updateProfileAction(data: { name?: string; title?: string }) {
+  const user = await requireUser();
+  const patch: Record<string, string> = {};
+  if (data.name?.trim()) patch.name = data.name.trim();
+  if (data.title?.trim()) patch.title = data.title.trim();
+  if (Object.keys(patch).length) await prisma.user.update({ where: { id: user.id }, data: patch });
+  revalidatePath("/", "layout");
+}
+
 export async function logoutAction() {
   await destroySession();
   redirect("/login");

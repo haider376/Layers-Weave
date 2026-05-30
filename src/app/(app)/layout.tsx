@@ -5,6 +5,7 @@ import { canAccessSales, canAccessSupply, canAccessLogistics, VIEWABLE_ROLES, RO
 import Sidebar from "@/components/Sidebar";
 import Toaster from "@/components/Toast";
 import Celebration from "@/components/Celebration";
+import PageTransition from "@/components/PageTransition";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -46,7 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             👁 Viewing as <b>{ROLE_LABEL[user.viewingAs as keyof typeof ROLE_LABEL] ?? user.viewingAs}</b> — this is a preview of what they see.
           </div>
         )}
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
       <Toaster />
       <Celebration />
