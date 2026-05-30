@@ -105,7 +105,7 @@ export default function Sidebar({
     <aside className="side">
       <div className="logo-wrap">
         <Logo />
-        <div className="logo-sub">Wholesale CRM</div>
+        <div className="logo-sub">Layers Weave</div>
       </div>
 
       <div>

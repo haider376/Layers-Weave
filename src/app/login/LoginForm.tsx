@@ -42,7 +42,7 @@ export default function LoginForm() {
           <Logo />
         </div>
         <h2>Sign in</h2>
-        <p className="wel">Wholesale CRM</p>
+        <p className="wel">Layers Weave</p>
         <form onSubmit={submit}>
           <div className="lfield">
             <label>Company email</label>
