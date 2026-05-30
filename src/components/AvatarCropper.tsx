@@ -19,23 +19,28 @@ export default function AvatarCropper({
   const drag = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null);
 
   function clamp(x: number, y: number, s: number, w: number, h: number) {
-    return { x: Math.min(0, Math.max(VIEW - w * s, x)), y: Math.min(0, Math.max(VIEW - h * s, y)) };
+    const dw = w * s, dh = h * s;
+    // when the image is smaller than the frame in a dimension, center it; else keep it covering
+    const cx = dw <= VIEW ? (VIEW - dw) / 2 : Math.min(0, Math.max(VIEW - dw, x));
+    const cy = dh <= VIEW ? (VIEW - dh) / 2 : Math.min(0, Math.max(VIEW - dh, y));
+    return { x: cx, y: cy };
   }
 
   function onLoad() {
     const el = imgRef.current;
     if (!el) return;
     const w = el.naturalWidth, h = el.naturalHeight;
-    const m = VIEW / Math.min(w, h);
+    const contain = VIEW / Math.max(w, h); // whole image visible (lowest zoom)
+    const cover = VIEW / Math.min(w, h);   // fills the frame (sensible default)
     setDims({ w, h });
-    setMinScale(m);
-    setScale(m);
-    setT({ x: (VIEW - w * m) / 2, y: (VIEW - h * m) / 2 });
+    setMinScale(contain);
+    setScale(cover);
+    setT(clamp((VIEW - w * cover) / 2, (VIEW - h * cover) / 2, cover, w, h));
   }
 
   function zoomTo(next: number) {
     if (!dims) return;
-    const s = Math.max(minScale, Math.min(minScale * 6, next));
+    const s = Math.max(minScale, Math.min(minScale * 8, next));
     const c = VIEW / 2;
     const ratio = s / scale;
     const nx = c - (c - t.x) * ratio;
@@ -105,7 +110,7 @@ export default function AvatarCropper({
         </div>
         <div className="cropper-zoom">
           <span>−</span>
-          <input type="range" min={minScale} max={minScale * 6} step="0.001" value={scale} onChange={(e) => zoomTo(Number(e.target.value))} />
+          <input type="range" min={minScale} max={minScale * 8} step="0.001" value={scale} onChange={(e) => zoomTo(Number(e.target.value))} />
           <span>+</span>
         </div>
         <div className="cropper-actions">

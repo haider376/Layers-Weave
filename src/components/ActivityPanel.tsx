@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "./Toast";
 import { celebrate } from "./Celebration";
@@ -65,8 +65,19 @@ export default function ActivityPanel({
     });
   }
 
+  // Quick-action buttons (left column) dispatch this to jump to a compose tab.
+  useEffect(() => {
+    function onCompose(e: Event) {
+      const t = (e as CustomEvent<typeof tab>).detail;
+      if (t) setTab(t);
+      document.getElementById("activity-anchor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    window.addEventListener("lw-compose", onCompose);
+    return () => window.removeEventListener("lw-compose", onCompose);
+  }, []);
+
   return (
-    <section className="panel">
+    <section className="panel" id="activity-anchor">
       <div className="panel-h">
         <h2>Activity</h2>
         <div className="compose-tabs">

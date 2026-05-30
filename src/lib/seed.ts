@@ -15,9 +15,6 @@ const USERS = [
   { email: "huzaifa@layerswholesale.co", name: "Huzaifa Asad", role: "BDR", title: "Business Development Rep" },
   { email: "fatima@layerswholesale.co", name: "Fatima Khan", role: "BDR", title: "Business Development Rep" },
   { email: "shahzaib@layerswholesale.co", name: "Shahzaib Rana", role: "Lead Gen/CRM", title: "Lead Gen / CRM" },
-  { email: "shahiq@layerswholesale.co", name: "Shahiq Iqbal Tariq", role: "Head of Supply", title: "Head of Supply" },
-  { email: "myra@layerswholesale.co", name: "Myra Bukhari", role: "Womenswear", title: "Head of Womenswear" },
-  { email: "waris@layerswholesale.co", name: "Muhammad Waris", role: "Logistics Coordinator", title: "Logistics Coordinator" },
 ];
 
 const RAGHOUSES = [
@@ -222,7 +219,7 @@ export async function seedDatabase(prisma: PrismaClient) {
         clientCountry: COUNTRY_BY_CLIENT[q.client] ?? "United Kingdom",
         dealId: dealByQuoteId[q.quoteId] ?? null,
         ownerId: userByKey["rija"],
-        collaboratorId: userByKey["shahiq"],
+        collaboratorId: userByKey["zikriya"],
         raghouseId: ragByName[q.raghouse],
         sellingPriceTotal: Math.round(selling * 100) / 100,
         buyingPriceTotal: Math.round(buying * 100) / 100,
@@ -349,8 +346,8 @@ export async function seedDatabase(prisma: PrismaClient) {
   await prisma.activity.createMany({
     data: [
       { kind: "sale", type: "system", body: "Deal won — LQ-48217 closed $18,400", actor: "Rija" },
-      { kind: "supply", type: "system", body: "LQ-30912 ready — 1,200 pcs graded & listed", actor: "Shahiq" },
-      { kind: "ship", type: "system", body: "LQ-33915 dispatched via Expost to London", actor: "Waris" },
+      { kind: "sale", type: "system", body: "LQ-30912 quote sent — 1,200 pcs, awaiting client sign-off", actor: "Kamila" },
+      { kind: "sale", type: "system", body: "Menace Vintage Ltd closed — £9,252", actor: "Rija" },
     ],
   });
 

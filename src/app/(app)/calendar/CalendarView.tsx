@@ -7,9 +7,9 @@ import { motion } from "framer-motion";
 export type CalEvent = { id: string; title: string; date: string; status: string; owner: string | null; dealId: string };
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const START_HOUR = 7;
-const END_HOUR = 21;
-const ROW = 46; // px per hour
+const START_HOUR = 8;
+const END_HOUR = 19;
+const ROW = 50; // px per hour
 
 function startOfWeek(d: Date) {
   const x = new Date(d);
