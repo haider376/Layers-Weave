@@ -89,6 +89,11 @@ export function audiencesFor(role: string): string[] {
   return [...base, "Sales"]; // AEs, BDRs, lead gen
 }
 
+// Who can reassign AE / BDR owners on accounts (CRM specialist, manager, CRO, Rija).
+export function canReassignOwner(role: string): boolean {
+  return ["CRO", "Sales Manager", "AE/QA", "Lead Gen/CRM"].includes(role as Role);
+}
+
 // §7 Pricing authority — who can approve a sub-floor (5%) markup.
 export function canApprovePricing(role: string): boolean {
   return role === "CRO" || role === "AE/QA";

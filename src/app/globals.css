@@ -25,13 +25,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 body::after{content:'';position:fixed;bottom:-280px;left:60px;width:520px;height:520px;background:radial-gradient(circle,rgba(109,25,255,.10),transparent 66%);pointer-events:none;z-index:0}
 .app{display:grid;grid-template-columns:236px 1fr;min-height:100vh;position:relative;z-index:1}
 
-.side{border-right:1px solid var(--line);padding:18px 14px 12px;display:flex;flex-direction:column;gap:14px;background:rgba(11,7,23,.55);position:sticky;top:0;height:100vh;overflow:hidden}
-.side-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:14px}
+.side{border-right:1px solid var(--line);padding:16px 12px 10px;display:flex;flex-direction:column;gap:11px;background:rgba(11,7,23,.55);position:sticky;top:0;height:100vh;overflow:hidden}
+.side-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:11px}
 .side-scroll::-webkit-scrollbar{width:6px}
 .side-scroll::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
 .side-scroll::-webkit-scrollbar-track{background:transparent}
 .nav-group{display:flex;flex-direction:column}
-.nav-btn{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;color:var(--muted);background:none;border:1px solid transparent;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;width:100%;text-align:left;transition:.16s}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:var(--muted);background:none;border:1px solid transparent;font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;width:100%;text-align:left;transition:.16s}
 .nav-btn svg{width:17px;height:17px;flex:none;stroke:currentColor}
 .nav-btn:hover{color:var(--text);background:rgba(255,255,255,.035)}
 .side-lb{display:flex;flex-direction:column;gap:1px;padding:0 4px}
@@ -47,9 +47,9 @@ body::after{content:'';position:fixed;bottom:-280px;left:60px;width:520px;height
 .logo-wrap svg{height:22px;width:auto;display:block}
 .logo-sub{font-size:9px;letter-spacing:.34em;color:var(--faint);text-transform:uppercase;margin-top:9px;padding-left:2px}
 
-.nav-label{font-size:10px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase;padding:0 10px;margin-bottom:8px}
-.nav{display:flex;flex-direction:column;gap:3px}
-.nav a{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;cursor:pointer;transition:.16s;border:1px solid transparent}
+.nav-label{font-size:9px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;padding:0 10px;margin-bottom:4px}
+.nav{display:flex;flex-direction:column;gap:1px}
+.nav a{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:12.5px;font-weight:500;cursor:pointer;transition:.16s;border:1px solid transparent}
 .nav a svg{width:17px;height:17px;flex:none;stroke:currentColor}
 .nav a:hover{color:var(--text);background:rgba(255,255,255,.035)}
 .nav a.active{color:#fff;background:var(--neon-soft);border-color:rgba(165,235,0,.4)}
@@ -711,3 +711,39 @@ select.se-input option{background:var(--panel-2)}
 .inv-doc .total{padding:16px 18px}
 .inv-doc .cact{padding:0 18px 14px}
 .inv-doc .note{padding:0 18px 18px}
+
+/* ── Tasks ───────────────────────────────────────────────────── */
+.task-add{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.task-row{display:flex;align-items:center;gap:11px;padding:11px 16px;border-top:1px solid var(--line)}
+.task-row:first-child{border-top:none}
+.task-row.done .task-title{text-decoration:line-through;color:var(--faint)}
+.task-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--line-2);background:transparent;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;transition:.14s}
+.task-check:hover{border-color:var(--neon)}
+.task-check.on{background:var(--neon);border-color:var(--neon)}
+.task-check svg{width:12px;height:12px;stroke:var(--neon-ink)}
+.prio-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.prio-dot.high{background:var(--red)}.prio-dot.medium{background:var(--amber)}.prio-dot.low{background:var(--muted)}
+.task-main{flex:1;min-width:0}
+.task-title{font-size:13px;font-weight:600}
+.task-meta{display:block;font-size:10.5px;color:var(--faint);margin-top:2px}
+.task-meta a{color:var(--violet-br);text-decoration:none}
+.task-type{font-size:10px;font-weight:700;color:var(--muted);background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+.task-due{font-size:11px;color:var(--muted);min-width:54px;text-align:right}
+
+/* ── Calendar month view + controls ──────────────────────────── */
+.seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line-2);border-radius:9px;padding:2px}
+.seg button{background:none;border:none;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;cursor:pointer;transition:.14s}
+.seg button.on{background:var(--neon);color:var(--neon-ink)}
+.cal-month-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cmg-dow{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700;text-align:center;padding:8px 0;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.cmg-cell{min-height:96px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:5px;cursor:pointer;transition:.12s;display:flex;flex-direction:column;gap:3px}
+.cmg-cell:hover{background:rgba(255,255,255,.025)}
+.cmg-cell.out{opacity:.4}
+.cmg-cell.today{background:var(--neon-soft)}
+.cmg-num{font-size:11px;font-weight:700;color:var(--muted)}
+.cmg-cell.today .cmg-num{color:var(--neon)}
+.cmg-ev{font-size:9.5px;font-weight:700;color:var(--neon-ink);border-radius:4px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmg-more{font-size:9px;color:var(--faint)}
+.cal-add-pop{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:rgba(160,253,58,.04);flex-wrap:wrap}
+.cal-add-pop .eyebrow{flex:none}
+.cal-hint{padding:8px 16px;font-size:11px;color:var(--faint);border-top:1px solid var(--line)}

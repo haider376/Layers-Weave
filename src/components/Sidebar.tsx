@@ -18,6 +18,8 @@ const ICONS = {
   calendar: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>,
   calls: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z" /></svg>,
   trophy: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0z" /><path d="M5 4H3v2a3 3 0 003 3M19 4h2v2a3 3 0 01-3 3" /></svg>,
+  tasks: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>,
+  inbox: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" /></svg>,
   calc: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 10h2M8 14h2M14 10h2v8h-6" /></svg>,
   settings: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></svg>,
   signout: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>,
@@ -92,32 +94,19 @@ export default function Sidebar({
           <Nav href="/sales" label="Pipeline" icon={ICONS.pipeline} pill={salesCount} />
           <Nav href="/companies" label="Companies" icon={ICONS.companies} />
           <Nav href="/contacts" label="Contacts" icon={ICONS.contacts} />
+          <Nav href="/tasks" label="Tasks" icon={ICONS.tasks} />
         </nav>
       </div>
 
       <div className="nav-group">
-        <div className="nav-label">Insights</div>
+        <div className="nav-label">Workspace</div>
         <nav className="nav">
           <Nav href="/calendar" label="Calendar" icon={ICONS.calendar} />
+          <Nav href="/inbox" label="Inbox" icon={ICONS.inbox} />
           <Nav href="/calls" label="Call Analyzer" icon={ICONS.calls} />
           <Nav href="/leaderboard" label="Leaderboard" icon={ICONS.trophy} />
         </nav>
       </div>
-
-      {leaderboard.length > 0 && (
-        <div className="nav-group">
-          <div className="nav-label">Leaderboard</div>
-          <div className="side-lb">
-            {leaderboard.slice(0, 5).map((p, i) => (
-              <div className="side-lb-row" key={p.name}>
-                <span className={`side-lb-rank${i === 0 ? " gold" : ""}`}>{i + 1}</span>
-                <span className="side-lb-nm">{p.name}</span>
-                <span className="side-lb-val">{p.wins}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="nav-group">
         <div className="nav-label">Tools</div>

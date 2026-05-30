@@ -10,25 +10,19 @@ export default async function CalendarPage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const meetings = await prisma.salesMeeting.findMany({
-    where: { meetingDate: { not: null } },
-    include: { deal: { include: { company: true } }, ae: true },
-    orderBy: { meetingDate: "asc" },
-    take: 400,
-  });
+  const [meetings, tasks] = await Promise.all([
+    prisma.salesMeeting.findMany({ where: { meetingDate: { not: null } }, include: { deal: { include: { company: true } } }, take: 400 }),
+    prisma.task.findMany({ where: { dueDate: { not: null } }, take: 400 }),
+  ]);
 
-  const events: CalEvent[] = meetings.map((m) => ({
-    id: m.id,
-    title: m.deal?.company.name ? `${m.deal.company.name} × Layers` : m.title,
-    date: (m.meetingDate ?? m.bookedDate).toISOString(),
-    status: m.status,
-    owner: m.ae?.name ?? null,
-    dealId: m.dealId,
-  }));
+  const events: CalEvent[] = [
+    ...meetings.map((m) => ({ id: m.id, title: m.deal?.company.name ? `${m.deal.company.name} × Layers` : m.title, date: (m.meetingDate ?? m.bookedDate).toISOString(), kind: "meeting" as const, status: m.status, dealId: m.dealId })),
+    ...tasks.map((t) => ({ id: t.id, title: t.title, date: t.dueDate!.toISOString(), kind: "task" as const, status: t.done ? "Done" : t.priority, dealId: t.dealId })),
+  ];
 
   return (
     <>
-      <Topbar title="Calendar" sub="Meetings, demos & follow-ups — your week at a glance" />
+      <Topbar title="Calendar" sub="Meetings, tasks & follow-ups — click any day to add" />
       <CalendarView events={events} />
     </>
   );

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { canAccessSales } from "@/lib/permissions";
+import { canAccessSales, canReassignOwner } from "@/lib/permissions";
 import { automationBookMeeting } from "@/lib/automations";
 
 async function guard() {
@@ -37,6 +37,14 @@ export async function updateContactAction(contactId: string, data: Record<string
   for (const k of allowed) if (k in data) patch[k] = data[k] || null;
   const c = await prisma.contact.update({ where: { id: contactId }, data: patch });
   bump(c.companyId);
+}
+
+// Reassign AE / BDR owner — restricted (CRM specialist, manager, CRO, Rija).
+export async function setCompanyOwnerAction(companyId: string, field: "ownerId" | "bdrId", userId: string) {
+  const user = await requireUser();
+  if (!canReassignOwner(user.role)) throw new Error("FORBIDDEN");
+  await prisma.company.update({ where: { id: companyId }, data: { [field]: userId || null } });
+  bump(companyId);
 }
 
 export async function addContactAction(companyId: string, name: string) {

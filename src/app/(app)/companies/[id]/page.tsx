@@ -2,12 +2,13 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { canAccessSales } from "@/lib/permissions";
+import { canAccessSales, canReassignOwner } from "@/lib/permissions";
 import { getTimeline } from "@/lib/sales";
 import Topbar from "@/components/Topbar";
 import ActivityPanel from "@/components/ActivityPanel";
 import EditableDetails from "@/components/EditableDetails";
 import RecordActions from "@/components/RecordActions";
+import OwnerSelect from "./OwnerSelect";
 import AddContact from "./AddContact";
 import { updateCompanyAction } from "../../sales/record-actions";
 
@@ -33,6 +34,9 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
     include: { owner: true, bdr: true, contacts: true, deals: { include: { contact: true }, orderBy: { createDate: "desc" } } },
   });
   if (!company) notFound();
+
+  const canReassign = canReassignOwner(user.role);
+  const reps = canReassign ? (await prisma.user.findMany({ orderBy: { name: "asc" } })).map((u) => ({ id: u.id, name: u.name })) : [];
 
   const events = await getTimeline({ companyId: id });
   const primary = company.contacts.find((c) => c.primary) ?? company.contacts[0] ?? null;
@@ -75,8 +79,8 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
                 ]}
               />
               <div className="kv-static">
-                <div><span>Owner (AE)</span><b>{company.owner?.name ?? "—"}</b></div>
-                <div><span>BDR owner</span><b>{company.bdr?.name ?? "—"}</b></div>
+                <div><span>Owner (AE)</span>{canReassign ? <OwnerSelect companyId={company.id} field="ownerId" value={company.ownerId ?? ""} users={reps} /> : <b>{company.owner?.name ?? "—"}</b>}</div>
+                <div><span>BDR owner</span>{canReassign ? <OwnerSelect companyId={company.id} field="bdrId" value={company.bdrId ?? ""} users={reps} /> : <b>{company.bdr?.name ?? "—"}</b>}</div>
                 <div><span>Record ID</span><b>{company.clientId}</b></div>
               </div>
             </div>
