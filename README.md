@@ -5,20 +5,31 @@ replacing the split HubSpot + Notion setup. Built to the Layers build spec and m
 design prototype exactly (deep blue-black theme, neon-green `#A0FD3A` accent, Montserrat +
 PP Monument Extended).
 
-> Self-contained build for **full testing**: Next.js (App Router, TypeScript) + Prisma +
-> **SQLite**, so it runs end-to-end with zero external services. Permissions (margin wall,
-> raghouse visibility) are enforced **server-side**, not just hidden in the UI.
+> Next.js (App Router, TypeScript) + Prisma + **PostgreSQL** (matching the spec's
+> Supabase recommendation). Permissions (margin wall, raghouse visibility) are enforced
+> **server-side**, not just hidden in the UI.
 
-## Quick start
+## Quick start (local)
+
+You need a Postgres database. The repo ships a `docker-compose.yml` for one:
 
 ```bash
+docker compose up -d   # Postgres on localhost:5432 (matches .env)
 npm install
-npm run setup     # prisma generate + db push + seed demo data
-npm run dev       # http://localhost:3000
+npm run setup          # prisma generate + db push + seed demo data
+npm run dev            # http://localhost:3000
 ```
+
+No Docker? Point `DATABASE_URL` in `.env` at any Postgres instance (Neon, Supabase,
+Vercel Postgres, a local install), then `npm run setup && npm run dev`.
 
 Sign in with any seeded account (domain-restricted to `@layerswholesale.com`).
 **Password for every demo user: `password`.**
+
+## Deploy a shareable URL
+
+See **[`DEPLOY.md`](./DEPLOY.md)** — import the repo into Vercel, add a Postgres
+`DATABASE_URL`, deploy, then visit `/api/seed?key=…` once to load demo data.
 
 | Email | Role | Sees margin? | Sees raghouse? |
 |-------|------|:---:|:---:|
@@ -29,7 +40,7 @@ Sign in with any seeded account (domain-restricted to `@layerswholesale.com`).
 | `myra@layerswholesale.com` | Womenswear | ❌ | ✅ |
 | `kamila@layerswholesale.com` | AE | ❌ | ❌ (no supply access) |
 | `huzaifa@layerswholesale.com` | BDR | ❌ | ❌ |
-| `waris@layerswholesale.com` | Logistics Coordinator | ❌ | ❌ |
+| `waris@layerswholesale.com` | Logistics Coordinator | ❌ | ✅ (pickup source, logistics only) |
 | `shahzaib@layerswholesale.com` | Lead Gen / CRM | ❌ | ❌ |
 
 ## What's implemented
@@ -73,11 +84,10 @@ restore pristine demo data.)
 ## Stack & notes
 
 - **Next.js 15** App Router, server components for data + server actions for mutations.
-- **Prisma + SQLite** (`prisma/dev.db`) for zero-setup local testing. The spec recommends Supabase
-  Postgres + RLS for production — the schema and the server-side permission layer
-  (`src/lib/permissions.ts`) map directly onto RLS policies when you migrate.
-- `.env` ships with a dev `SESSION_SECRET` so the app runs immediately; rotate it for any real
-  deployment.
+- **Prisma + PostgreSQL**. The server-side permission layer (`src/lib/permissions.ts`) maps
+  directly onto Supabase Row-Level Security policies if/when you move to Supabase.
+- `.env` ships with dev defaults so the app runs immediately against the bundled docker Postgres;
+  rotate `SESSION_SECRET` / `SEED_SECRET` for any real deployment.
 - Integrations (Zoom Phone, email/calendar, 3PL APIs) are phase-2 per the spec and stubbed in the UI
   (the "Zoom Phone connected" pill, click-to-log scaffolding).
 

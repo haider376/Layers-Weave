@@ -1,12 +1,14 @@
 // Layers Wholesale CRM — data model (spec §3)
-// SQLite for zero-setup local testing. Enums are stored as strings.
+// PostgreSQL (matches the spec's Supabase recommendation). Enums are stored
+// as strings for portability. Run Postgres locally via `docker compose up -d`
+// or point DATABASE_URL at a hosted instance (Vercel Postgres / Neon / Supabase).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
