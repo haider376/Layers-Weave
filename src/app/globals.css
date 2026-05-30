@@ -573,3 +573,30 @@ select.se-input option{background:var(--panel-2)}
 .switch .knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:.18s}
 .switch.on{background:var(--neon-soft);border-color:var(--neon)}
 .switch.on .knob{left:18px;background:var(--neon)}
+
+/* ── Analytics board (draggable / expandable) ────────────────── */
+.an-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.an-grid{grid-template-columns:1fr}}
+.an-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.an-card.wide{grid-column:1 / -1}
+.an-h{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.an-h h2{font-size:13px;font-weight:700;letter-spacing:.02em}
+.an-h .count{font-size:11px;color:var(--faint);font-weight:600}
+.an-drag{cursor:grab;color:var(--faint);font-size:14px;line-height:1;user-select:none}
+.an-drag:active{cursor:grabbing}
+.an-expand{margin-left:auto;background:var(--panel-2);border:1px solid var(--line-2);color:var(--muted);border-radius:7px;width:26px;height:26px;cursor:pointer;font-size:13px;transition:.14s}
+.an-expand:hover{border-color:var(--neon);color:var(--neon)}
+.an-body{padding:16px 18px}
+
+/* Donut */
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.donut-seg{stroke-dasharray:0 999;animation:donutGrow .8s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes donutGrow{from{opacity:.2}to{opacity:1}}
+.donut-svg .donut-seg{transition:stroke-width .15s}
+.donut-total{font-family:var(--display);fill:var(--text);font-size:17px}
+.donut-sub{fill:var(--faint);font-size:7px;letter-spacing:.1em;text-transform:uppercase}
+.donut-legend{display:flex;flex-direction:column;gap:6px;flex:1;min-width:120px}
+.dl-row{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.dl-row i{width:10px;height:10px;border-radius:3px;flex:none}
+.dl-l{flex:1;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-v{font-weight:700;font-variant-numeric:tabular-nums}
