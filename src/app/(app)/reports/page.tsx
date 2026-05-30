@@ -86,7 +86,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <Topbar title="Reports" sub={`Daily, weekly & monthly KPIs across all teams`} />
+      <Topbar title="Analytics" sub={`Daily, weekly & monthly KPIs across the sales org`} />
       <PeriodTabs period={period} />
 
       <div className="kpis" style={{ gridTemplateColumns: "repeat(6,1fr)" }}>

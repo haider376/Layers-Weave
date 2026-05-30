@@ -14,6 +14,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     where: { stage: { notIn: ["Closed Won", "Closed Lost", "Disqualified"] } },
   });
 
+  // Sidebar leaderboard — top AEs by deals won.
+  const wonDeals = await prisma.deal.findMany({ where: { stage: "Closed Won" }, include: { owner: true } });
+  const winMap = new Map<string, number>();
+  for (const d of wonDeals) if (d.owner) winMap.set(d.owner.name, (winMap.get(d.owner.name) ?? 0) + 1);
+  const leaderboard = [...winMap.entries()].sort((a, b) => b[1] - a[1]).map(([name, wins]) => ({ name, wins }));
+
   return (
     <div className="app">
       <Sidebar
@@ -32,6 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           logistics: canAccessLogistics(user.role),
         }}
         viewableRoles={VIEWABLE_ROLES.map((r) => ({ value: r, label: ROLE_LABEL[r] }))}
+        leaderboard={leaderboard}
       />
       <main className="main">
         {user.viewingAs && (

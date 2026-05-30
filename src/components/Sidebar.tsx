@@ -1,27 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Logo, { initials } from "./Logo";
 import { logoutAction, updateAvatarAction, setViewAsAction } from "@/app/actions/session";
 import { ROLE_LABEL, type Role } from "@/lib/permissions";
 import AvatarCropper from "./AvatarCropper";
 import { showToast } from "./Toast";
 
-type NavItem = { href: string; label: string; icon: React.ReactNode; pill?: number; show: boolean };
+const ICONS = {
+  dash: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" /></svg>,
+  analytics: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M18 9l-5 5-3-3-4 4" /></svg>,
+  pipeline: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="13" width="3" height="4" /></svg>,
+  companies: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-4" /></svg>,
+  contacts: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" /><path d="M4 21v-1a6 6 0 0112 0v1" /></svg>,
+  calendar: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>,
+  calls: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z" /></svg>,
+  calc: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 10h2M8 14h2M14 10h2v8h-6" /></svg>,
+  settings: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></svg>,
+  signout: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>,
+};
 
 export default function Sidebar({
   user,
   salesCount,
-  access,
   viewableRoles,
+  leaderboard = [],
 }: {
   user: { name: string; role: string; realRole: string; isAdmin: boolean; viewingAs: string | null; avatarUrl: string | null };
   salesCount: number;
   access: { sales: boolean; supply: boolean; logistics: boolean };
   viewableRoles: { value: string; label: string }[];
+  leaderboard?: { name: string; wins: number }[];
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -33,78 +44,28 @@ export default function Sidebar({
     await setViewAsAction(role === user.realRole ? null : role);
     router.refresh();
   }
-
-  const items: NavItem[] = [
-    {
-      href: "/dashboard",
-      label: "Dashboard",
-      show: true,
-      icon: (
-        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" /></svg>
-      ),
-    },
-    {
-      href: "/sales",
-      label: "Pipeline",
-      pill: salesCount,
-      show: access.sales,
-      icon: (
-        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="13" width="3" height="4" /></svg>
-      ),
-    },
-    {
-      href: "/companies",
-      label: "Companies",
-      show: access.sales,
-      icon: (
-        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-4" /><path d="M9 9v0M9 13v0M9 17v0" /></svg>
-      ),
-    },
-    {
-      href: "/contacts",
-      label: "Contacts",
-      show: access.sales,
-      icon: (
-        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" /><path d="M4 21v-1a6 6 0 0112 0v1" /></svg>
-      ),
-    },
-    {
-      href: "/supply",
-      label: "Supply",
-      show: access.supply,
-      icon: (
-        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4 8 4 8-4z" /><path d="M4 7v10l8 4 8-4V7" /><path d="M12 11v10" /></svg>
-      ),
-    },
-    {
-      href: "/logistics",
-      label: "Logistics",
-      show: access.logistics,
-      icon: (
-        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 7h11v8H3z" /><path d="M14 10h4l3 3v2h-7z" /><circle cx="7" cy="17" r="2" /><circle cx="17" cy="17" r="2" /></svg>
-      ),
-    },
-  ];
-
   function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
     const reader = new FileReader();
-    reader.onload = () => setCropSrc(String(reader.result)); // open cropper
+    reader.onload = () => setCropSrc(String(reader.result));
     reader.readAsDataURL(f);
     e.target.value = "";
   }
-
   async function onCropSave(dataUrl: string) {
     setAvatar(dataUrl);
     setCropSrc(null);
-    try {
-      await updateAvatarAction(dataUrl);
-      showToast("Profile photo updated");
-    } catch {
-      showToast("Couldn't save photo");
-    }
+    try { await updateAvatarAction(dataUrl); showToast("Profile photo updated"); }
+    catch { showToast("Couldn't save photo"); }
   }
+
+  const Nav = ({ href, label, icon, pill }: { href: string; label: string; icon: React.ReactNode; pill?: number }) => (
+    <Link href={href} className={pathname === href || (href !== "/dashboard" && pathname.startsWith(href)) ? "active" : ""}>
+      {icon}
+      {label}
+      {pill ? <span className="pill">{pill}</span> : null}
+    </Link>
+  );
 
   const roleLabel = ROLE_LABEL[user.role as Role] ?? user.role;
 
@@ -115,82 +76,76 @@ export default function Sidebar({
         <div className="logo-sub">Layers Weave</div>
       </div>
 
-      <div>
+      <div className="nav-group">
         <div className="nav-label">Overview</div>
         <nav className="nav">
-          <Link href="/dashboard" className={pathname === "/dashboard" ? "active" : ""}>
-            {items[0].icon}
-            Dashboard
-          </Link>
-          <Link href="/reports" className={pathname.startsWith("/reports") ? "active" : ""}>
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M18 9l-5 5-3-3-4 4" /></svg>
-            Reports
-          </Link>
+          <Nav href="/dashboard" label="Dashboard" icon={ICONS.dash} />
+          <Nav href="/reports" label="Analytics" icon={ICONS.analytics} />
         </nav>
       </div>
 
-      <div>
-        <div className="nav-label">Teams</div>
+      <div className="nav-group">
+        <div className="nav-label">Sales</div>
         <nav className="nav">
-          {items.slice(1).filter((i) => i.show).map((i) => (
-            <Link key={i.href} href={i.href} className={pathname.startsWith(i.href) ? "active" : ""}>
-              {i.icon}
-              {i.label}
-              {i.pill ? <span className="pill">{i.pill}</span> : null}
-            </Link>
-          ))}
+          <Nav href="/sales" label="Pipeline" icon={ICONS.pipeline} pill={salesCount} />
+          <Nav href="/companies" label="Companies" icon={ICONS.companies} />
+          <Nav href="/contacts" label="Contacts" icon={ICONS.contacts} />
         </nav>
       </div>
 
-      <div>
+      <div className="nav-group">
+        <div className="nav-label">Insights</div>
+        <nav className="nav">
+          <Nav href="/calendar" label="Calendar" icon={ICONS.calendar} />
+          <Nav href="/calls" label="Call Analyzer" icon={ICONS.calls} />
+        </nav>
+      </div>
+
+      {leaderboard.length > 0 && (
+        <div className="nav-group">
+          <div className="nav-label">Leaderboard</div>
+          <div className="side-lb">
+            {leaderboard.slice(0, 5).map((p, i) => (
+              <div className="side-lb-row" key={p.name}>
+                <span className={`side-lb-rank${i === 0 ? " gold" : ""}`}>{i + 1}</span>
+                <span className="side-lb-nm">{p.name}</span>
+                <span className="side-lb-val">{p.wins}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="nav-group">
         <div className="nav-label">Tools</div>
         <nav className="nav">
-          <Link href="/calculator" className={pathname.startsWith("/calculator") ? "active" : ""}>
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 10h2M8 14h2M14 10h2v8h-6" /></svg>
-            Price Calculator
-          </Link>
-          <button
-            onClick={() => logoutAction()}
-            className=""
-            style={{ display: "flex", alignItems: "center", gap: 11, padding: "9px 11px", borderRadius: 9, color: "var(--muted)", background: "none", border: "1px solid transparent", font: "inherit", fontSize: 13, fontWeight: 500, cursor: "pointer", width: "100%" }}
-          >
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24" style={{ width: 17, height: 17, stroke: "currentColor" }}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+          <Nav href="/calculator" label="Price Calculator" icon={ICONS.calc} />
+          <Nav href="/settings" label="Settings" icon={ICONS.settings} />
+          <button className="nav-btn" onClick={() => logoutAction()}>
+            {ICONS.signout}
             Sign out
           </button>
         </nav>
       </div>
 
       {user.isAdmin && (
-        <div>
+        <div className="nav-group">
           <div className="nav-label">View as</div>
-          <select
-            className="viewas-select"
-            value={user.viewingAs ?? user.realRole}
-            onChange={(e) => onViewAs(e.target.value)}
-          >
+          <select className="viewas-select" value={user.viewingAs ?? user.realRole} onChange={(e) => onViewAs(e.target.value)}>
             {viewableRoles.map((r) => (
-              <option key={r.value} value={r.value}>
-                {r.value === user.realRole ? `${r.label} (you)` : r.label}
-              </option>
+              <option key={r.value} value={r.value}>{r.value === user.realRole ? `${r.label} (you)` : r.label}</option>
             ))}
           </select>
         </div>
       )}
 
       <div className="side-foot">
-        <label
-          className="ava"
-          title="Upload photo"
-          style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
-          onClick={() => fileRef.current?.click()}
-        >
+        <label className="ava" title="Upload photo" style={avatar ? { backgroundImage: `url(${avatar})` } : undefined} onClick={() => fileRef.current?.click()}>
           {!avatar && <span>{initials(user.name)}</span>}
-          <span className="cam">
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" /><circle cx="12" cy="13" r="4" /></svg>
-          </span>
+          <span className="cam"><svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" /><circle cx="12" cy="13" r="4" /></svg></span>
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={onAvatarChange} />
         </label>
-        <div>
+        <div className="side-foot-id">
           <div className="nm">{user.name}</div>
           <div className="rl">{roleLabel}</div>
         </div>

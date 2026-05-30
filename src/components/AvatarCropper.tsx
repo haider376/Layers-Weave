@@ -1,79 +1,70 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-// Self-contained avatar cropper: drag to position, zoom with slider/wheel,
-// exports a square crop as a data URL. No external dependencies.
+const VIEW = 288; // crop viewport (px)
+
 export default function AvatarCropper({
-  src,
-  onCancel,
-  onSave,
+  src, onCancel, onSave,
 }: {
   src: string;
   onCancel: () => void;
   onSave: (dataUrl: string) => void;
 }) {
-  const VIEW = 280; // crop viewport size (px)
-  const imgRef = useRef<HTMLImageElement | null>(null);
-  const [natural, setNatural] = useState({ w: 0, h: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [dims, setDims] = useState<{ w: number; h: number } | null>(null);
   const [minScale, setMinScale] = useState(1);
-  const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  const [scale, setScale] = useState(1);
+  const [t, setT] = useState({ x: 0, y: 0 });
+  const drag = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null);
 
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => {
-      imgRef.current = img;
-      setNatural({ w: img.naturalWidth, h: img.naturalHeight });
-      const s = VIEW / Math.min(img.naturalWidth, img.naturalHeight);
-      setMinScale(s);
-      setZoom(s);
-      setPos({ x: (VIEW - img.naturalWidth * s) / 2, y: (VIEW - img.naturalHeight * s) / 2 });
-    };
-    img.src = src;
-  }, [src]);
-
-  function clampPos(x: number, y: number, scale: number) {
-    const w = natural.w * scale, h = natural.h * scale;
-    return {
-      x: Math.min(0, Math.max(VIEW - w, x)),
-      y: Math.min(0, Math.max(VIEW - h, y)),
-    };
+  function clamp(x: number, y: number, s: number, w: number, h: number) {
+    return { x: Math.min(0, Math.max(VIEW - w * s, x)), y: Math.min(0, Math.max(VIEW - h * s, y)) };
   }
 
-  function onZoom(z: number) {
+  function onLoad() {
+    const el = imgRef.current;
+    if (!el) return;
+    const w = el.naturalWidth, h = el.naturalHeight;
+    const m = VIEW / Math.min(w, h);
+    setDims({ w, h });
+    setMinScale(m);
+    setScale(m);
+    setT({ x: (VIEW - w * m) / 2, y: (VIEW - h * m) / 2 });
+  }
+
+  function zoomTo(next: number) {
+    if (!dims) return;
+    const s = Math.max(minScale, Math.min(minScale * 6, next));
     const c = VIEW / 2;
-    const ratio = z / zoom;
-    const nx = c - (c - pos.x) * ratio;
-    const ny = c - (c - pos.y) * ratio;
-    setZoom(z);
-    setPos(clampPos(nx, ny, z));
+    const ratio = s / scale;
+    const nx = c - (c - t.x) * ratio;
+    const ny = c - (c - t.y) * ratio;
+    setScale(s);
+    setT(clamp(nx, ny, s, dims.w, dims.h));
   }
 
   function onPointerDown(e: React.PointerEvent) {
-    drag.current = { x: e.clientX, y: e.clientY, px: pos.x, py: pos.y };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    drag.current = { x: e.clientX, y: e.clientY, tx: t.x, ty: t.y };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }
   function onPointerMove(e: React.PointerEvent) {
-    if (!drag.current) return;
-    const nx = drag.current.px + (e.clientX - drag.current.x);
-    const ny = drag.current.py + (e.clientY - drag.current.y);
-    setPos(clampPos(nx, ny, zoom));
+    if (!drag.current || !dims) return;
+    const nx = drag.current.tx + (e.clientX - drag.current.x);
+    const ny = drag.current.ty + (e.clientY - drag.current.y);
+    setT(clamp(nx, ny, scale, dims.w, dims.h));
   }
   function onPointerUp() { drag.current = null; }
 
   function save() {
-    const img = imgRef.current;
-    if (!img) return;
+    const el = imgRef.current;
+    if (!el || !dims) return;
     const out = 320;
     const canvas = document.createElement("canvas");
     canvas.width = out; canvas.height = out;
     const ctx = canvas.getContext("2d")!;
-    // Map viewport → source pixels
-    const sx = -pos.x / zoom, sy = -pos.y / zoom, sSize = VIEW / zoom;
-    ctx.drawImage(img, sx, sy, sSize, sSize, 0, 0, out, out);
-    onSave(canvas.toDataURL("image/jpeg", 0.9));
+    ctx.drawImage(el, -t.x / scale, -t.y / scale, VIEW / scale, VIEW / scale, 0, 0, out, out);
+    onSave(canvas.toDataURL("image/jpeg", 0.92));
   }
 
   return (
@@ -86,25 +77,40 @@ export default function AvatarCropper({
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
-          onWheel={(e) => onZoom(Math.max(minScale, Math.min(minScale * 5, zoom * (e.deltaY < 0 ? 1.06 : 0.94))))}
+          onPointerCancel={onPointerUp}
+          onWheel={(e) => zoomTo(scale * (e.deltaY < 0 ? 1.08 : 0.92))}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            ref={imgRef}
             src={src}
             alt="crop"
             draggable={false}
-            style={{ position: "absolute", left: pos.x, top: pos.y, width: natural.w * zoom, height: natural.h * zoom, maxWidth: "none", userSelect: "none" }}
+            onLoad={onLoad}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: dims ? dims.w : "auto",
+              height: dims ? dims.h : "auto",
+              maxWidth: "none",
+              transform: `translate(${t.x}px, ${t.y}px) scale(${scale})`,
+              transformOrigin: "0 0",
+              opacity: dims ? 1 : 0,
+              userSelect: "none",
+              willChange: "transform",
+            }}
           />
           <div className="cropper-ring" />
         </div>
         <div className="cropper-zoom">
           <span>−</span>
-          <input type="range" min={minScale} max={minScale * 5} step="0.01" value={zoom} onChange={(e) => onZoom(Number(e.target.value))} />
+          <input type="range" min={minScale} max={minScale * 6} step="0.001" value={scale} onChange={(e) => zoomTo(Number(e.target.value))} />
           <span>+</span>
         </div>
         <div className="cropper-actions">
           <button className="btn ghost" onClick={onCancel}>Cancel</button>
-          <button className="btn primary" onClick={save}>Save photo</button>
+          <button className="btn primary" onClick={save} disabled={!dims}>Save photo</button>
         </div>
       </div>
     </div>
