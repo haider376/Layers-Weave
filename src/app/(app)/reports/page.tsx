@@ -86,7 +86,21 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const quotaGoal = period === "daily" ? 1000 : period === "monthly" ? 30000 : 7000;
   const quotaPct = Math.round((wonValue / quotaGoal) * 100);
 
+  // funnel — conversion through the pipeline
+  const FUNNEL_STAGES = ["Appointment Scheduled", "Showed up", "Initiation", "Handpick / Bulk Vintage", "Closed Won"];
+  const funnel = FUNNEL_STAGES.map((s) => ({ label: s, value: deals.filter((d) => d.stage === s).length }));
+
+  // forecast — weighted pipeline by stage win-probability
+  const PROB: Record<string, number> = { "Appointment Scheduled": 0.1, "Showed up": 0.25, "No Show / Reschedule": 0.05, Initiation: 0.4, "Handpick / Bulk Vintage": 0.6 };
+  const openByStage = new Map<string, number>();
+  for (const d of openDeals) openByStage.set(d.stage, (openByStage.get(d.stage) ?? 0) + d.amount);
+  const weighted = openDeals.reduce((s, d) => s + d.amount * (PROB[d.stage] ?? 0.1), 0);
+  const openTotal = openDeals.reduce((s, d) => s + d.amount, 0);
+  const forecastRows = [...openByStage.entries()].sort((a, b) => b[1] - a[1]).map(([label, v]) => ({ label, value: money(Math.round(v * (PROB[label] ?? 0.1))), pct: v * (PROB[label] ?? 0.1) }));
+
   const cards: Card[] = [
+    { id: "funnel", title: "Conversion funnel", hint: "stage → stage", type: "funnel", data: funnel },
+    { id: "forecast", title: "Revenue forecast", hint: "weighted pipeline", type: "forecast", data: { committed: money(wonValue), weighted: money(weighted), best: money(wonValue + openTotal), rows: forecastRows } },
     { id: "pipeline", title: "Pipeline by stage", hint: "deals", type: "donut", data: pipelineDonut, center: "deals" },
     { id: "winloss", title: "Win / Loss", hint: "all deals", type: "donut", data: winLossDonut, center: "deals" },
     { id: "wonByAe", title: "Closed / Won by AE", hint: "revenue", type: "bars", data: wonBars },

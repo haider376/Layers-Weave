@@ -747,3 +747,40 @@ select.se-input option{background:var(--panel-2)}
 .cal-add-pop{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:rgba(160,253,58,.04);flex-wrap:wrap}
 .cal-add-pop .eyebrow{flex:none}
 .cal-hint{padding:8px 16px;font-size:11px;color:var(--faint);border-top:1px solid var(--line)}
+
+/* ── Analytics funnel + forecast ─────────────────────────────── */
+.funnel-chart{display:flex;flex-direction:column;gap:10px}
+.fc-step{display:flex;flex-direction:column;gap:3px}
+.fc-bar-wrap{display:flex;justify-content:center}
+.fc-bar{height:30px;background:linear-gradient(90deg,var(--violet),var(--neon));border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:var(--neon-ink);font-weight:800;font-size:12px;min-width:40px;transform-origin:center;animation:growBar .8s cubic-bezier(.22,.61,.36,1) both}
+.fc-meta{display:flex;justify-content:space-between;align-items:center}
+.fc-l{font-size:11px;color:var(--muted)}
+.fc-conv{font-size:10px;font-weight:800;color:var(--neon)}
+.forecast{display:flex;flex-direction:column;gap:8px}
+.fcast-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.fcast-top>div{display:flex;flex-direction:column;gap:3px}
+.fcast-l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.fcast-top b{font-size:18px}
+
+/* ── Deal drawer (slide-over peek) ───────────────────────────── */
+.drawer-overlay{position:fixed;inset:0;z-index:115;background:rgba(4,3,8,.55);backdrop-filter:blur(3px);display:flex;justify-content:flex-end}
+.drawer{width:420px;max-width:92vw;height:100vh;background:var(--panel);border-left:1px solid var(--line-2);box-shadow:-30px 0 80px -30px rgba(0,0,0,.9);overflow-y:auto}
+.drawer-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:1}
+.drawer-x{background:var(--panel-2);border:1px solid var(--line-2);color:var(--muted);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:12px}
+.drawer-x:hover{border-color:var(--neon);color:var(--neon)}
+.drawer-body{padding:18px}
+.drawer-title{font-size:22px;line-height:1.1}
+.drawer-amt{font-size:14px;color:var(--neon);font-weight:700;margin-top:6px;display:flex;align-items:center}
+.drawer-kv{display:flex;flex-direction:column;gap:10px;margin:18px 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.drawer-kv>div{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.drawer-kv span{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.drawer-kv b{font-size:12.5px}
+.drawer-kv .dg-input{max-width:200px}
+.drawer-link{color:var(--violet-br);text-decoration:none;font-size:12.5px;font-weight:600}
+.drawer-sec{margin-bottom:16px}
+.drawer-sec .eyebrow{display:block;margin-bottom:8px}
+.drawer-quote{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);padding:5px 0}
+.drawer-ev{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:6px 0;border-top:1px solid var(--line)}
+.drawer-ev-dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--muted)}
+.drawer-ev-dot.note{background:var(--neon)}.drawer-ev-dot.email{background:var(--violet-br)}.drawer-ev-dot.call{background:var(--amber)}
+.drawer-ev-at{font-size:10px;color:var(--faint);flex:none}

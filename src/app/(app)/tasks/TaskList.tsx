@@ -63,7 +63,7 @@ export default function TaskList({ tasks }: { tasks: TaskRow[] }) {
                   <span className={`prio-dot ${t.priority.toLowerCase()}`} title={t.priority} />
                   <div className="task-main">
                     <span className="task-title">{t.title}</span>
-                    {t.company && <span className="task-meta">{t.dealId ? <Link href={`/deals/${t.dealId}`}>{t.company}</Link> : t.company}</span>}
+                    {t.company && <span className="task-meta">{t.dealId ? <Link href={`?deal=${t.dealId}`}>{t.company}</Link> : t.company}</span>}
                   </div>
                   <span className="task-type">{t.type}</span>
                   {t.dueDate && <span className="task-due">{new Date(t.dueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>}

@@ -69,7 +69,7 @@ export default async function ContactDetail({ params }: { params: Promise<{ id: 
             <div className="panel-h"><h2>Deals</h2><span className="count">{contact.deals.length}</span></div>
             <div style={{ padding: "6px 0" }}>
               {contact.deals.map((d) => (
-                <Link href={`/deals/${d.id}`} key={d.id} className="mini-row">
+                <Link href={`?deal=${d.id}`} key={d.id} className="mini-row">
                   <span style={{ flex: 1 }}>{d.name.replace(/ × Layers$/, "")}<small>{d.stage}</small></span>
                   <span style={{ color: "var(--neon)", fontWeight: 700, fontSize: 12 }}>${d.amount.toLocaleString("en-US")}</span>
                 </Link>

@@ -6,6 +6,8 @@ import Sidebar from "@/components/Sidebar";
 import Toaster from "@/components/Toast";
 import Celebration from "@/components/Celebration";
 import PageTransition from "@/components/PageTransition";
+import DealDrawer from "@/components/DealDrawer";
+import { Suspense } from "react";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -51,6 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </main>
       <Toaster />
       <Celebration />
+      <Suspense fallback={null}><DealDrawer /></Suspense>
     </div>
   );
 }

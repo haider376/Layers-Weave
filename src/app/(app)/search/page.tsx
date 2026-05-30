@@ -43,12 +43,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         )}
         {deals.length > 0 && (
           <Sec title="Deals" count={deals.length}>
-            {deals.map((d) => <Row key={d.id} href={`/deals/${d.id}`} main={d.name.replace(/ × Layers$/, "")} sub={`${d.dealId} · ${d.company.name}`} tag={d.stage} />)}
+            {deals.map((d) => <Row key={d.id} href={`?deal=${d.id}`} main={d.name.replace(/ × Layers$/, "")} sub={`${d.dealId} · ${d.company.name}`} tag={d.stage} />)}
           </Sec>
         )}
         {quotes.length > 0 && (
           <Sec title="Quotes" count={quotes.length}>
-            {quotes.map((qq) => <Row key={qq.id} href={showSupply ? "/supply" : `/deals/${qq.dealId ?? ""}`} main={qq.quoteId} sub={`${qq.clientName} · ${qq.type}`} tag={qq.status} />)}
+            {quotes.map((qq) => <Row key={qq.id} href={`?deal=${qq.dealId ?? ""}`} main={qq.quoteId} sub={`${qq.clientName} · ${qq.type}`} tag={qq.status} />)}
           </Sec>
         )}
       </div>

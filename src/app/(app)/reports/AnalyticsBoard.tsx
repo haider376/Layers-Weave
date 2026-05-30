@@ -10,12 +10,17 @@ type Seg = { k: string; v: number; color: string };
 type Stack = { label: string; total: number; segs: Seg[] };
 type Quota = { actual: string; goal: string; pct: number; deals: number };
 
+type FunnelStep = { label: string; value: number };
+type Forecast = { committed: string; weighted: string; best: string; rows: { label: string; value: string; pct: number }[] };
+
 export type Card =
   | { id: string; title: string; hint?: string; type: "donut"; data: DonutSlice[]; center?: string }
   | { id: string; title: string; hint?: string; type: "bars"; data: Bar[] }
   | { id: string; title: string; hint?: string; type: "stacked"; data: Stack[] }
   | { id: string; title: string; hint?: string; type: "spark"; data: number[] }
-  | { id: string; title: string; hint?: string; type: "quota"; data: Quota };
+  | { id: string; title: string; hint?: string; type: "quota"; data: Quota }
+  | { id: string; title: string; hint?: string; type: "funnel"; data: FunnelStep[] }
+  | { id: string; title: string; hint?: string; type: "forecast"; data: Forecast };
 
 export type Kpi = { label: string; value: string; sub: string; accent?: "neon" | "vio" };
 
@@ -85,6 +90,39 @@ function renderCard(c: Card) {
         <div className="quota-top"><span className="quota-actual">{q.actual}</span><span className="quota-pct" style={{ color: q.pct >= 100 ? "var(--neon)" : "var(--muted)" }}>{q.pct}%</span></div>
         <div className="quota-track"><i style={{ width: `${Math.min(100, q.pct)}%` }} /></div>
         <div className="quota-foot"><span>{q.deals} deals · goal {q.goal}</span><span>{q.pct >= 100 ? "🎯 Goal smashed" : "in progress"}</span></div>
+      </div>
+    );
+  }
+  if (c.type === "funnel") {
+    const top = Math.max(1, c.data[0]?.value ?? 1);
+    return (
+      <div className="funnel-chart">
+        {c.data.map((s, i) => {
+          const pct = (s.value / top) * 100;
+          const conv = i > 0 && c.data[i - 1].value ? Math.round((s.value / c.data[i - 1].value) * 100) : null;
+          return (
+            <div className="fc-step" key={s.label}>
+              <div className="fc-bar-wrap"><div className="fc-bar" style={{ width: `${Math.max(8, pct)}%` }}><span>{s.value}</span></div></div>
+              <div className="fc-meta"><span className="fc-l">{s.label}</span>{conv !== null && <span className="fc-conv">{conv}%</span>}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+  if (c.type === "forecast") {
+    const f = c.data;
+    const max = Math.max(1, ...f.rows.map((r) => r.pct));
+    return (
+      <div className="forecast">
+        <div className="fcast-top">
+          <div><span className="fcast-l">Committed</span><b className="font-display" style={{ color: "var(--neon)" }}>{f.committed}</b></div>
+          <div><span className="fcast-l">Weighted</span><b className="font-display" style={{ color: "var(--violet-br)" }}>{f.weighted}</b></div>
+          <div><span className="fcast-l">Best case</span><b className="font-display">{f.best}</b></div>
+        </div>
+        {f.rows.map((r) => (
+          <div className="rbar" key={r.label}><span className="rbar-l">{r.label}</span><div className="rbar-track"><i style={{ width: `${Math.max(3, (r.pct / max) * 100)}%`, background: "var(--violet-br)" }} /></div><span className="rbar-v">{r.value}</span></div>
+        ))}
       </div>
     );
   }

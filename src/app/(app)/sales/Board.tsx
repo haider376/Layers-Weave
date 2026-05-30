@@ -136,7 +136,7 @@ export default function Board({ deals }: { deals: BoardDeal[] }) {
                       setOverStage(null);
                     }}
                   >
-                    <a className="dn dn-link" href={`/deals/${d.id}`}>{d.name}</a>
+                    <a className="dn dn-link" href={`?deal=${d.id}`}>{d.name}</a>
                     <div className="meta">
                       <span className="amt">${d.amount.toLocaleString("en-US")}</span>
                       {d.quoteId && <span className="qid">{d.quoteId}</span>}

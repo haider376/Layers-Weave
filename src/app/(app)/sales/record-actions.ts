@@ -119,6 +119,33 @@ export async function createDealAction(input: { name: string; companyId: string;
   return { id: deal.id };
 }
 
+// Compact deal payload for the slide-over drawer (peek without navigating).
+export async function getDealDrawerAction(id: string) {
+  await guard();
+  const d = await prisma.deal.findUnique({
+    where: { id },
+    include: { company: true, contact: true, owner: true, quotes: { select: { quoteId: true, status: true, type: true } } },
+  });
+  if (!d) return null;
+  const [activities, calls, emails] = await Promise.all([
+    prisma.activity.findMany({ where: { dealId: id }, orderBy: { createdAt: "desc" }, take: 6 }),
+    prisma.callLog.findMany({ where: { dealId: id }, orderBy: { createdAt: "desc" }, take: 4 }),
+    prisma.emailMessage.findMany({ where: { dealId: id }, orderBy: { createdAt: "desc" }, take: 4 }),
+  ]);
+  const events = [
+    ...activities.map((a) => ({ kind: a.type === "note" ? "note" : "system", text: a.body, at: a.createdAt.toISOString() })),
+    ...calls.map((c) => ({ kind: "call", text: `Call — ${c.outcome ?? "logged"}`, at: c.createdAt.toISOString() })),
+    ...emails.map((e) => ({ kind: "email", text: `${e.direction === "outbound" ? "Sent" : "Received"}: ${e.subject}`, at: e.createdAt.toISOString() })),
+  ].sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 8);
+
+  return {
+    id: d.id, dealId: d.dealId, name: d.name.replace(/ × Layers$/, ""), stage: d.stage, amount: d.amount,
+    requestType: d.requestType ?? "", company: { id: d.companyId, name: d.company.name },
+    contact: d.contact ? { id: d.contact.id, name: d.contact.name } : null,
+    owner: d.owner?.name ?? "—", quotes: d.quotes, events,
+  };
+}
+
 export async function updateDealAction(dealId: string, data: { name?: string; amount?: number; stage?: string; requestType?: string; contactId?: string }) {
   await guard();
   const patch: Record<string, unknown> = {};

@@ -88,7 +88,7 @@ export default function CalendarView({ events }: { events: CalEvent[] }) {
                   const top = e.kind === "meeting" ? (dt.getHours() + dt.getMinutes() / 60 - START_HOUR) * ROW : 2 + (evOn(d).filter((x) => x.kind === "task").indexOf(e)) * 26;
                   return (
                     <motion.div key={e.id} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="cal-ev" style={{ top: Math.max(0, top), borderLeftColor: evColor(e) }}>
-                      {e.dealId ? <Link href={`/deals/${e.dealId}`}><span className="cal-ev-t">{e.title}</span></Link> : <span className="cal-ev-t">{e.title}</span>}
+                      {e.dealId ? <Link href={`?deal=${e.dealId}`}><span className="cal-ev-t">{e.title}</span></Link> : <span className="cal-ev-t">{e.title}</span>}
                       <span className="cal-ev-m">{e.kind === "meeting" ? dt.toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit" }) : "task"} · {e.status}</span>
                     </motion.div>
                   );
