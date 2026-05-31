@@ -17,12 +17,13 @@ async function withSchema<T>(fn: () => Promise<T>): Promise<T> {
 //                                              OAuth redirect; auto-derived on
 //                                              Vercel from VERCEL_URL otherwise.
 
-const PROVIDER = "google-calendar";
+const PROVIDER = "google-calendar"; // single Google connection: Calendar + Gmail
 const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const SCOPES = [
   "https://www.googleapis.com/auth/calendar.events",
   "https://www.googleapis.com/auth/calendar.readonly",
+  "https://www.googleapis.com/auth/gmail.send",
   "openid",
   "email",
 ];
@@ -192,4 +193,50 @@ export async function createGoogleEvent(userId: string, input: {
   if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}` };
   const data = (await res.json()) as { htmlLink?: string };
   return { ok: true, htmlLink: data.htmlLink };
+}
+
+// ── Gmail send ──────────────────────────────────────────────────────────────
+// base64url with no padding, as the Gmail API expects.
+function b64url(s: string): string {
+  return Buffer.from(s, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Encode a header value that may contain non-ASCII (RFC 2047).
+function encodeHeader(v: string): string {
+  // eslint-disable-next-line no-control-regex
+  return /^[\x00-\x7F]*$/.test(v) ? v : `=?UTF-8?B?${Buffer.from(v, "utf8").toString("base64")}?=`;
+}
+
+// Send an email as the connected Gmail account. Returns ok + the gmail thread id.
+export async function sendGmail(userId: string, input: {
+  to: string; subject: string; body: string; fromName?: string;
+}): Promise<{ ok: boolean; threadId?: string; error?: string }> {
+  const token = await freshAccessToken(userId);
+  if (!token) return { ok: false, error: "not connected" };
+  const conn = await getConnection(userId);
+  const from = conn.accountEmail
+    ? (input.fromName ? `${encodeHeader(input.fromName)} <${conn.accountEmail}>` : conn.accountEmail)
+    : undefined;
+
+  // Build a minimal RFC 822 message (HTML body).
+  const lines = [
+    from ? `From: ${from}` : "",
+    `To: ${input.to}`,
+    `Subject: ${encodeHeader(input.subject)}`,
+    "MIME-Version: 1.0",
+    'Content-Type: text/html; charset="UTF-8"',
+    "Content-Transfer-Encoding: base64",
+    "",
+    Buffer.from(input.body, "utf8").toString("base64"),
+  ].filter(Boolean);
+  const raw = b64url(lines.join("\r\n"));
+
+  const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ raw }),
+  });
+  if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}` };
+  const data = (await res.json()) as { threadId?: string };
+  return { ok: true, threadId: data.threadId };
 }

@@ -1,18 +1,22 @@
-# Google Calendar Integration — Setup
+# Google Integration (Calendar + Gmail) — Setup
 
-This connects each user's **Google Calendar** to Layers Weave so they can:
-- Create events from the in-app Create modal (with attendees → real Google invites)
-- See their Google events alongside meetings/tasks on the calendar
+ONE Google connection grants BOTH features. Each user connects their own Google
+account once (Calendar → sidebar → Connect, or Settings → Integrations), and gets:
+- **Calendar**: create events from the in-app modal (attendees → real Google
+  invites), and see their Google events on the calendar.
+- **Gmail**: emails sent from a contact's timeline go out through their own Gmail
+  account (and are logged to the CRM).
 
-It's **per-user OAuth** — every rep connects their own Google account from
-**Calendar → sidebar → Connect**, or **Settings → Integrations → Google Calendar**.
+It's **per-user OAuth**.
 
 ---
 
 ## 1. Create the Google OAuth app (one-time, ~10 min)
 
 1. Go to **https://console.cloud.google.com/** and create (or pick) a project.
-2. **APIs & Services → Library →** enable the **Google Calendar API**.
+2. **APIs & Services → Library →** enable BOTH:
+   - **Google Calendar API**
+   - **Gmail API**
 3. **APIs & Services → OAuth consent screen**:
    - User type: **Internal** (if your Google Workspace is `layerswholesale.*`)
      — this skips Google's app-verification review. Use **External** only if reps
