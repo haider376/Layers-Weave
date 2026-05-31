@@ -38,7 +38,9 @@ export default function FilterBar({
           </Popover.Trigger>
           <Popover.Portal>
             <Popover.Content className="fbar-pop" sideOffset={6} align="start">
-              {f.type === "multi" ? <MultiFilter f={f} value={(state[f.key] as string[]) ?? []} onChange={(v) => onChange(f.key, v)} /> : <DateFilter value={(state[f.key] as { from?: string; to?: string }) ?? {}} onChange={(v) => onChange(f.key, v)} />}
+              <div className="ui-select-anim">
+                {f.type === "multi" ? <MultiFilter f={f} value={(state[f.key] as string[]) ?? []} onChange={(v) => onChange(f.key, v)} /> : <DateFilter value={(state[f.key] as { from?: string; to?: string }) ?? {}} onChange={(v) => onChange(f.key, v)} />}
+              </div>
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>

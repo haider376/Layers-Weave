@@ -32,16 +32,18 @@ export default function Select({
       </RS.Trigger>
       <RS.Portal>
         <RS.Content position="popper" sideOffset={6} collisionPadding={10} className="ui-select-content">
-          <RS.Viewport className="ui-select-vp">
-            {opts.map((o) => (
-              <RS.Item key={o.value || EMPTY} value={toRadix(o.value)} className="ui-select-item">
-                <RS.ItemText>{o.badge ? <span className={`badge badge-${o.badge}`}>{o.label}</span> : o.label}</RS.ItemText>
-                <RS.ItemIndicator className="ui-select-check">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                </RS.ItemIndicator>
-              </RS.Item>
-            ))}
-          </RS.Viewport>
+          <div className="ui-select-anim">
+            <RS.Viewport className="ui-select-vp">
+              {opts.map((o) => (
+                <RS.Item key={o.value || EMPTY} value={toRadix(o.value)} className="ui-select-item">
+                  <RS.ItemText>{o.badge ? <span className={`badge badge-${o.badge}`}>{o.label}</span> : o.label}</RS.ItemText>
+                  <RS.ItemIndicator className="ui-select-check">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  </RS.ItemIndicator>
+                </RS.Item>
+              ))}
+            </RS.Viewport>
+          </div>
         </RS.Content>
       </RS.Portal>
     </RS.Root>

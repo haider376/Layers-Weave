@@ -6,7 +6,6 @@ import { useRef, useState } from "react";
 import Logo, { initials } from "./Logo";
 import { updateAvatarAction } from "@/app/actions/session";
 import AvatarCropper from "./AvatarCropper";
-import WeaveMark from "./WeaveMark";
 import { showToast } from "./Toast";
 
 const ICONS = {
@@ -67,7 +66,6 @@ export default function Sidebar({
   return (
     <aside className="side">
       <div className="logo-wrap logo-row">
-        <WeaveMark size={28} />
         <div className="logo-text"><Logo /><div className="logo-sub">Weave</div></div>
       </div>
 

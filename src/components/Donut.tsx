@@ -1,13 +1,13 @@
 export type DonutSlice = { label: string; value: number; color: string };
 
-export default function Donut({ data, total, centerLabel }: { data: DonutSlice[]; total?: number; centerLabel?: string }) {
+export default function Donut({ data, total, centerLabel, size = 150 }: { data: DonutSlice[]; total?: number; centerLabel?: string; size?: number }) {
   const sum = total ?? data.reduce((s, d) => s + d.value, 0);
   const R = 54, C = 64, SW = 18;
   const circ = 2 * Math.PI * R;
   let offset = 0;
   return (
     <div className="donut-wrap">
-      <svg viewBox="0 0 128 128" className="donut-svg" style={{ width: 150, height: 150 }}>
+      <svg viewBox="0 0 128 128" className="donut-svg" style={{ width: size, height: size }}>
         <circle cx={C} cy={C} r={R} fill="none" stroke="var(--panel-2)" strokeWidth={SW} />
         {data.map((d, i) => {
           const frac = sum ? d.value / sum : 0;
