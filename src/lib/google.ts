@@ -182,6 +182,50 @@ type GoogleApiEvent = {
   end?: { dateTime?: string; date?: string };
 };
 
+// Admin diagnostics: what scopes were granted, token state, and a LIVE probe of
+// the Calendar API so we can see the real error if events don't load.
+export async function googleDiagnostics(userId: string): Promise<Record<string, unknown>> {
+  const row = await prisma.integration.findUnique({ where: { userId_provider: { userId, provider: PROVIDER } } }).catch(() => null);
+  if (!row) return { connected: false };
+
+  const grantedScopes = (row.scope ?? "").split(" ").filter(Boolean);
+  const hasCalRead = grantedScopes.some((s) => s.includes("calendar.readonly") || s.includes("calendar.events") || s.endsWith("/calendar"));
+  const hasGmailSend = grantedScopes.some((s) => s.includes("gmail.send"));
+
+  const token = await freshAccessToken(userId);
+  let calProbe: Record<string, unknown> = { ran: false };
+  if (token) {
+    const now = new Date();
+    const min = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+    const max = new Date(now.getFullYear(), now.getMonth() + 2, 0).toISOString();
+    const p = new URLSearchParams({ timeMin: min, timeMax: max, singleEvents: "true", orderBy: "startTime", maxResults: "10" });
+    const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?${p}`, { headers: { authorization: `Bearer ${token}` } });
+    const text = await res.text();
+    let parsed: unknown = null;
+    try { parsed = JSON.parse(text); } catch { /* keep raw */ }
+    const items = (parsed as { items?: unknown[] } | null)?.items;
+    calProbe = {
+      ran: true,
+      httpStatus: res.status,
+      eventCount: Array.isArray(items) ? items.length : 0,
+      // surface Google's error body (e.g. insufficient scope) when not 200
+      error: res.ok ? null : (text.slice(0, 400)),
+    };
+  }
+
+  return {
+    connected: true,
+    accountEmail: row.accountEmail,
+    grantedScopes,
+    hasCalendarScope: hasCalRead,
+    hasGmailSendScope: hasGmailSend,
+    hasRefreshToken: !!row.refreshToken,
+    accessTokenExpired: row.expiresAt ? row.expiresAt.getTime() < Date.now() : null,
+    gotFreshToken: !!token,
+    calendarProbe: calProbe,
+  };
+}
+
 // Create an event on the user's primary calendar (with optional attendees).
 export async function createGoogleEvent(userId: string, input: {
   title: string; startISO: string; endISO: string; attendees?: string[];

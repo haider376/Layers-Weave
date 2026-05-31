@@ -113,13 +113,13 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
           )}
           {tab === "Integrations" && (
             <div className="set-list">
-              {/* Google Calendar — live OAuth integration */}
+              {/* Google Workspace — ONE connection powers Calendar + Gmail */}
               <div className="set-row">
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span className="itg-ic" style={{ background: "#1A73E8", color: "#fff" }}>C</span>
+                  <span className="itg-ic" style={{ background: "#1A73E8", color: "#fff" }}>G</span>
                   <div>
-                    <div className="set-row-t">Google Calendar {google.connected && <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Connected</span>}</div>
-                    <div className="set-row-s">{google.connected ? (google.email ?? "Two-way event sync + invites") : google.configured ? "Sync events & send invites" : "Needs Google API keys (admin setup)"}</div>
+                    <div className="set-row-t">Google (Calendar + Gmail) {google.connected && <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Connected</span>}</div>
+                    <div className="set-row-s">{google.connected ? `${google.email ?? "Connected"} · calendar sync, invites & send email from Gmail` : google.configured ? "Sync calendar events, send invites & email from your Gmail" : "Needs Google API keys (admin setup)"}</div>
                   </div>
                 </div>
                 {google.connected ? (
@@ -131,7 +131,7 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
                 )}
               </div>
               {/* Remaining integrations — coming soon */}
-              {[["Zoom Phone", "Click-to-call + logging", "Z", "#2D8CFF"], ["Gmail", "2-way email sync", "G", "#EA4335"], ["Outlook", "2-way email sync", "O", "#0078D4"], ["Fireflies", "Call recordings", "F", "#7C3AED"], ["WhatsApp Business", "Client comms", "W", "#25D366"], ["Slack", "Deal-won alerts", "S", "#611f69"]].map(([n, s, ic, col]) => (
+              {[["Zoom Phone", "Click-to-call + logging", "Z", "#2D8CFF"], ["Outlook", "2-way email sync", "O", "#0078D4"], ["Fireflies", "Call recordings", "F", "#7C3AED"], ["WhatsApp Business", "Client comms", "W", "#25D366"], ["Slack", "Deal-won alerts", "S", "#611f69"]].map(([n, s, ic, col]) => (
                 <div className="set-row" key={n}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><span className="itg-ic" style={{ background: col as string, color: "#fff" }}>{ic}</span><div><div className="set-row-t">{n}</div><div className="set-row-s">{s}</div></div></div><button className="itg-cta" onClick={() => showToast(`${n} integration — coming soon`)}>Connect</button></div>
               ))}
             </div>

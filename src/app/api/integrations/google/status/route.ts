@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { googleConfigured, appOrigin, redirectUri } from "@/lib/google";
+import { googleConfigured, appOrigin, redirectUri, googleDiagnostics } from "@/lib/google";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +15,9 @@ export async function GET() {
   const id = process.env.GOOGLE_CLIENT_ID;
   const secret = process.env.GOOGLE_CLIENT_SECRET;
 
+  // Live diagnostics for THIS admin's connection (scopes + a real Calendar probe).
+  const connection = await googleDiagnostics(user.id);
+
   return NextResponse.json({
     configured: googleConfigured(),
     has_GOOGLE_CLIENT_ID: !!id,
@@ -28,5 +31,6 @@ export async function GET() {
     computed_appOrigin: appOrigin(),
     computed_redirectUri: redirectUri(),
     NODE_ENV: process.env.NODE_ENV,
+    connection,
   });
 }

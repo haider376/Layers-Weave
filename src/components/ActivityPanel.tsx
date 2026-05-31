@@ -69,8 +69,12 @@ export default function ActivityPanel({
   function run(fn: () => Promise<unknown>, after?: () => void, toast?: string) {
     start(async () => {
       try {
-        await fn();
-        if (toast) showToast(toast);
+        const res = await fn();
+        // For email sends, reflect whether it actually went out via Gmail.
+        const r = res as { sentVia?: string } | undefined;
+        if (r?.sentVia === "gmail") showToast("Email sent via Gmail ✓");
+        else if (r?.sentVia === "logged") showToast("Email logged (connect Google to send)");
+        else if (toast) showToast(toast);
         after?.();
         router.refresh();
       } catch {
