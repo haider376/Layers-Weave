@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
@@ -10,10 +10,13 @@ export default async function LeadsPage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const companies = await prisma.company.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { owner: true, bdr: true, _count: { select: { deals: true, contacts: true } } },
-  });
+  const [companies, cadences] = await Promise.all([
+    prisma.company.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { owner: true, bdr: true, _count: { select: { deals: true, contacts: true } } },
+    }),
+    safe(prisma.cadence.findMany({ where: { active: true }, select: { id: true, name: true, function: true }, orderBy: { updatedAt: "desc" } }), []),
+  ]);
 
   const leads: Lead[] = companies.map((c) => ({
     id: c.id, name: c.name, clientId: c.clientId,
@@ -28,7 +31,7 @@ export default async function LeadsPage() {
   return (
     <>
       <Topbar title="Leads" sub={`${leads.length} accounts — filter, sort, import & export`} />
-      <LeadsView leads={leads} />
+      <LeadsView leads={leads} cadences={cadences} />
     </>
   );
 }

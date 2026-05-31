@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
@@ -10,11 +10,14 @@ export default async function PeoplePage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const contacts = await prisma.contact.findMany({
-    orderBy: { name: "asc" },
-    include: { company: { include: { owner: true } } },
-    take: 1000,
-  });
+  const [contacts, cadences] = await Promise.all([
+    prisma.contact.findMany({
+      orderBy: { name: "asc" },
+      include: { company: { include: { owner: true } } },
+      take: 1000,
+    }),
+    safe(prisma.cadence.findMany({ where: { active: true }, select: { id: true, name: true, function: true }, orderBy: { updatedAt: "desc" } }), []),
+  ]);
 
   const people: Person[] = contacts.map((c) => ({
     id: c.id, name: c.name, title: c.title ?? "—", email: c.email ?? "—", phone: c.phone ?? "—",
@@ -26,7 +29,7 @@ export default async function PeoplePage() {
   return (
     <>
       <Topbar title="People" sub={`${people.length} contacts — filter, sort, import & export`} />
-      <PeopleView people={people} />
+      <PeopleView people={people} cadences={cadences} />
     </>
   );
 }

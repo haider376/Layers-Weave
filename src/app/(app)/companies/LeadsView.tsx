@@ -7,6 +7,7 @@ import { showToast } from "@/components/Toast";
 import { initials } from "@/components/Logo";
 import Select from "@/components/ui/Select";
 import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
+import BulkEnroll, { type CadenceOpt } from "@/components/BulkEnroll";
 import { createLeadAction, importLeadsAction, updateCompanyAction } from "../sales/record-actions";
 
 const BADGE = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
@@ -32,7 +33,7 @@ function parseCSV(text: string): Record<string, string>[] {
   return lines.slice(1).map((l) => { const cells = split(l); const o: Record<string, string> = {}; headers.forEach((h, i) => (o[h] = cells[i] ?? "")); return o; });
 }
 
-export default function LeadsView({ leads }: { leads: Lead[] }) {
+export default function LeadsView({ leads, cadences = [] }: { leads: Lead[]; cadences?: CadenceOpt[] }) {
   const router = useRouter();
   const [, start] = useTransition();
   const [view, setView] = useState<"table" | "board" | "report">("table");
@@ -43,6 +44,7 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
   const [adding, setAdding] = useState(false);
   const [nl, setNl] = useState({ name: "", country: "", type: "Wholesaler", leadStatus: "New", tier: "B" });
   const [dragId, setDragId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const fileRef = useRef<HTMLInputElement>(null);
 
   const filterDefs: FilterDef[] = useMemo(() => {
@@ -80,6 +82,9 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
   }, [leads, q, fstate, filterDefs, sortKey, dir]);
 
   function sortBy(k: keyof Lead) { if (sortKey === k) setDir((d) => (d === 1 ? -1 : 1)); else { setSortKey(k); setDir(1); } }
+  const toggleSel = (id: string) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const allShownSelected = filtered.length > 0 && filtered.every((l) => selected.has(l.id));
+  const toggleAll = () => setSelected((s) => { const n = new Set(s); if (allShownSelected) filtered.forEach((l) => n.delete(l.id)); else filtered.forEach((l) => n.add(l.id)); return n; });
 
   function exportCSV() {
     const cols: (keyof Lead)[] = ["name", "owner", "bdr", "leadStatus", "country", "tier", "type", "createdAt", "lastActivity", "deals", "contacts"];
@@ -114,6 +119,7 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
         <div className="seg">{(["table", "board", "report"] as const).map((v) => <button key={v} className={view === v ? "on" : ""} onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}</div>
         <input className="ed lv-search" style={{ border: "1px solid var(--line-2)" }} placeholder="Filter leads…" value={q} onChange={(e) => setQ(e.target.value)} />
         <span style={{ flex: 1 }} />
+        <BulkEnroll cadences={cadences} ids={[...selected]} mode="company" onDone={() => setSelected(new Set())} />
         <button className="btn ghost lv-btn" onClick={() => fileRef.current?.click()}>Import</button>
         <button className="btn ghost lv-btn" onClick={exportCSV}>Export</button>
         <button className="btn primary lv-btn" onClick={() => setAdding((a) => !a)}>+ Add lead</button>
@@ -142,10 +148,11 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
         <section className="panel">
           <div className="panel-h"><h2>All leads</h2><span className="count">{filtered.length} shown</span></div>
           <table>
-            <thead><tr><SortTh k="name" label="Company" /><SortTh k="owner" label="Owner" /><SortTh k="bdr" label="BDR" /><SortTh k="leadStatus" label="Lead status" /><SortTh k="country" label="Country" /><SortTh k="createdAt" label="Created" /><SortTh k="lastActivity" label="Last activity" /></tr></thead>
+            <thead><tr><th className="sel-th"><input type="checkbox" className="lv-check" checked={allShownSelected} onChange={toggleAll} /></th><SortTh k="name" label="Company" /><SortTh k="owner" label="Owner" /><SortTh k="bdr" label="BDR" /><SortTh k="leadStatus" label="Lead status" /><SortTh k="country" label="Country" /><SortTh k="createdAt" label="Created" /><SortTh k="lastActivity" label="Last activity" /></tr></thead>
             <tbody>
               {filtered.map((l) => (
-                <tr className="row" key={l.id}>
+                <tr className={`row${selected.has(l.id) ? " sel" : ""}`} key={l.id}>
+                  <td className="sel-td"><input type="checkbox" className="lv-check" checked={selected.has(l.id)} onChange={() => toggleSel(l.id)} /></td>
                   <td><Link href={`?company=${l.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>{l.name}<small style={{ display: "block", color: "var(--faint)", fontWeight: 500 }}>{l.clientId}</small></Link></td>
                   <td><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span className="mini-av">{initials(l.owner)}</span>{l.owner.split(" ")[0]}</span></td>
                   <td>{l.bdr.split(" ")[0]}</td>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
 import { initials } from "@/components/Logo";
 import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
+import BulkEnroll, { type CadenceOpt } from "@/components/BulkEnroll";
 import { importPeopleAction } from "../sales/record-actions";
 
 export type Person = {
@@ -24,7 +25,7 @@ function parseCSV(text: string): Record<string, string>[] {
   return lines.slice(1).map((l) => { const cells = split(l); const o: Record<string, string> = {}; headers.forEach((h, i) => (o[h] = cells[i] ?? "")); return o; });
 }
 
-export default function PeopleView({ people }: { people: Person[] }) {
+export default function PeopleView({ people, cadences = [] }: { people: Person[]; cadences?: CadenceOpt[] }) {
   const router = useRouter();
   const [, start] = useTransition();
   const [view, setView] = useState<"table" | "board" | "report">("table");
@@ -32,6 +33,7 @@ export default function PeopleView({ people }: { people: Person[] }) {
   const [fstate, setFstate] = useState<FilterState>({});
   const [sortKey, setSortKey] = useState<keyof Person>("name");
   const [dir, setDir] = useState<1 | -1>(1);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const fileRef = useRef<HTMLInputElement>(null);
 
   const filterDefs: FilterDef[] = useMemo(() => {
@@ -69,6 +71,9 @@ export default function PeopleView({ people }: { people: Person[] }) {
   }, [people, q, fstate, filterDefs, sortKey, dir]);
 
   function sortBy(k: keyof Person) { if (sortKey === k) setDir((d) => (d === 1 ? -1 : 1)); else { setSortKey(k); setDir(1); } }
+  const toggleSel = (id: string) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const allShownSelected = filtered.length > 0 && filtered.every((p) => selected.has(p.id));
+  const toggleAll = () => setSelected((s) => { const n = new Set(s); if (allShownSelected) filtered.forEach((p) => n.delete(p.id)); else filtered.forEach((p) => n.add(p.id)); return n; });
   function exportCSV() {
     const cols: (keyof Person)[] = ["name", "title", "company", "email", "phone", "owner", "createdAt"];
     const csv = cols.join(",") + "\n" + filtered.map((p) => cols.map((c) => `"${String(p[c] ?? "")}"`).join(",")).join("\n");
@@ -97,6 +102,7 @@ export default function PeopleView({ people }: { people: Person[] }) {
         <div className="seg">{(["table", "board", "report"] as const).map((v) => <button key={v} className={view === v ? "on" : ""} onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}</div>
         <input className="ed lv-search" style={{ border: "1px solid var(--line-2)" }} placeholder="Filter people…" value={q} onChange={(e) => setQ(e.target.value)} />
         <span style={{ flex: 1 }} />
+        <BulkEnroll cadences={cadences} ids={[...selected]} onDone={() => setSelected(new Set())} />
         <button className="btn ghost lv-btn" onClick={() => fileRef.current?.click()}>Import</button>
         <button className="btn ghost lv-btn" onClick={exportCSV}>Export</button>
         <input ref={fileRef} type="file" accept=".csv" hidden onChange={importCSV} />
@@ -108,10 +114,11 @@ export default function PeopleView({ people }: { people: Person[] }) {
         <section className="panel">
           <div className="panel-h"><h2>All people</h2><span className="count">{filtered.length} shown</span></div>
           <table>
-            <thead><tr><SortTh k="name" label="Name" /><SortTh k="title" label="Title" /><SortTh k="company" label="Company" /><SortTh k="owner" label="Owner" /><SortTh k="email" label="Email" /><SortTh k="createdAt" label="Created" /></tr></thead>
+            <thead><tr><th className="sel-th"><input type="checkbox" className="lv-check" checked={allShownSelected} onChange={toggleAll} /></th><SortTh k="name" label="Name" /><SortTh k="title" label="Title" /><SortTh k="company" label="Company" /><SortTh k="owner" label="Owner" /><SortTh k="email" label="Email" /><SortTh k="createdAt" label="Created" /></tr></thead>
             <tbody>
               {filtered.map((p) => (
-                <tr className="row" key={p.id}>
+                <tr className={`row${selected.has(p.id) ? " sel" : ""}`} key={p.id}>
+                  <td className="sel-td"><input type="checkbox" className="lv-check" checked={selected.has(p.id)} onChange={() => toggleSel(p.id)} /></td>
                   <td><Link href={`?contact=${p.id}`} style={{ fontWeight: 600, textDecoration: "none" }}><span className="mini-av" style={{ marginRight: 8 }}>{initials(p.name)}</span>{p.name}{p.primary && <span className="q-type" style={{ marginLeft: 8 }}>PRIMARY</span>}</Link></td>
                   <td>{p.title}</td>
                   <td><Link href={`?company=${p.companyId}`} style={{ color: "var(--violet-br)", textDecoration: "none" }}>{p.company}</Link></td>

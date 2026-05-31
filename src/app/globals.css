@@ -1497,3 +1497,9 @@ html.compact .kpis,html.compact .grid2,html.compact .an-grid{gap:14px}
 .enroll-fn{font-size:10px;color:var(--faint);background:var(--panel);border-radius:20px;padding:2px 8px}
 
 @media(max-width:1000px){.cad-body{grid-template-columns:1fr}.cad-strip{grid-template-columns:1fr}}
+
+/* ── List-view row selection (bulk "Add to cadence") ── */
+.sel-th,.sel-td{width:40px;text-align:center;padding-left:14px !important;padding-right:6px !important}
+.lv-check{accent-color:var(--neon);width:15px;height:15px;cursor:pointer;vertical-align:middle}
+tbody tr.row.sel{background:var(--neon-soft)}
+tbody tr.row.sel:hover{background:color-mix(in srgb,var(--neon) 16%,transparent)}

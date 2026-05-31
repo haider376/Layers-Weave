@@ -341,6 +341,67 @@ CREATE TABLE "Notification" (
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "AppSetting" (
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AppSetting_pkey" PRIMARY KEY ("key")
+);
+
+-- CreateTable
+CREATE TABLE "Cadence" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "function" TEXT NOT NULL DEFAULT 'Outbound',
+    "priority" TEXT NOT NULL DEFAULT 'Medium',
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "ownerId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Cadence_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "CadenceStep" (
+    "id" TEXT NOT NULL,
+    "cadenceId" TEXT NOT NULL,
+    "day" INTEGER NOT NULL DEFAULT 0,
+    "type" TEXT NOT NULL DEFAULT 'call',
+    "subject" TEXT NOT NULL DEFAULT '',
+    "position" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "CadenceStep_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "CadenceMembership" (
+    "id" TEXT NOT NULL,
+    "cadenceId" TEXT NOT NULL,
+    "contactId" TEXT NOT NULL,
+    "assigneeId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "currentDay" INTEGER NOT NULL DEFAULT 0,
+    "enrolledAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "CadenceMembership_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "CadenceStepRun" (
+    "id" TEXT NOT NULL,
+    "membershipId" TEXT NOT NULL,
+    "stepId" TEXT NOT NULL,
+    "done" BOOLEAN NOT NULL DEFAULT false,
+    "outcome" TEXT,
+    "completedAt" TIMESTAMP(3),
+
+    CONSTRAINT "CadenceStepRun_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -367,6 +428,9 @@ CREATE UNIQUE INDEX "Raghouse_name_key" ON "Raghouse"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Carrier_name_key" ON "Carrier"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CadenceMembership_cadenceId_contactId_key" ON "CadenceMembership"("cadenceId", "contactId");
 
 -- AddForeignKey
 ALTER TABLE "Company" ADD CONSTRAINT "Company_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -433,5 +497,26 @@ ALTER TABLE "PriceApproval" ADD CONSTRAINT "PriceApproval_quoteId_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "CallLog" ADD CONSTRAINT "CallLog_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Cadence" ADD CONSTRAINT "Cadence_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CadenceStep" ADD CONSTRAINT "CadenceStep_cadenceId_fkey" FOREIGN KEY ("cadenceId") REFERENCES "Cadence"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CadenceMembership" ADD CONSTRAINT "CadenceMembership_cadenceId_fkey" FOREIGN KEY ("cadenceId") REFERENCES "Cadence"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CadenceMembership" ADD CONSTRAINT "CadenceMembership_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CadenceMembership" ADD CONSTRAINT "CadenceMembership_assigneeId_fkey" FOREIGN KEY ("assigneeId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CadenceStepRun" ADD CONSTRAINT "CadenceStepRun_membershipId_fkey" FOREIGN KEY ("membershipId") REFERENCES "CadenceMembership"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CadenceStepRun" ADD CONSTRAINT "CadenceStepRun_stepId_fkey" FOREIGN KEY ("stepId") REFERENCES "CadenceStep"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 `;

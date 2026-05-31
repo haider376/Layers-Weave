@@ -96,6 +96,27 @@ export async function enrollContactsAction(cadenceId: string, contactIds: string
   return { added };
 }
 
+// Enroll every contact belonging to the selected companies/leads into a cadence.
+export async function enrollCompaniesAction(cadenceId: string, companyIds: string[]) {
+  const user = await guard();
+  const contacts = await prisma.contact.findMany({ where: { companyId: { in: companyIds } }, select: { id: true } });
+  let added = 0;
+  for (const { id: contactId } of contacts) {
+    const exists = await prisma.cadenceMembership.findUnique({ where: { cadenceId_contactId: { cadenceId, contactId } } });
+    if (exists) {
+      if (exists.status === "removed") {
+        await prisma.cadenceMembership.update({ where: { id: exists.id }, data: { status: "active", currentDay: 0, startedAt: new Date() } });
+        added++;
+      }
+      continue;
+    }
+    await prisma.cadenceMembership.create({ data: { cadenceId, contactId, assigneeId: user.id } });
+    added++;
+  }
+  revalidate();
+  return { added };
+}
+
 // Mark the current step done; advance the member to the next step (or complete).
 export async function completeStepAction(membershipId: string, outcome?: string) {
   const user = await guard();
