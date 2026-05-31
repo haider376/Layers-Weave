@@ -5,6 +5,7 @@ import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
 import { initials } from "@/components/Logo";
+import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
 import { importPeopleAction } from "../sales/record-actions";
 
 export type Person = {
@@ -12,6 +13,7 @@ export type Person = {
   company: string; companyId: string; owner: string; leadStatus: string; createdAt: string;
 };
 
+const BADGE = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
 const fmtD = (s: string) => new Date(s).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" });
 
 function parseCSV(text: string): Record<string, string>[] {
@@ -27,15 +29,44 @@ export default function PeopleView({ people }: { people: Person[] }) {
   const [, start] = useTransition();
   const [view, setView] = useState<"table" | "board" | "report">("table");
   const [q, setQ] = useState("");
+  const [fstate, setFstate] = useState<FilterState>({});
   const [sortKey, setSortKey] = useState<keyof Person>("name");
   const [dir, setDir] = useState<1 | -1>(1);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const filterDefs: FilterDef[] = useMemo(() => {
+    const uniq = (arr: string[]) => [...new Set(arr.filter((x) => x && x !== "—"))].sort();
+    return [
+      { key: "leadStatus", label: "Lead status", type: "multi", options: uniq(people.map((p) => p.leadStatus)).map((s) => ({ value: s, label: s, badge: BADGE(s) })) },
+      { key: "owner", label: "Owner", type: "multi", options: uniq(people.map((p) => p.owner)).map((o) => ({ value: o, label: o })) },
+      { key: "company", label: "Company", type: "multi", options: uniq(people.map((p) => p.company)).map((c) => ({ value: c, label: c })) },
+      { key: "primary", label: "Type", type: "multi", options: [{ value: "primary", label: "Primary contact" }, { value: "secondary", label: "Secondary" }] },
+      { key: "createdAt", label: "Create date", type: "date" },
+    ];
+  }, [people]);
+
   const filtered = useMemo(() => {
     let r = people;
+    for (const def of filterDefs) {
+      const v = fstate[def.key];
+      const key: string = def.key;
+      if (def.type === "multi" && Array.isArray(v) && v.length) {
+        if (key === "primary") r = r.filter((p) => v.includes(p.primary ? "primary" : "secondary"));
+        else r = r.filter((p) => v.includes(String((p as unknown as Record<string, string>)[key])));
+      } else if (def.type === "date" && v && !Array.isArray(v) && (v.from || v.to)) {
+        r = r.filter((p) => {
+          const raw = (p as unknown as Record<string, string | null>)[def.key];
+          if (!raw) return false;
+          const d = raw.slice(0, 10);
+          if (v.from && d < v.from) return false;
+          if (v.to && d > v.to) return false;
+          return true;
+        });
+      }
+    }
     if (q.trim()) { const t = q.toLowerCase(); r = r.filter((p) => p.name.toLowerCase().includes(t) || p.company.toLowerCase().includes(t) || p.email.toLowerCase().includes(t)); }
     return [...r].sort((a, b) => { const av = a[sortKey] ?? ""; const bv = b[sortKey] ?? ""; return av < bv ? -dir : av > bv ? dir : 0; });
-  }, [people, q, sortKey, dir]);
+  }, [people, q, fstate, filterDefs, sortKey, dir]);
 
   function sortBy(k: keyof Person) { if (sortKey === k) setDir((d) => (d === 1 ? -1 : 1)); else { setSortKey(k); setDir(1); } }
   function exportCSV() {
@@ -70,6 +101,8 @@ export default function PeopleView({ people }: { people: Person[] }) {
         <button className="btn ghost lv-btn" onClick={exportCSV}>Export</button>
         <input ref={fileRef} type="file" accept=".csv" hidden onChange={importCSV} />
       </div>
+
+      <FilterBar filters={filterDefs} state={fstate} onChange={(k, v) => setFstate((s) => ({ ...s, [k]: v }))} onClear={() => setFstate({})} />
 
       {view === "table" && (
         <section className="panel">
