@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { audiencesFor } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
+import NavPunk from "@/components/NavPunk";
 import InboxActions from "./InboxActions";
 
 function timeAgo(d: Date) {
@@ -32,7 +33,7 @@ export default async function InboxPage() {
           <div className="feed">
             {notes.map((n) => (
               <div className={`ev ${n.audience === "Sales" ? "sale" : n.audience === "Supply" ? "supply" : "ship"}`} key={n.id} style={{ opacity: n.read ? 0.6 : 1 }}>
-                <div className="ic"><svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg></div>
+                <div className="ic"><NavPunk name="bell" size={15} /></div>
                 <div><div className="bd">{n.body}</div><div className="tm">{n.audience} · {timeAgo(n.createdAt)}</div></div>
               </div>
             ))}
@@ -45,7 +46,7 @@ export default async function InboxPage() {
           <div className="feed">
             {activities.map((a) => (
               <div className={`ev ${a.kind}`} key={a.id}>
-                <div className="ic"><svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M12 20v-6M6 20v-4M18 20v-9" /></svg></div>
+                <div className="ic"><NavPunk name="flame" size={15} /></div>
                 <div><div className="bd">{a.body}</div><div className="tm">{a.actor ? `${a.actor} · ` : ""}{timeAgo(a.createdAt)}</div></div>
               </div>
             ))}

@@ -215,6 +215,82 @@ assets.headset = svg(24, `
   <path d="M250 400 L290 400 L290 440 L250 440 Z"/>
 `, [{ x: 110, y: 360, len: 55, w: 6 }, { x: 402, y: 360, len: 55, w: 6 }], { sw: 13 });
 
+// ── UI icons (topbar / controls) — same hand-drawn family, no drips so they
+//    stay crisp at small sizes in the chrome ───────────────────────────────
+function uiSvg(id, body, sw = 18) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+${defs(id)}
+  <g filter="url(#rough_${id})" stroke="${LIME}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+${body}
+  </g>
+</svg>`;
+}
+
+// 25) SEARCH
+assets.search = uiSvg(25, `
+  <circle cx="220" cy="220" r="140"/>
+  <path d="M322 322 L430 430"/>
+`);
+
+// 26) BELL
+assets.bell = uiSvg(26, `
+  <path d="M380 330 C380 200 340 110 256 110 C172 110 132 200 132 330 C132 360 90 380 90 380 L422 380 C422 380 380 360 380 330 Z"/>
+  <path d="M210 420 C220 445 292 445 302 420"/>
+  <path d="M256 110 L256 80"/>
+`);
+
+// 27) GEAR / settings
+assets.gear = uiSvg(27, `
+  <circle cx="256" cy="256" r="70"/>
+  <path d="M256 110 L256 60 M256 452 L256 402 M402 256 L452 256 M60 256 L110 256
+    M358 154 L394 118 M118 394 L154 358 M358 358 L394 394 M118 118 L154 154"/>
+`, 16);
+
+// 28) MAIL / envelope
+assets.mail = uiSvg(28, `
+  <rect x="70" y="120" width="372" height="272" rx="20"/>
+  <path d="M86 150 L256 286 L426 150"/>
+`);
+
+// 29) EXIT / sign-out
+assets.exit = uiSvg(29, `
+  <path d="M200 110 L120 110 C104 110 90 124 90 140 L90 372 C90 388 104 402 120 402 L200 402"/>
+  <path d="M330 170 L420 256 L330 342"/>
+  <path d="M420 256 L190 256"/>
+`);
+
+// 30) PLUS / add
+assets.plus = uiSvg(30, `
+  <path d="M256 110 L256 402 M110 256 L402 256"/>
+`, 20);
+
+// 31) CLOSE / x
+assets.close = uiSvg(31, `
+  <path d="M140 140 L372 372 M372 140 L140 372"/>
+`, 20);
+
+// 32) FILTER
+assets.filter = uiSvg(32, `
+  <path d="M80 120 L432 120 L300 280 L300 400 L212 360 L212 280 Z"/>
+`);
+
+// 33) NOTE / pencil
+assets.note = uiSvg(33, `
+  <path d="M110 150 L300 150 M110 230 L370 230 M110 310 L260 310"/>
+  <path d="M330 360 L420 270 L450 300 L360 390 L320 400 Z"/>
+`);
+
+// 34) CALENDAR
+assets.calendar = uiSvg(34, `
+  <rect x="80" y="110" width="352" height="312" rx="22"/>
+  <path d="M80 190 L432 190 M170 80 L170 140 M342 80 L342 140"/>
+`);
+
+// 35) CHECK
+assets.check = uiSvg(35, `
+  <path d="M110 270 L210 370 L410 140"/>
+`, 22);
+
 // ── Write all SVGs ──────────────────────────────────────────────────────────
 for (const [name, content] of Object.entries(assets)) {
   fs.writeFileSync(path.join(OUT, `${name}.svg`), content.trim() + "\n");

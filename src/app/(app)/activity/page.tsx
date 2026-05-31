@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import Topbar from "@/components/Topbar";
+import NavPunk from "@/components/NavPunk";
 
 function timeAgo(d: Date) {
   const m = Math.round((Date.now() - d.getTime()) / 60000);
@@ -12,10 +13,10 @@ function timeAgo(d: Date) {
 }
 
 const ICON: Record<string, React.ReactNode> = {
-  note: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z" /></svg>,
-  email: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M22 7l-10 6L2 7" /></svg>,
-  call: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z" /></svg>,
-  system: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>,
+  note: <NavPunk name="note" size={15} />,
+  email: <NavPunk name="mail" size={15} />,
+  call: <NavPunk name="phone" size={15} />,
+  system: <NavPunk name="check" size={15} />,
 };
 
 export default async function ActivityPage() {

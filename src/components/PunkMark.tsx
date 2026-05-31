@@ -3,12 +3,16 @@
 export type PunkName =
   | "globe" | "star" | "smiley" | "bolt" | "arrow" | "flame" | "heart" | "crown"
   | "target" | "hanger" | "phone" | "trophy" | "dollar" | "fist" | "eye" | "clock"
-  | "scissors" | "rocket" | "tag" | "chat" | "pin" | "diamond" | "skull" | "headset";
+  | "scissors" | "rocket" | "tag" | "chat" | "pin" | "diamond" | "skull" | "headset"
+  | "search" | "bell" | "gear" | "mail" | "exit" | "plus" | "close" | "filter"
+  | "note" | "calendar" | "check";
 
 export const PUNK_NAMES: PunkName[] = [
   "globe", "star", "smiley", "bolt", "arrow", "flame", "heart", "crown",
   "target", "hanger", "phone", "trophy", "dollar", "fist", "eye", "clock",
   "scissors", "rocket", "tag", "chat", "pin", "diamond", "skull", "headset",
+  "search", "bell", "gear", "mail", "exit", "plus", "close", "filter",
+  "note", "calendar", "check",
 ];
 
 export default function PunkMark({

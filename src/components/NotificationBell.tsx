@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getMyNotificationsAction, markNotificationsReadAction } from "@/app/actions/notifications";
+import NavPunk from "./NavPunk";
 
 type Note = { id: string; audience: string; body: string; read: boolean; at: string };
 
@@ -49,7 +50,7 @@ export default function NotificationBell() {
   return (
     <div className="integrations" ref={wrap}>
       <button className={`itg-btn${open ? " on" : ""}`} title="Notifications" onClick={toggle} style={{ position: "relative" }}>
-        <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
+        <NavPunk name="bell" size={19} />
         {unread > 0 && <span className="bell-badge">{unread > 9 ? "9+" : unread}</span>}
       </button>
       {open && (

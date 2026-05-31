@@ -1594,3 +1594,23 @@ tbody tr.row.sel:hover{background:color-mix(in srgb,var(--neon) 16%,transparent)
 .nav a:nth-child(4){animation-delay:.16s}
 .nav a:nth-child(5){animation-delay:.20s}
 @media(prefers-reduced-motion:reduce){.nav a{animation:none}}
+
+/* Punk icons in topbar / search buttons — bounce on hover, lime when active */
+.itg-btn .navpunk,.search-btn .navpunk{transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
+.itg-btn:hover .navpunk,.search-c:hover .search-btn .navpunk{transform:rotate(-6deg) scale(1.12)}
+.itg-btn.on .navpunk{color:var(--neon)}
+
+/* Punk icons inside activity timeline + record-action chips (color via mask) */
+.tl-ic .navpunk{color:var(--muted)}
+.tl-ev.note .tl-ic .navpunk{color:var(--neon)}
+.tl-ev.email .tl-ic .navpunk{color:var(--violet-br)}
+.tl-ev.call .tl-ic .navpunk{color:var(--amber)}
+.tl-ev.meeting .tl-ic .navpunk{color:var(--neon)}
+.rec-act-ic .navpunk{color:currentColor}
+.rec-act:hover .rec-act-ic .navpunk{transform:rotate(-6deg) scale(1.12);transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
+
+/* Punk icons in inbox feed rows (color via mask) */
+.ev .ic .navpunk{color:var(--muted)}
+.ev.sale .ic .navpunk{color:var(--neon)}
+.ev.supply .ic .navpunk{color:var(--amber)}
+.ev.ship .ic .navpunk{color:var(--violet-br)}

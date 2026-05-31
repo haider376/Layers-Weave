@@ -2,6 +2,7 @@ import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { initials } from "@/components/Logo";
 import Topbar from "@/components/Topbar";
+import NavPunk from "@/components/NavPunk";
 
 const STAGES = [
   "Appointment Scheduled",
@@ -63,7 +64,7 @@ export default async function DashboardPage() {
         <div className="kpi">
           <span className="bar" />
           <div className="lbl">
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>
+            <NavPunk name="dollar" size={14} />
             Pipeline value
           </div>
           <div className="val neon">{money(pipelineValue)}</div>
@@ -72,7 +73,7 @@ export default async function DashboardPage() {
         <div className="kpi">
           <span className="bar" />
           <div className="lbl">
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
+            <NavPunk name="trophy" size={14} />
             Won this month
           </div>
           <div className="val neon">{money(wonValue)}</div>
@@ -81,7 +82,7 @@ export default async function DashboardPage() {
         <div className="kpi v">
           <span className="bar" />
           <div className="lbl">
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+            <NavPunk name="calendar" size={14} />
             SQLs booked
           </div>
           <div className="val vio">{meetings}</div>
@@ -90,7 +91,7 @@ export default async function DashboardPage() {
         <div className="kpi">
           <span className="bar" />
           <div className="lbl">
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z" /></svg>
+            <NavPunk name="phone" size={14} />
             Calls
           </div>
           <div className="val">{calls.toLocaleString("en-US")}</div>
