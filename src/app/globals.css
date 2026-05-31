@@ -242,6 +242,20 @@ tr.detail.open .tl-wrap{max-height:320px}
 .lfield{margin-bottom:14px}
 .lfield label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-weight:600}
 .lfield .inp input{font-size:14px}
+/* Keep browser autofill on-theme — Chrome/Safari otherwise force a white box
+   that breaks the dark card. The inset shadow trick paints over the UA fill,
+   and a long transition delay stops the yellow flash from ever showing. */
+.inp input:-webkit-autofill,
+.inp input:-webkit-autofill:hover,
+.inp input:-webkit-autofill:focus,
+.inp input:-webkit-autofill:active{
+  -webkit-text-fill-color:var(--text);
+  -webkit-box-shadow:0 0 0 1000px var(--panel-2) inset;
+  box-shadow:0 0 0 1000px var(--panel-2) inset;
+  caret-color:var(--text);
+  border-radius:9px;
+  transition:background-color 9999s ease-in-out 0s;
+}
 .lbtn{width:100%;border:none;border-radius:30px;padding:13px;background:var(--neon);color:var(--neon-ink);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;transition:.15s}
 .lbtn:hover{filter:brightness(1.05);box-shadow:var(--glow-green)}
 .lerr{color:#ef8483;font-size:11.5px;margin-top:10px;text-align:center;min-height:14px}
