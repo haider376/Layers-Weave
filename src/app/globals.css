@@ -1289,3 +1289,66 @@ tbody td{padding:15px 22px}
 .seq-step-x{margin-left:auto;background:none;border:0;color:var(--faint);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
 .seq-step-x:hover{color:var(--red)}
 @media(max-width:820px){.seqs{grid-template-columns:1fr}.fcast-board{grid-template-columns:1fr}}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SLEEK SYMMETRY — final polish layer (roomy, aligned, conversion-centric)
+   This is the last word on spacing & rhythm. Goals: a calm centred canvas,
+   one consistent radius (--r2) and gap (--gap), confident type, and every
+   panel / header / card sharing the exact same internal padding so nothing
+   sits a pixel out of place.
+   ════════════════════════════════════════════════════════════════════════ */
+:root{--r2:14px;--gap:20px;--pad:18px}
+
+/* Centred canvas with generous, symmetric breathing room */
+.main{padding:30px 40px 80px;max-width:1640px;margin:0 auto;width:100%}
+@media(max-width:1100px){.main{padding:22px 22px 64px}}
+.topbar{margin-bottom:26px;align-items:flex-start}
+
+/* Confident, quiet type scale */
+.ph h1{font-size:25px;line-height:1.08}
+.ph p{font-size:13px;margin-top:7px}
+
+/* One rhythm everywhere — 20px gaps, no asymmetric stacks */
+.kpis{gap:var(--gap);margin-bottom:var(--gap);grid-auto-rows:1fr}
+.grid2,.with-rail,.an-grid,.record-3{gap:var(--gap)}
+.panel + .panel{margin-top:var(--gap)}
+.an-grid{align-items:stretch}
+
+/* Unified card surfaces — same radius, same border, same hover */
+.panel,.kpi,.an-card,.ccard{border-radius:var(--r2)}
+.kpi{padding:18px 20px;display:flex;flex-direction:column;justify-content:flex-start}
+.kpi .lbl{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.kpi .val{font-size:27px;line-height:1.05;margin-top:8px}
+.kpi .delta{margin-top:6px;font-size:11.5px;color:var(--muted)}
+
+/* Panel + card headers share identical padding so titles line up across columns */
+.panel-h,.an-h{padding:15px 20px;min-height:54px;display:flex;align-items:center;gap:10px}
+.panel-h h2,.an-h h2{font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+.panel-h .count,.an-h .count{margin-left:auto;font-size:11px;color:var(--faint);font-weight:600}
+.an-h .an-expand{margin-left:0}
+
+/* Tables breathe a touch more and align to the same 20px gutter */
+table th{padding:11px 20px;font-size:10.5px;letter-spacing:.04em}
+table td{padding:13px 20px}
+.mini-row{padding:11px 20px}
+
+/* Section blocks inside panels get the same 20px gutter as the header */
+.set-body{padding:20px}
+.an-card .an-body{padding:16px 20px}
+
+/* KPI accent bar sits flush + consistent */
+.kpi .bar{left:0;top:0}
+
+/* Segmented controls / filter bars align to the grid and never crowd */
+.lv-toolbar{gap:10px;margin-bottom:var(--gap);align-items:center}
+.fbar{margin-bottom:var(--gap)}
+
+/* Buttons: calmer, more uniform sizing */
+.btn{border-radius:10px}
+
+/* Forecast 2-col + new pages inherit the unified gap */
+.seqs,.fcast-board{gap:var(--gap)}
+
+/* Compact density still respected but never cramped */
+html.compact .main{padding:22px 28px 64px}
+html.compact .kpis,html.compact .grid2,html.compact .an-grid{gap:14px}
