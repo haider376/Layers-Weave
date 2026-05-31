@@ -6,9 +6,9 @@ import PeriodTabs from "./PeriodTabs";
 import AnalyticsBoard, { type Card, type Kpi } from "./AnalyticsBoard";
 
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
-const PAL = ["#6D19FF", "#A5EB00", "#A47BFF", "#D9A23A", "#8FCE00", "#5512CC", "#6F6982", "#3A3352"];
-const OUTCOME_COLORS: Record<string, string> = { "No answer": "#3A3352", "Left voicemail": "#6D19FF", Connected: "#A5EB00", "Meeting Booked": "#8FCE00", "Not Interested": "#A47BFF", Busy: "#D9A23A", "Wrong number": "#E2574E", "Call Back Later": "#6F6982" };
-const LEAD_COLORS: Record<string, string> = { New: "#6D19FF", "In Progress": "#A47BFF", "Open Deal": "#A5EB00", "Cool Off": "#E2574E", "Data Quality": "#D9A23A", "Do Not Contact": "#6F6982" };
+const PAL = ["#8A8A90", "#C6F542", "#C9C9CC", "#E0B23C", "#A9DF1E", "#6A6A70", "#646469", "#2A2A2E"];
+const OUTCOME_COLORS: Record<string, string> = { "No answer": "#2A2A2E", "Left voicemail": "#8A8A90", Connected: "#C6F542", "Meeting Booked": "#A9DF1E", "Not Interested": "#C9C9CC", Busy: "#E0B23C", "Wrong number": "#F0594F", "Call Back Later": "#646469" };
+const LEAD_COLORS: Record<string, string> = { New: "#8A8A90", "In Progress": "#C9C9CC", "Open Deal": "#C6F542", "Cool Off": "#F0594F", "Data Quality": "#E0B23C", "Do Not Contact": "#646469" };
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
 
 export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
@@ -46,15 +46,15 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const pipelineDonut = STAGES.map((s, i) => ({ label: s, value: deals.filter((d) => d.stage === s).length, color: PAL[i % PAL.length] })).filter((d) => d.value > 0);
   // donut: win / loss
   const winLossDonut = [
-    { label: "Won", value: won.length, color: "#A5EB00" },
-    { label: "Open", value: openDeals.length, color: "#6D19FF" },
-    { label: "Lost", value: deals.filter((d) => d.stage === "Closed Lost").length, color: "#E2574E" },
-    { label: "Disqualified", value: deals.filter((d) => d.stage === "Disqualified").length, color: "#6F6982" },
+    { label: "Won", value: won.length, color: "#C6F542" },
+    { label: "Open", value: openDeals.length, color: "#8A8A90" },
+    { label: "Lost", value: deals.filter((d) => d.stage === "Closed Lost").length, color: "#F0594F" },
+    { label: "Disqualified", value: deals.filter((d) => d.stage === "Disqualified").length, color: "#646469" },
   ].filter((d) => d.value > 0);
   // donut: lead status
   const leadCounts = new Map<string, number>();
   for (const c of companies) leadCounts.set(c.leadStatus, (leadCounts.get(c.leadStatus) ?? 0) + 1);
-  const leadDonut = [...leadCounts.entries()].map(([label, value]) => ({ label, value, color: LEAD_COLORS[label] ?? "#6F6982" }));
+  const leadDonut = [...leadCounts.entries()].map(([label, value]) => ({ label, value, color: LEAD_COLORS[label] ?? "#646469" }));
 
   // bars: won by AE
   const wonByAe = new Map<string, number>();
@@ -69,12 +69,12 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   // stacked: call outcomes by rep
   const byAgent = new Map<string, Map<string, number>>();
   for (const c of calls) { const a = c.agent ?? "—"; const o = c.outcome ?? "Other"; if (!byAgent.has(a)) byAgent.set(a, new Map()); const m = byAgent.get(a)!; m.set(o, (m.get(o) ?? 0) + 1); }
-  const callStacked = [...byAgent.entries()].map(([label, m]) => ({ label, total: [...m.values()].reduce((x, y) => x + y, 0), segs: [...m.entries()].map(([k, v]) => ({ k, v, color: OUTCOME_COLORS[k] ?? "#6F6982" })) })).sort((a, b) => b.total - a.total);
+  const callStacked = [...byAgent.entries()].map(([label, m]) => ({ label, total: [...m.values()].reduce((x, y) => x + y, 0), segs: [...m.entries()].map(([k, v]) => ({ k, v, color: OUTCOME_COLORS[k] ?? "#646469" })) })).sort((a, b) => b.total - a.total);
 
   // stacked: lead status by owner
   const leadByOwner = new Map<string, Map<string, number>>();
   for (const c of companies) { const o = c.owner?.name ?? "Unassigned"; if (!leadByOwner.has(o)) leadByOwner.set(o, new Map()); const m = leadByOwner.get(o)!; m.set(c.leadStatus, (m.get(c.leadStatus) ?? 0) + 1); }
-  const leadStacked = [...leadByOwner.entries()].map(([label, m]) => ({ label, total: [...m.values()].reduce((x, y) => x + y, 0), segs: [...m.entries()].map(([k, v]) => ({ k, v, color: LEAD_COLORS[k] ?? "#6F6982" })) })).sort((a, b) => b.total - a.total).slice(0, 8);
+  const leadStacked = [...leadByOwner.entries()].map(([label, m]) => ({ label, total: [...m.values()].reduce((x, y) => x + y, 0), segs: [...m.entries()].map(([k, v]) => ({ k, v, color: LEAD_COLORS[k] ?? "#646469" })) })).sort((a, b) => b.total - a.total).slice(0, 8);
 
   // spark: calls last 14 days
   const trend = Array.from({ length: 14 }, (_, i) => {

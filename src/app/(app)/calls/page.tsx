@@ -8,9 +8,9 @@ import Sparkline from "@/components/Sparkline";
 import Donut from "@/components/Donut";
 
 const SENT_COLORS: Record<string, string> = {
-  "SQL Booked": "#A5EB00", "Interested / Follow up": "#8FCE00", "Call Back Later": "#D9A23A",
-  "Not Interested": "#E2574E", "Left Voicemail": "#6D19FF", "No Answer": "#3A3352",
-  "Stopped at Gatekeeper": "#A47BFF", "Wrong Number": "#E2574E",
+  "SQL Booked": "#C6F542", "Interested / Follow up": "#A9DF1E", "Call Back Later": "#E0B23C",
+  "Not Interested": "#F0594F", "Left Voicemail": "#8A8A90", "No Answer": "#2A2A2E",
+  "Stopped at Gatekeeper": "#C9C9CC", "Wrong Number": "#F0594F",
 };
 
 export default async function CallsPage() {
@@ -39,8 +39,8 @@ export default async function CallsPage() {
   // sentiment breakdown
   const sentMap = new Map<string, number>();
   for (const c of calls) sentMap.set(c.outcome ?? "—", (sentMap.get(c.outcome ?? "—") ?? 0) + 1);
-  const sentiment = [...sentMap.entries()].sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value, color: SENT_COLORS[label] ?? "#6F6982" }));
-  const connDonut = [{ label: "Connected", value: connected, color: "#A5EB00" }, { label: "Not connected", value: total - connected, color: "#3A3352" }];
+  const sentiment = [...sentMap.entries()].sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value, color: SENT_COLORS[label] ?? "#646469" }));
+  const connDonut = [{ label: "Connected", value: connected, color: "#C6F542" }, { label: "Not connected", value: total - connected, color: "#2A2A2E" }];
 
   const trend = Array.from({ length: 14 }, (_, i) => {
     const d0 = new Date(); d0.setHours(0, 0, 0, 0); d0.setDate(d0.getDate() - (13 - i));

@@ -9,25 +9,25 @@ const VARIANTS: Record<CelebrationKind, { title: string; sub: string; colors: st
   sql: {
     title: "SQL BOOKED 🔥",
     sub: "Sales just pulled up. Lock in.",
-    colors: ["#A5EB00", "#A47BFF", "#fff"],
+    colors: ["#C6F542", "#C9C9CC", "#fff"],
     emoji: "📅",
   },
   won: {
     title: "DEAL CLOSED 💸",
     sub: "Bag secured. That's W behavior.",
-    colors: ["#A5EB00", "#EF9F27", "#fff", "#A47BFF"],
+    colors: ["#C6F542", "#EF9F27", "#fff", "#C9C9CC"],
     emoji: "🤑",
   },
   delivered: {
     title: "DELIVERED ✅",
     sub: "Logistics ate. No crumbs left.",
-    colors: ["#A47BFF", "#A5EB00", "#fff"],
+    colors: ["#C9C9CC", "#C6F542", "#fff"],
     emoji: "📦",
   },
   quote: {
     title: "QUOTE LIVE ⚡",
     sub: "Supply's cooking. Say less.",
-    colors: ["#EF9F27", "#A5EB00", "#fff"],
+    colors: ["#EF9F27", "#C6F542", "#fff"],
     emoji: "🧾",
   },
 };
