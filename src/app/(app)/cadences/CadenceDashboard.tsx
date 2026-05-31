@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import Sparkline from "@/components/Sparkline";
 import { showToast } from "@/components/Toast";
 import { STEP_META, type StepType, type DueStep } from "@/lib/cadences";
-import { completeStepAction, createAndOpenCadenceAction } from "@/app/actions/cadences";
+import { completeStepAction } from "@/app/actions/cadences";
 import DialPad from "./DialPad";
 import CadenceList, { type CadenceRow } from "./CadenceList";
+import CreateCadenceButton from "./CreateCadenceButton";
 
 type FeedItem = { id: string; kind: "call" | "meeting"; who: string; detail: string; connected: boolean; at: string; ago: string; agent: string };
 type Stats = { prioritized: number; completedToday: number; callsThisMonth: number; oppsCreated: number };
@@ -96,9 +97,7 @@ export default function CadenceDashboard({ cadences, dueSteps, feed, me, stats }
         <button className={tab === "rhythm" ? "on" : ""} onClick={() => setTab("rhythm")}>Rhythm</button>
         <button className={tab === "cadences" ? "on" : ""} onClick={() => setTab("cadences")}>Cadences</button>
         <span style={{ flex: 1 }} />
-        <form action={createAndOpenCadenceAction}>
-          <button type="submit" className="btn primary" style={{ flex: "none", padding: "8px 16px" }}>+ Create cadence</button>
-        </form>
+        <CreateCadenceButton />
       </div>
 
       {tab === "rhythm" ? (

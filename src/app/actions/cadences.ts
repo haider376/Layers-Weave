@@ -5,11 +5,26 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
+import { ensureCadenceSchema, isMissingTable } from "@/lib/ensureCadenceSchema";
 
 async function guard() {
   const user = await requireUser();
   if (!canAccessSales(user.role)) throw new Error("FORBIDDEN");
   return user;
+}
+
+// Run a DB op; if the Cadence tables don't exist yet (deploy that skipped the
+// migration), create them on the fly and retry once.
+async function withSchema<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (isMissingTable(e)) {
+      await ensureCadenceSchema();
+      return await fn();
+    }
+    throw e;
+  }
 }
 
 function revalidate() {
@@ -21,7 +36,7 @@ type StepInput = { day: number; type: string; subject: string };
 
 export async function createCadenceAction(input: { name: string; function?: string; priority?: string; steps?: StepInput[] }) {
   const user = await guard();
-  const cadence = await prisma.cadence.create({
+  const cadence = await withSchema(() => prisma.cadence.create({
     data: {
       name: input.name.trim() || "Untitled cadence",
       function: input.function ?? "Outbound",
@@ -31,7 +46,7 @@ export async function createCadenceAction(input: { name: string; function?: stri
         ? { create: input.steps.map((s, i) => ({ day: s.day, type: s.type, subject: s.subject, position: i })) }
         : { create: [{ day: 0, type: "call", subject: "First touch", position: 0 }] },
     },
-  });
+  }));
   revalidate();
   return { id: cadence.id };
 }
@@ -41,7 +56,9 @@ export async function createCadenceAction(input: { name: string; function?: stri
 // (client-side router.push after a revalidating action can no-op).
 export async function createAndOpenCadenceAction() {
   const user = await guard();
-  const cadence = await prisma.cadence.create({
+  // Create (self-healing schema) BEFORE redirect — redirect() throws, so it
+  // must live outside the retry wrapper.
+  const cadence = await withSchema(() => prisma.cadence.create({
     data: {
       name: "Untitled cadence",
       function: "Outbound",
@@ -49,7 +66,7 @@ export async function createAndOpenCadenceAction() {
       ownerId: user.id,
       steps: { create: [{ day: 0, type: "call", subject: "First touch", position: 0 }] },
     },
-  });
+  }));
   revalidatePath("/cadences");
   redirect(`/cadences/${cadence.id}`);
 }
