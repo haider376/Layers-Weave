@@ -17,9 +17,13 @@ export default function Select({
   disabled?: boolean;
   size?: "sm" | "md";
 }) {
+  // Radix forbids empty-string item values, so map "" <-> a sentinel internally.
+  const EMPTY = "__none__";
   const opts: Opt[] = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
+  const toRadix = (v: string) => (v === "" ? EMPTY : v);
+  const fromRadix = (v: string) => (v === EMPTY ? "" : v);
   return (
-    <RS.Root value={value} onValueChange={onValueChange} disabled={disabled}>
+    <RS.Root value={toRadix(value)} onValueChange={(v) => onValueChange(fromRadix(v))} disabled={disabled}>
       <RS.Trigger className={`ui-select ui-select-${size} ${className}`} aria-label={placeholder}>
         <RS.Value placeholder={placeholder} />
         <RS.Icon className="ui-select-ico">
@@ -31,7 +35,7 @@ export default function Select({
           <motion.div initial={{ opacity: 0, y: -4, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.14, ease: [0.2, 0.7, 0.2, 1] }}>
             <RS.Viewport>
               {opts.map((o) => (
-                <RS.Item key={o.value} value={o.value} className="ui-select-item">
+                <RS.Item key={o.value || EMPTY} value={toRadix(o.value)} className="ui-select-item">
                   <RS.ItemText>{o.label}</RS.ItemText>
                   <RS.ItemIndicator className="ui-select-check">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
