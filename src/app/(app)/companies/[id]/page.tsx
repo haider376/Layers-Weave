@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales, canReassignOwner } from "@/lib/permissions";
 import { getTimeline } from "@/lib/sales";
@@ -8,6 +8,7 @@ import Topbar from "@/components/Topbar";
 import ActivityPanel from "@/components/ActivityPanel";
 import EditableDetails from "@/components/EditableDetails";
 import RecordActions from "@/components/RecordActions";
+import RecordTasks from "@/components/RecordTasks";
 import OwnerSelect from "./OwnerSelect";
 import AddContact from "./AddContact";
 import { updateCompanyAction } from "../../sales/record-actions";
@@ -40,6 +41,8 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
 
   const events = await getTimeline({ companyId: id });
   const primary = company.contacts.find((c) => c.primary) ?? company.contacts[0] ?? null;
+  const tasksRaw = await safe(prisma.task.findMany({ where: { companyId: id }, orderBy: [{ done: "asc" }, { dueDate: "asc" }], take: 50 }), []);
+  const tasks = tasksRaw.map((t) => ({ id: t.id, title: t.title, type: t.type, priority: t.priority, done: t.done, dueDate: t.dueDate ? t.dueDate.toISOString() : null }));
 
   return (
     <>
@@ -119,6 +122,8 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
               {company.deals.length === 0 && <div className="q-note" style={{ padding: 16 }}>No deals yet.</div>}
             </div>
           </section>
+
+          <RecordTasks companyId={company.id} tasks={tasks} />
         </div>
       </div>
     </>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import { getTimeline } from "@/lib/sales";
@@ -9,6 +9,7 @@ import Topbar from "@/components/Topbar";
 import ActivityPanel from "@/components/ActivityPanel";
 import EditableDetails from "@/components/EditableDetails";
 import RecordActions from "@/components/RecordActions";
+import RecordTasks from "@/components/RecordTasks";
 import { updateContactAction } from "../../sales/record-actions";
 
 export default async function ContactDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -20,6 +21,8 @@ export default async function ContactDetail({ params }: { params: Promise<{ id: 
   const contact = await prisma.contact.findUnique({ where: { id }, include: { company: true, deals: true } });
   if (!contact) notFound();
   const events = await getTimeline({ contactId: id });
+  const tasksRaw = await safe(prisma.task.findMany({ where: { contactId: id }, orderBy: [{ done: "asc" }, { dueDate: "asc" }], take: 50 }), []);
+  const tasks = tasksRaw.map((t) => ({ id: t.id, title: t.title, type: t.type, priority: t.priority, done: t.done, dueDate: t.dueDate ? t.dueDate.toISOString() : null }));
 
   return (
     <>
@@ -77,6 +80,8 @@ export default async function ContactDetail({ params }: { params: Promise<{ id: 
               {contact.deals.length === 0 && <div className="q-note" style={{ padding: 16 }}>No deals linked.</div>}
             </div>
           </section>
+
+          <RecordTasks contactId={contact.id} tasks={tasks} />
         </div>
       </div>
     </>

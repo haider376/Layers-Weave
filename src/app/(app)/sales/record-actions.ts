@@ -53,6 +53,70 @@ export async function addContactAction(companyId: string, name: string) {
   bump(companyId);
 }
 
+async function uniqueClientId() {
+  for (let i = 0; i < 50; i++) {
+    const id = `C-${1000 + Math.floor(Math.random() * 9000)}`;
+    if (!(await prisma.company.findUnique({ where: { clientId: id } }))) return id;
+  }
+  return `C-${Date.now()}`;
+}
+
+// Create a Lead (company)
+export async function createLeadAction(input: { name: string; country?: string; type?: string; leadStatus?: string; tier?: string }) {
+  const user = await guard();
+  const c = await prisma.company.create({
+    data: {
+      clientId: await uniqueClientId(), name: input.name.trim() || "New lead",
+      country: input.country || null, type: input.type || "Wholesaler", tier: input.tier || "B",
+      leadStatus: input.leadStatus || "New", ownerId: user.id, ownerAssignedAt: new Date(),
+    },
+  });
+  bump(c.id);
+  return { id: c.id };
+}
+
+// Create a Person (contact)
+export async function createPersonAction(input: { name: string; companyId: string; title?: string; email?: string; phone?: string; primary?: boolean }) {
+  await guard();
+  const c = await prisma.contact.create({
+    data: { name: input.name.trim() || "New person", companyId: input.companyId, title: input.title || null, email: input.email || null, phone: input.phone || null, primary: !!input.primary },
+  });
+  bump(input.companyId);
+  revalidatePath(`/contacts/${c.id}`);
+  return { id: c.id };
+}
+
+// Bulk CSV import — Leads
+export async function importLeadsAction(rows: { name: string; country?: string; leadStatus?: string; type?: string; tier?: string }[]) {
+  const user = await guard();
+  let n = 0;
+  for (const r of rows.slice(0, 1000)) {
+    if (!r.name?.trim()) continue;
+    await prisma.company.create({
+      data: { clientId: await uniqueClientId(), name: r.name.trim(), country: r.country || null, type: r.type || "Wholesaler", tier: r.tier || "B", leadStatus: r.leadStatus || "New", ownerId: user.id, ownerAssignedAt: new Date() },
+    });
+    n++;
+  }
+  revalidatePath("/companies");
+  return { imported: n };
+}
+
+// Bulk CSV import — People (matches/creates company by name)
+export async function importPeopleAction(rows: { name: string; email?: string; phone?: string; title?: string; company?: string }[]) {
+  const user = await guard();
+  let n = 0;
+  for (const r of rows.slice(0, 1000)) {
+    if (!r.name?.trim()) continue;
+    const cname = (r.company || "Unassigned").trim();
+    const existing = await prisma.company.findFirst({ where: { name: cname } });
+    const companyId = existing ? existing.id : (await prisma.company.create({ data: { clientId: await uniqueClientId(), name: cname, leadStatus: "New", ownerId: user.id, ownerAssignedAt: new Date() } })).id;
+    await prisma.contact.create({ data: { name: r.name.trim(), email: r.email || null, phone: r.phone || null, title: r.title || null, companyId } });
+    n++;
+  }
+  revalidatePath("/contacts");
+  return { imported: n };
+}
+
 // ── Timeline composers ──
 export async function logNoteAction(input: { companyId: string; dealId?: string; contactId?: string; body: string }) {
   const user = await guard();

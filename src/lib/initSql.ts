@@ -38,6 +38,7 @@ CREATE TABLE "Company" (
     "timeZone" TEXT,
     "numberEmployees" INTEGER,
     "lastContacted" TIMESTAMP(3),
+    "ownerAssignedAt" TIMESTAMP(3),
     "aiNotes" TEXT,
     "source" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -55,6 +56,7 @@ CREATE TABLE "Contact" (
     "email" TEXT,
     "phone" TEXT,
     "primary" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "companyId" TEXT NOT NULL,
 
     CONSTRAINT "Contact_pkey" PRIMARY KEY ("id")

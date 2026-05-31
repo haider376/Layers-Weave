@@ -79,7 +79,7 @@ export default function DealDrawer() {
     <AnimatePresence>
       {kind && (
         <motion.div className="drawer-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={close}>
-          <motion.aside className="drawer" onClick={(e) => e.stopPropagation()} initial={{ x: 440 }} animate={{ x: 0 }} exit={{ x: 440 }} transition={{ type: "spring", stiffness: 320, damping: 34 }}>
+          <motion.aside className="drawer" onClick={(e) => e.stopPropagation()} initial={{ x: -440 }} animate={{ x: 0 }} exit={{ x: -440 }} transition={{ type: "spring", stiffness: 320, damping: 34 }}>
             <div className="drawer-h"><span className="eyebrow">{label}</span><button className="drawer-x" onClick={close}>✕</button></div>
             {loading && <div className="q-note" style={{ padding: 20 }}>Loading…</div>}
             {!loading && !data && <div className="q-note" style={{ padding: 20 }}>Not found.</div>}

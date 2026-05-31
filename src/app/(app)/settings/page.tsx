@@ -9,8 +9,12 @@ export default async function SettingsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
+  // Team section is locked to the 10 authorized internal members (first names).
+  const ALLOWED = ["shahzaib", "haider", "zikriya", "adan", "rija", "kamila", "asjad", "fatima", "huzaifa", "hilmand"];
   const team = user.isAdmin
-    ? (await prisma.user.findMany({ orderBy: { name: "asc" } })).map((u) => ({ name: u.name, email: u.email, role: ROLE_LABEL[u.role as Role] ?? u.role, active: u.active }))
+    ? (await prisma.user.findMany({ orderBy: { name: "asc" } }))
+        .filter((u) => ALLOWED.includes(u.name.split(" ")[0].toLowerCase()))
+        .map((u) => ({ name: u.name, email: u.email, role: ROLE_LABEL[u.role as Role] ?? u.role, active: u.active }))
     : [];
 
   return (

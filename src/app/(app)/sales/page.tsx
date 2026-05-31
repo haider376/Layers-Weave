@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { initials } from "@/components/Logo";
 import Topbar from "@/components/Topbar";
 import { RailPanel, RailLeaderboard } from "@/components/Rail";
-import Board, { type BoardDeal } from "./Board";
+import { type BoardDeal } from "./Board";
+import DealsView from "./DealsView";
 
 export default async function SalesPage() {
   const user = await getCurrentUser();
@@ -13,7 +14,7 @@ export default async function SalesPage() {
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
   const [deals, meetings] = await Promise.all([
-    prisma.deal.findMany({ include: { owner: true, quotes: { select: { quoteId: true } } }, orderBy: { createDate: "desc" } }),
+    prisma.deal.findMany({ include: { owner: true, company: true, quotes: { select: { quoteId: true } } }, orderBy: { createDate: "desc" } }),
     prisma.salesMeeting.findMany({ include: { bdr: true } }),
   ]);
 
@@ -23,6 +24,8 @@ export default async function SalesPage() {
     amount: d.amount,
     stage: d.stage,
     ownerInitials: d.owner ? initials(d.owner.name) : "—",
+    ownerName: d.owner?.name ?? "—",
+    company: d.company.name,
     quoteId: d.quotes[0]?.quoteId ?? null,
   }));
 
@@ -43,7 +46,7 @@ export default async function SalesPage() {
       <Topbar title="Deals" sub="Drag deals across your 8 stages — appointment to close" />
       <div className="with-rail">
         <div style={{ minWidth: 0 }}>
-          <Board deals={data} />
+          <DealsView deals={data} />
         </div>
         <aside className="rail">
           <RailPanel title="AE leaderboard" hint="deals won"><RailLeaderboard rows={aeRows} avatars /></RailPanel>

@@ -57,6 +57,7 @@ model Company {
   timeZone        String?
   numberEmployees Int?
   lastContacted   DateTime?
+  ownerAssignedAt DateTime?
   aiNotes         String?
   source          String?
   createdAt       DateTime @default(now())
@@ -80,6 +81,7 @@ model Contact {
   email     String?
   phone     String?
   primary   Boolean @default(false)
+  createdAt DateTime @default(now())
   companyId String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 

@@ -13,6 +13,8 @@ export type BoardDeal = {
   amount: number;
   stage: string;
   ownerInitials: string;
+  ownerName?: string;
+  company?: string;
   quoteId: string | null;
 };
 

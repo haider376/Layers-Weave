@@ -11,13 +11,19 @@ async function guard() {
   return user;
 }
 
-export async function addTaskAction(input: { title: string; type: string; priority: string; dueDate?: string }) {
+export async function addTaskAction(input: { title: string; type: string; priority: string; dueDate?: string; companyId?: string; contactId?: string; dealId?: string }) {
   const user = await guard();
   if (!input.title.trim()) return;
   await prisma.task.create({
-    data: { title: input.title.trim(), type: input.type, priority: input.priority, ownerId: user.id, dueDate: input.dueDate ? new Date(input.dueDate) : null },
+    data: {
+      title: input.title.trim(), type: input.type, priority: input.priority, ownerId: user.id,
+      dueDate: input.dueDate ? new Date(input.dueDate) : null,
+      companyId: input.companyId ?? null, contactId: input.contactId ?? null, dealId: input.dealId ?? null,
+    },
   });
   revalidatePath("/tasks");
+  if (input.companyId) revalidatePath(`/companies/${input.companyId}`);
+  if (input.contactId) revalidatePath(`/contacts/${input.contactId}`);
 }
 
 export async function toggleTaskAction(id: string) {
