@@ -5,6 +5,7 @@ import { prisma, safe } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { canAccessSales, canReassignOwner } from "@/lib/permissions";
 import { automationBookMeeting } from "@/lib/automations";
+import { getConnection, sendGmail } from "@/lib/google";
 
 async function guard() {
   const user = await requireUser();
