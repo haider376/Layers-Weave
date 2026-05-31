@@ -1352,3 +1352,134 @@ table td{padding:13px 20px}
 /* Compact density still respected but never cramped */
 html.compact .main{padding:22px 28px 64px}
 html.compact .kpis,html.compact .grid2,html.compact .an-grid{gap:14px}
+
+/* ════════════════════════════════════════════════════════════════════════
+   CADENCES — Salesloft-style dashboard, dial pad, builder, enroll
+   ════════════════════════════════════════════════════════════════════════ */
+.cad{display:flex;flex-direction:column;gap:18px}
+
+/* Header stat strip */
+.cad-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+.cad-stat{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:var(--r2);padding:16px 18px}
+.cad-stat-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:12px}
+.cad-stat-row{display:flex;align-items:flex-end;gap:26px}
+.cad-stat-v{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.cad-stat-l{font-size:11px;color:var(--muted);margin-top:5px}
+.cad-spark{flex:1;min-width:80px;opacity:.85}
+
+/* Tabs */
+.cad-tabs{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line);padding-bottom:0}
+.cad-tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--faint);font-family:inherit;font-size:13.5px;font-weight:600;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.14s}
+.cad-tabs button:hover{color:var(--text)}
+.cad-tabs button.on{color:var(--text);border-color:var(--neon)}
+
+/* Body: queue + live feed */
+.cad-body{display:grid;grid-template-columns:1fr 320px;gap:var(--gap);align-items:start}
+.cad-queue{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+.cad-q-toolbar{display:flex;flex-direction:column;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.cad-chips{display:flex;gap:8px;flex-wrap:wrap}
+.cad-chip{display:inline-flex;align-items:center;gap:7px;background:var(--panel-2);border:1px solid var(--line-2);color:var(--muted);border-radius:30px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.14s}
+.cad-chip:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
+.cad-chip.on{border-color:var(--neon);background:var(--neon-soft);color:var(--text)}
+.cad-chip-n{background:var(--line-2);color:var(--text);border-radius:20px;font-size:10px;font-weight:800;min-width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+.cad-chip.on .cad-chip-n{background:var(--neon);color:var(--neon-ink)}
+.cad-q-filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cad-type-seg{display:inline-flex;border:1px solid var(--line-2);border-radius:9px;overflow:hidden}
+.cad-type-seg button{padding:7px 12px;border:0;background:var(--panel);color:var(--faint);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border-left:1px solid var(--line)}
+.cad-type-seg button:first-child{border-left:0}
+.cad-type-seg button:hover{color:var(--text);background:var(--panel-2)}
+.cad-type-seg button.on{background:var(--neon);color:var(--neon-ink)}
+.cad-mine{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.cad-mine input{accent-color:var(--neon);width:15px;height:15px}
+
+.cad-list-head,.cad-row{display:grid;grid-template-columns:2.2fr 1.6fr 1.4fr .9fr .9fr;gap:12px;align-items:center}
+.cad-list-head{padding:10px 18px;border-bottom:1px solid var(--line);font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);font-weight:700}
+.cad-run-h{text-align:right}
+.cad-list{display:flex;flex-direction:column}
+.cad-row{padding:12px 18px;border-bottom:1px solid var(--line);transition:background .12s}
+.cad-row:hover{background:var(--panel-2)}
+.cad-row.b-overdue{box-shadow:inset 3px 0 0 var(--red)}
+.cad-row.b-today{box-shadow:inset 3px 0 0 var(--neon)}
+.cad-step{display:flex;align-items:center;gap:10px;min-width:0}
+.cad-step-ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;flex:none}
+.cad-step-t{display:flex;flex-direction:column;min-width:0}
+.cad-step-t b{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cad-step-t small{font-size:10.5px;color:var(--faint)}
+.cad-person{display:flex;flex-direction:column;min-width:0}
+.cad-person-n{font-size:12.5px;font-weight:600;color:var(--text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cad-person-n:hover{color:var(--neon)}
+.cad-person small{font-size:10.5px;color:var(--faint)}
+.cad-cad a{font-size:12px;color:var(--muted);text-decoration:none}
+.cad-cad a:hover{color:var(--text)}
+.cad-due{font-size:11.5px;font-weight:600;color:var(--muted)}
+.cad-due.b-overdue{color:var(--red)}
+.cad-due.b-today{color:var(--neon-deep)}
+.cad-run{display:flex;justify-content:flex-end}
+.cad-dial{display:inline-flex;align-items:center;gap:6px;background:var(--neon);color:var(--neon-ink);border:0;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.14s}
+.cad-dial:hover{filter:brightness(1.06)}
+.cad-done{background:var(--panel-2);border:1px solid var(--line-2);color:var(--text);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.cad-done:hover{border-color:var(--neon);color:var(--neon)}
+
+/* Live feed */
+.cad-feed{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;position:sticky;top:18px}
+.cad-feed-h{padding:14px 16px;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700}
+.cad-feed-list{max-height:560px;overflow-y:auto}
+.cad-feed-i{display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line)}
+.cad-feed-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none;background:var(--faint)}
+.cad-feed-dot.call{background:#0b8043}.cad-feed-dot.meeting{background:#1a73e8}
+.cad-feed-dot.ok{box-shadow:0 0 0 3px var(--neon-soft)}
+.cad-feed-t{font-size:12px;color:var(--text)}.cad-feed-t b{font-weight:600}
+.cad-feed-m{font-size:10.5px;color:var(--faint);margin-top:2px}
+
+/* Cadence list table */
+.cadlist-toolbar{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cad-func{font-size:11px;font-weight:600;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-2);border-radius:20px;padding:3px 10px}
+.cad-due-pill{background:var(--neon);color:var(--neon-ink);border-radius:20px;font-size:11px;font-weight:800;padding:2px 9px}
+
+/* Builder */
+.cadb{display:flex;flex-direction:column;gap:0}
+.cadb-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}
+.cadb-head-actions{display:flex;align-items:center;gap:10px}
+.cadb-move{display:inline-flex;gap:2px}
+.cadb-move button{width:24px;height:24px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--muted);border-radius:6px;cursor:pointer;font-size:12px}
+.cadb-move button:hover:not(:disabled){border-color:var(--neon);color:var(--neon)}
+.cadb-move button:disabled{opacity:.35;cursor:not-allowed}
+
+/* Dial pad */
+.dial-wrap{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:200;animation:gcalFade .14s ease}
+.dial{width:min(400px,94vw);background:var(--panel);border:1px solid var(--line-2);border-radius:18px;padding:24px;position:relative;box-shadow:0 30px 90px rgba(0,0,0,.6);animation:gcalPop .16s ease}
+.dial-x{position:absolute;top:14px;right:16px;background:none;border:0;color:var(--faint);font-size:26px;line-height:1;cursor:pointer}
+.dial-x:hover{color:var(--text)}
+.dial-id{text-align:center;margin-bottom:14px}
+.dial-av{width:60px;height:60px;border-radius:50%;background:var(--neon-soft);color:var(--neon);display:grid;place-items:center;font-family:var(--display);font-size:22px;font-weight:800;margin:0 auto 12px}
+.dial-nm{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.dial-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.dial-num{font-size:13px;color:var(--text);margin-top:8px;font-variant-numeric:tabular-nums}
+.dial-stage{text-align:center;font-size:12px;font-weight:600;color:var(--faint);padding:8px;margin:6px 0}
+.dial-stage.live{color:var(--neon)}
+.dial-pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--neon);margin-right:6px;animation:dialPulse 1s infinite}
+@keyframes dialPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.dial-call{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--neon);color:var(--neon-ink);border:0;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.dial-call:hover{filter:brightness(1.06)}.dial-call:disabled{opacity:.4;cursor:not-allowed}
+.dial-hang{width:100%;background:var(--red);color:#fff;border:0;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.dial-disp-h{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);font-weight:700;margin:18px 0 8px}
+.dial-disps{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px}
+.dial-disp{padding:9px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--muted);border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;text-align:left;transition:.12s}
+.dial-disp:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
+.dial-disp.on{border-color:var(--neon);background:var(--neon-soft);color:var(--text)}
+.dial-disp.good.on{border-color:var(--neon);background:var(--neon);color:var(--neon-ink)}
+.dial-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+
+/* Enroll popover */
+.enroll-pop{width:280px}
+.enroll-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);font-weight:700;margin:4px 2px 6px}
+.enroll-people{border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px}
+.enroll-person{display:flex;align-items:center;gap:9px;padding:6px 6px;font-size:12.5px;color:var(--text);cursor:pointer;border-radius:7px}
+.enroll-person:hover{background:var(--panel-2)}
+.enroll-person input{accent-color:var(--neon);width:15px;height:15px}
+.enroll-list{display:flex;flex-direction:column;gap:3px;max-height:240px;overflow-y:auto}
+.enroll-cad{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border:1px solid var(--line);background:var(--panel-2);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12.5px;color:var(--text);text-align:left;transition:.12s}
+.enroll-cad:hover{border-color:var(--neon);background:var(--neon-soft)}
+.enroll-fn{font-size:10px;color:var(--faint);background:var(--panel);border-radius:20px;padding:2px 8px}
+
+@media(max-width:1000px){.cad-body{grid-template-columns:1fr}.cad-strip{grid-template-columns:1fr}}

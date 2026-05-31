@@ -11,6 +11,7 @@ import RecordActions from "@/components/RecordActions";
 import RecordTasks from "@/components/RecordTasks";
 import OwnerSelect from "./OwnerSelect";
 import AddContact from "./AddContact";
+import EnrollCadence from "@/components/EnrollCadence";
 import { updateCompanyAction } from "../../sales/record-actions";
 
 const LEAD_STATUSES = ["New", "In Progress", "Open Deal", "Cool Off", "Data Quality", "Do Not Contact"];
@@ -43,6 +44,7 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
   const primary = company.contacts.find((c) => c.primary) ?? company.contacts[0] ?? null;
   const tasksRaw = await safe(prisma.task.findMany({ where: { companyId: id }, orderBy: [{ done: "asc" }, { dueDate: "asc" }], take: 50 }), []);
   const tasks = tasksRaw.map((t) => ({ id: t.id, title: t.title, type: t.type, priority: t.priority, done: t.done, dueDate: t.dueDate ? t.dueDate.toISOString() : null }));
+  const cadencesRaw = await safe(prisma.cadence.findMany({ where: { active: true }, select: { id: true, name: true, function: true }, orderBy: { updatedAt: "desc" } }), []);
 
   return (
     <>
@@ -121,6 +123,16 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
               {company.deals.length === 0 && <div className="q-note" style={{ padding: 16 }}>No deals yet.</div>}
               <div style={{ padding: "8px 16px" }}>
                 <Link href={`/deals/new?company=${company.id}`} className="addline">+ New deal</Link>
+              </div>
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panel-h"><h2>Cadences</h2></div>
+            <div style={{ padding: "6px 0" }}>
+              <div className="q-note" style={{ padding: "8px 16px 4px", textAlign: "left" }}>Enroll this account&apos;s contacts into an outreach cadence.</div>
+              <div style={{ padding: "4px 16px 8px" }}>
+                <EnrollCadence cadences={cadencesRaw} contacts={company.contacts.map((c) => ({ id: c.id, name: c.name }))} />
               </div>
             </div>
           </section>

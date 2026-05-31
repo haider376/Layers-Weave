@@ -380,5 +380,72 @@ export async function seedDatabase(prisma: PrismaClient) {
     ],
   });
 
+  // ── Cadences (Salesloft-style) ──────────────────────────────────────────
+  const CADENCES: { name: string; function: string; priority: string; owner: string; steps: { day: number; type: string; subject: string }[] }[] = [
+    {
+      name: "Outbound Prospecting — Tier 1 Account", function: "Outbound", priority: "High", owner: "rija",
+      steps: [
+        { day: 0, type: "task", subject: "Contact & account research" },
+        { day: 0, type: "call", subject: "Call 1 — leave voicemail" },
+        { day: 0, type: "email", subject: "Email 1 — personalised intro" },
+        { day: 2, type: "linkedin", subject: "LinkedIn connection request" },
+        { day: 3, type: "call", subject: "Call 2 — current sourcing?" },
+        { day: 6, type: "email", subject: "Email 2 — Carhartt case study" },
+        { day: 9, type: "call", subject: "Call 3 — share account screenshot" },
+        { day: 14, type: "email", subject: "Email 3 — break-up note" },
+      ],
+    },
+    {
+      // The requested call-only cadence: 5 days, 8 calls.
+      name: "Call Blitz — 5 day / 8 call", function: "Outbound", priority: "High", owner: "huzaifa",
+      steps: [
+        { day: 0, type: "call", subject: "Call 1 — opener" },
+        { day: 0, type: "call", subject: "Call 2 — afternoon retry" },
+        { day: 1, type: "call", subject: "Call 3 — morning dial" },
+        { day: 1, type: "call", subject: "Call 4 — afternoon dial" },
+        { day: 2, type: "call", subject: "Call 5 — switch time block" },
+        { day: 3, type: "call", subject: "Call 6 — value reminder" },
+        { day: 4, type: "call", subject: "Call 7 — last attempt" },
+        { day: 5, type: "call", subject: "Call 8 — break-up call" },
+      ],
+    },
+    {
+      name: "Inbound Follow-up", function: "Inbound", priority: "Medium", owner: "kamila",
+      steps: [
+        { day: 0, type: "call", subject: "Speed-to-lead call (5 min)" },
+        { day: 0, type: "email", subject: "Thanks + next steps" },
+        { day: 1, type: "call", subject: "Follow-up call" },
+        { day: 3, type: "email", subject: "Catalogue + pricing" },
+      ],
+    },
+  ];
+
+  const someContacts = await prisma.contact.findMany({ take: 40, include: { company: true } });
+  let ci = 0;
+  for (const c of CADENCES) {
+    const cadence = await prisma.cadence.create({
+      data: {
+        name: c.name, function: c.function, priority: c.priority, ownerId: userByKey[c.owner],
+        steps: { create: c.steps.map((s, i) => ({ day: s.day, type: s.type, subject: s.subject, position: i })) },
+      },
+      include: { steps: { orderBy: { position: "asc" } } },
+    });
+    // Enroll a handful of contacts at varied steps so the dashboard has due work.
+    const enrollCount = c.function === "Inbound" ? 4 : 6;
+    for (let k = 0; k < enrollCount && ci < someContacts.length; k++, ci++) {
+      const contact = someContacts[ci];
+      const stepIdx = k % cadence.steps.length;
+      const day = cadence.steps[stepIdx].day;
+      // back-date startedAt so some steps are overdue / due today
+      const started = new Date(Date.now() - (day + (k % 3)) * 86400000);
+      await prisma.cadenceMembership.create({
+        data: {
+          cadenceId: cadence.id, contactId: contact.id, assigneeId: userByKey[c.owner],
+          currentDay: day, startedAt: started,
+        },
+      });
+    }
+  }
+
   return { users: USERS.length, defaultPassword: DEFAULT_PASSWORD };
 }

@@ -10,6 +10,7 @@ import ActivityPanel from "@/components/ActivityPanel";
 import EditableDetails from "@/components/EditableDetails";
 import RecordActions from "@/components/RecordActions";
 import RecordTasks from "@/components/RecordTasks";
+import EnrollCadence from "@/components/EnrollCadence";
 import { updateContactAction } from "../../sales/record-actions";
 
 export default async function ContactDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -23,6 +24,8 @@ export default async function ContactDetail({ params }: { params: Promise<{ id: 
   const events = await getTimeline({ contactId: id });
   const tasksRaw = await safe(prisma.task.findMany({ where: { contactId: id }, orderBy: [{ done: "asc" }, { dueDate: "asc" }], take: 50 }), []);
   const tasks = tasksRaw.map((t) => ({ id: t.id, title: t.title, type: t.type, priority: t.priority, done: t.done, dueDate: t.dueDate ? t.dueDate.toISOString() : null }));
+  const cadencesRaw = await safe(prisma.cadence.findMany({ where: { active: true }, select: { id: true, name: true, function: true }, orderBy: { updatedAt: "desc" } }), []);
+  const memberships = await safe(prisma.cadenceMembership.findMany({ where: { contactId: id, status: "active" }, include: { cadence: true } }), []);
 
   return (
     <>
@@ -78,6 +81,21 @@ export default async function ContactDetail({ params }: { params: Promise<{ id: 
                 </Link>
               ))}
               {contact.deals.length === 0 && <div className="q-note" style={{ padding: 16 }}>No deals linked.</div>}
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panel-h"><h2>Cadences</h2><span className="count">{memberships.length}</span></div>
+            <div style={{ padding: "6px 0" }}>
+              {memberships.map((m) => (
+                <Link href={`/cadences/${m.cadenceId}`} key={m.id} className="mini-row">
+                  <span style={{ flex: 1 }}>{m.cadence.name}<small>{m.cadence.function} · day {m.currentDay}</small></span>
+                </Link>
+              ))}
+              {memberships.length === 0 && <div className="q-note" style={{ padding: 16 }}>Not in any cadence.</div>}
+              <div style={{ padding: "8px 16px" }}>
+                <EnrollCadence cadences={cadencesRaw} contactId={contact.id} />
+              </div>
             </div>
           </section>
 

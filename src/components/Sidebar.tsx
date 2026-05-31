@@ -24,8 +24,8 @@ const ICONS = {
   inbox: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" /></svg>,
   calc: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 10h2M8 14h2M14 10h2v8h-6" /></svg>,
   weight: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M6 7h12l3 13H3z" /><circle cx="12" cy="4" r="2" /><path d="M8.5 11a3.5 3.5 0 007 0" /></svg>,
-  forecast: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-6" /><path d="M18 8h3v3" /></svg>,
-  sequences: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="5" cy="6" r="2" /><circle cx="5" cy="18" r="2" /><path d="M5 8v8" /><path d="M11 6h8M11 18h8M11 12h8" /></svg>,
+  forecast: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M2 12a10 10 0 1 0 10-10" /><path d="M12 12l4-4" /><circle cx="12" cy="12" r="5.5" /><circle cx="12" cy="12" r="1.6" /></svg>,
+  cadences: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="6" cy="5" r="2" /><circle cx="6" cy="19" r="2" /><path d="M6 7v10" /><path d="M11 5h9M11 12h6M11 19h9" /></svg>,
   settings: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></svg>,
   signout: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>,
 };
@@ -88,7 +88,7 @@ export default function Sidebar({
           <Nav href="/sales" label="Deals" icon={ICONS.pipeline} pill={salesCount} />
           <Nav href="/companies" label="Leads" icon={ICONS.companies} />
           <Nav href="/contacts" label="People" icon={ICONS.contacts} />
-          <Nav href="/sequences" label="Sequences" icon={ICONS.sequences} />
+          <Nav href="/cadences" label="Cadences" icon={ICONS.cadences} />
           <Nav href="/tasks" label="Tasks" icon={ICONS.tasks} />
         </nav>
       </div>

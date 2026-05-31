@@ -34,6 +34,8 @@ model User {
   meetingsAsBdr   SalesMeeting[] @relation("MeetingBdr")
   quotesOwned     Quote[]   @relation("QuoteOwner")
   quotesCollab    Quote[]   @relation("QuoteCollaborator")
+  cadencesOwned   Cadence[]           @relation("CadenceOwner")
+  cadenceMembers  CadenceMembership[] @relation("CadenceAssignee")
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -87,6 +89,7 @@ model Contact {
 
   calls CallLog[]
   deals Deal[]
+  cadenceMemberships CadenceMembership[]
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -407,4 +410,63 @@ model AppSetting {
   key       String   @id
   value     String // JSON-encoded payload
   updatedAt DateTime @updatedAt @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cadences — Salesloft-style repeatable outreach sequences
+// ─────────────────────────────────────────────────────────────
+model Cadence {
+  id        String   @id @default(cuid())
+  name      String
+  function  String   @default("Outbound") // Inbound | Outbound | Event | Other
+  priority  String   @default("Medium") // High | Medium | Low
+  active    Boolean  @default(true)
+  ownerId   String?
+  owner     User?    @relation("CadenceOwner", fields: [ownerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  steps   CadenceStep[]
+  members CadenceMembership[]
+}
+
+model CadenceStep {
+  id         String  @id @default(cuid())
+  cadenceId  String
+  cadence    Cadence @relation(fields: [cadenceId], references: [id], onDelete: Cascade)
+  day        Int     @default(0)
+  type       String  @default("call") // call | email | linkedin | task
+  subject    String  @default("")
+  position   Int     @default(0)
+
+  memberSteps CadenceStepRun[]
+}
+
+model CadenceMembership {
+  id         String   @id @default(cuid())
+  cadenceId  String
+  cadence    Cadence  @relation(fields: [cadenceId], references: [id], onDelete: Cascade)
+  contactId  String
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  assigneeId String?
+  assignee   User?    @relation("CadenceAssignee", fields: [assigneeId], references: [id])
+  status     String   @default("active") // active | completed | removed
+  currentDay Int      @default(0)
+  enrolledAt DateTime @default(now())
+  startedAt  DateTime @default(now())
+
+  runs CadenceStepRun[]
+
+  @@unique([cadenceId, contactId])
+}
+
+model CadenceStepRun {
+  id           String   @id @default(cuid())
+  membershipId String
+  membership   CadenceMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  stepId       String
+  step         CadenceStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  done         Boolean  @default(false)
+  outcome      String?
+  completedAt  DateTime?
 }
