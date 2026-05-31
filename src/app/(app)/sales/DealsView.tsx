@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
 import Board, { type BoardDeal } from "./Board";
 
-const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
+const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Closed Won", "Closed Lost", "Disqualified"];
 function stageCls(s: string) {
   if (s === "Closed Won") return "go"; if (s === "Closed Lost" || s === "Disqualified") return "bad";
   if (s === "No Show / Reschedule") return "wait"; return "work";

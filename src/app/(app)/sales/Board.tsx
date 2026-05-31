@@ -23,7 +23,6 @@ const STAGES = [
   "Showed up",
   "No Show / Reschedule",
   "Initiation",
-  "Handpick / Bulk Vintage",
   "Closed Won",
   "Closed Lost",
   "Disqualified",
@@ -32,7 +31,6 @@ const STAGES = [
 const COLUMN_CLS: Record<string, string> = {
   "No Show / Reschedule": "noshow",
   Initiation: "init",
-  "Handpick / Bulk Vintage": "work",
   "Closed Won": "won",
   "Closed Lost": "lost",
   Disqualified: "dq",

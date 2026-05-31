@@ -5,7 +5,7 @@ import Topbar from "@/components/Topbar";
 import PeriodTabs from "./PeriodTabs";
 import AnalyticsBoard, { type Card, type Kpi } from "./AnalyticsBoard";
 
-const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
+const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Closed Won", "Closed Lost", "Disqualified"];
 const PAL = ["#8A8A90", "#C6F542", "#C9C9CC", "#E0B23C", "#A9DF1E", "#6A6A70", "#646469", "#2A2A2E"];
 const OUTCOME_COLORS: Record<string, string> = { "No answer": "#2A2A2E", "Left voicemail": "#8A8A90", Connected: "#C6F542", "Meeting Booked": "#A9DF1E", "Not Interested": "#C9C9CC", Busy: "#E0B23C", "Wrong number": "#F0594F", "Call Back Later": "#646469" };
 const LEAD_COLORS: Record<string, string> = { New: "#8A8A90", "In Progress": "#C9C9CC", "Open Deal": "#C6F542", "Cool Off": "#F0594F", "Data Quality": "#E0B23C", "Do Not Contact": "#646469" };
@@ -87,11 +87,11 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const quotaPct = Math.round((wonValue / quotaGoal) * 100);
 
   // funnel — conversion through the pipeline
-  const FUNNEL_STAGES = ["Appointment Scheduled", "Showed up", "Initiation", "Handpick / Bulk Vintage", "Closed Won"];
+  const FUNNEL_STAGES = ["Appointment Scheduled", "Showed up", "Initiation", "Closed Won"];
   const funnel = FUNNEL_STAGES.map((s) => ({ label: s, value: deals.filter((d) => d.stage === s).length }));
 
   // forecast — weighted pipeline by stage win-probability
-  const PROB: Record<string, number> = { "Appointment Scheduled": 0.1, "Showed up": 0.25, "No Show / Reschedule": 0.05, Initiation: 0.4, "Handpick / Bulk Vintage": 0.6 };
+  const PROB: Record<string, number> = { "Appointment Scheduled": 0.1, "Showed up": 0.25, "No Show / Reschedule": 0.05,Initiation: 0.4};
   const openByStage = new Map<string, number>();
   for (const d of openDeals) openByStage.set(d.stage, (openByStage.get(d.stage) ?? 0) + d.amount);
   const weighted = openDeals.reduce((s, d) => s + d.amount * (PROB[d.stage] ?? 0.1), 0);

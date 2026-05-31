@@ -12,7 +12,7 @@ import { celebrate } from "./Celebration";
 import { showToast } from "./Toast";
 import Select from "./ui/Select";
 
-const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
+const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Closed Won", "Closed Lost", "Disqualified"];
 const money = (n: number) => "$" + n.toLocaleString("en-US");
 function ago(s: string) { const m = Math.round((Date.now() - +new Date(s)) / 60000); if (m < 60) return `${m}m`; const h = Math.round(m / 60); return h < 24 ? `${h}h` : `${Math.round(h / 24)}d`; }
 

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 
-export default function PeriodTabs({ period, basePath = "/reports" }: { period: string; basePath?: string }) {
-  const tabs = [
+export default function PeriodTabs({ period, basePath = "/reports", options }: { period: string; basePath?: string; options?: string[] }) {
+  const all = [
     { k: "daily", label: "Daily" },
     { k: "weekly", label: "Weekly" },
     { k: "monthly", label: "Monthly" },
   ];
+  const tabs = options ? all.filter((t) => options.includes(t.k)) : all;
   return (
     <div className="seg" style={{ marginBottom: 18 }}>
       {tabs.map((t) => (

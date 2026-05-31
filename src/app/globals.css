@@ -894,6 +894,11 @@ select.dg-input:focus,select.ed:focus,select.se-input:focus{box-shadow:0 0 0 2px
 
 /* ── Motion polish — smooth, restrained ──────────────────────── */
 *{transition-duration:.16s;transition-timing-function:cubic-bezier(.2,.7,.2,1)}
+/* CRITICAL: Radix positions every popover/select/dropdown by setting an inline
+   `transform` on the injected popper wrapper. The global `* { transition }`
+   above would otherwise animate that transform from translate(0,0) — making
+   menus visibly slide in from the top-left corner. Never transition the wrapper. */
+[data-radix-popper-content-wrapper]{transition:none !important}
 .kpi,.panel,.ccard,.col{animation-duration:.5s}
 .reveal{animation-duration:.6s}
 .reveal-group>*{animation-duration:.5s}
@@ -1172,21 +1177,36 @@ tbody td{padding:15px 22px}
 @media (max-width: 900px) { .gcal { grid-template-columns: 1fr; } .gcal-side { display: none; } }
 
 /* ── Goals settings editor (Settings → Goals) ── */
-.gs{display:flex;flex-direction:column;gap:24px;max-width:680px}
+.gs{display:flex;flex-direction:column;gap:22px;max-width:760px}
+.gs-toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .gs-block{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:18px}
-.gs-block-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
-.gs-sync{background:var(--panel);border:1px solid var(--line-2);color:var(--muted);border-radius:8px;padding:7px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
-.gs-sync:hover{border-color:var(--neon);color:var(--neon)}
-.gs-team{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.gs-field{display:flex;flex-direction:column;gap:6px;font-size:11.5px;font-weight:600;color:var(--faint)}
-.gs-num{display:flex;align-items:center;background:var(--panel);border:1px solid var(--line-2);border-radius:9px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
-.gs-num:focus-within{border-color:var(--neon);box-shadow:0 0 0 3px var(--neon-soft)}
-.gs-pre{padding:0 0 0 10px;color:var(--faint);font-size:12.5px}
-.gs-num input{flex:1;background:none;border:0;outline:none;color:var(--text);font-family:inherit;font-size:13px;font-weight:600;padding:9px 11px;width:100%}
-.gs-num input::-webkit-outer-spin-button,.gs-num input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.gs-hint{margin-top:12px;font-size:11.5px;color:var(--faint)}
-.gs-hint b{color:var(--text)}
+.gs-team{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.gs-tile{background:var(--panel);border:1px solid var(--line-2);border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:3px}
+.gs-tile-v{font-family:var(--display);font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--neon)}
+.gs-tile-l{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);font-weight:600}
 .gs-table{width:100%}
 .gs-table th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);text-align:left;padding:6px 8px}
-.gs-table td{padding:5px 8px;border-top:1px solid var(--line)}
-.gs-table td .gs-num{max-width:130px}
+.gs-table td{padding:6px 8px;border-top:1px solid var(--line);vertical-align:middle}
+.gs-table td .ni-wrap,.gs-table td .ui-input{max-width:130px}
+@media(max-width:680px){.gs-team{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Permissions matrix (Settings → Permissions) ── */
+.perm-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.perm-table{width:100%;border-collapse:collapse;min-width:560px}
+.perm-table th{font-size:10.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.03em;padding:11px 8px;text-align:center;border-bottom:1px solid var(--line);background:var(--panel-2)}
+.perm-table th.perm-cap-h{text-align:left;padding-left:16px}
+.perm-cap{padding:11px 16px;border-bottom:1px solid var(--line);min-width:220px}
+.perm-cap-t{font-size:13px;font-weight:600;color:var(--text)}
+.perm-cap-d{font-size:11px;color:var(--faint);margin-top:2px}
+.perm-cell{text-align:center;border-bottom:1px solid var(--line);padding:8px}
+.perm-table tbody tr:last-child td{border-bottom:0}
+.perm-dot{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--line-2);background:var(--panel-2);color:var(--neon-ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.12s}
+.perm-dot:hover{border-color:var(--neon)}
+.perm-dot.on{background:var(--neon);border-color:var(--neon)}
+
+/* ── NumberInput with prefix (e.g. $) ── */
+.ni-wrap{display:flex;align-items:center;background:var(--panel-2);border:1px solid var(--line-2);border-radius:9px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.ni-wrap:focus-within{border-color:var(--neon);box-shadow:0 0 0 3px var(--neon-soft)}
+.ni-pre{padding:0 0 0 11px;color:var(--faint);font-size:12.5px}
+.ni-wrap input{flex:1;background:none;border:0;outline:none;color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;padding:9px 11px;width:100%}
+.ni-wrap input::-webkit-outer-spin-button,.ni-wrap input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}

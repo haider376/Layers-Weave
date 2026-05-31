@@ -8,12 +8,14 @@ import { updateProfileAction } from "@/app/actions/session";
 import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
 import { useEffect } from "react";
 import GoalsSettings, { type AeMeta } from "./GoalsSettings";
+import PermissionsSettings from "./PermissionsSettings";
 import type { SalesGoals } from "@/lib/goals";
+import type { PermissionMatrix } from "@/lib/appConfig";
 
 type Team = { name: string; email: string; role: string; active: boolean }[];
-const TABS = ["Profile", "Account", "Goals", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
+const TABS = ["Profile", "Account", "Goals", "Permissions", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
 type Tab = (typeof TABS)[number];
-const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
+const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Closed Won", "Closed Lost", "Disqualified"];
 
 function Toggle({ label, sub, defaultOn = true }: { label: string; sub: string; defaultOn?: boolean }) {
   const [on, setOn] = useState(defaultOn);
@@ -40,13 +42,14 @@ function Field({ label, value, type = "text", disabled }: { label: string; value
   return <div className="dg-row"><span className="dg-label">{label}</span><input className="dg-input" type={type} value={v} disabled={disabled} onChange={(e) => setV(e.target.value)} /></div>;
 }
 
-export default function SettingsView({ me, isAdmin, team, goals, aes }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; aes: AeMeta[] }) {
+export default function SettingsView({ me, isAdmin, team, goals, reps, permissions }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Profile");
   const [name, setName] = useState(me.name);
   const [title, setTitle] = useState(me.role);
   const [pending, start] = useTransition();
-  const tabs = TABS.filter((t) => (t !== "Team" && t !== "Goals") || isAdmin);
+  const ADMIN_ONLY: Tab[] = ["Team", "Goals", "Permissions"];
+  const tabs = TABS.filter((t) => !ADMIN_ONLY.includes(t) || isAdmin);
 
   function saveProfile() { start(async () => { await updateProfileAction({ name, title }); showToast("Profile saved"); router.refresh(); }); }
 
@@ -79,7 +82,8 @@ export default function SettingsView({ me, isAdmin, team, goals, aes }: { me: { 
               <div className="set-row" style={{ borderColor: "rgba(226,87,78,.4)" }}><div><div className="set-row-t" style={{ color: "var(--red)" }}>Sign out everywhere</div><div className="set-row-s">End all other sessions</div></div><button className="btn ghost" style={{ flex: "none", padding: "8px 14px" }} onClick={() => showToast("Other sessions ended")}>Sign out all</button></div>
             </div>
           )}
-          {tab === "Goals" && <GoalsSettings initial={goals} aes={aes} />}
+          {tab === "Goals" && <GoalsSettings initial={goals} reps={reps} />}
+          {tab === "Permissions" && <PermissionsSettings initial={permissions} />}
           {tab === "Notifications" && (
             <div className="set-list">
               <Toggle label="New SQL booked" sub="When a meeting is booked" />

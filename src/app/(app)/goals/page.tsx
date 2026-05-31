@@ -3,80 +3,135 @@ import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { initials } from "@/components/Logo";
 import Topbar from "@/components/Topbar";
-import { getSalesGoals, AE_FIRST } from "@/lib/goals";
+import PeriodTabs from "../reports/PeriodTabs";
+import { getSalesGoals, teamTotals, toMonthly, kindOf, ROSTER, METRIC_LABEL, WEEKS_PER_MONTH, type Weekly } from "@/lib/goals";
+import { metricsForOwner, type RepMetrics } from "@/lib/metrics";
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
 
-export default async function GoalsPage() {
+export default async function GoalsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  const { period: p = "weekly" } = await searchParams;
+  const period: "weekly" | "monthly" = p === "monthly" ? "monthly" : "weekly";
+  const windowDays = period === "monthly" ? 30 : 7;
+  const since = new Date(Date.now() - windowDays * 86400000);
 
-  const [users, deals, meetings, calls, goals] = await Promise.all([
+  const [users, deals, calls, goals] = await Promise.all([
     prisma.user.findMany(),
-    prisma.deal.findMany({ where: { stage: "Closed Won" } }),
-    prisma.salesMeeting.findMany({ where: { bookedDate: { gte: new Date(Date.now() - 30 * 86400000) } } }),
-    safe(prisma.callLog.findMany({ where: { createdAt: { gte: new Date(Date.now() - 30 * 86400000) } } }), []),
+    prisma.deal.findMany({ where: { createDate: { gte: since } } }),
+    safe(prisma.callLog.findMany({ where: { createdAt: { gte: since } } }), []),
     getSalesGoals(),
   ]);
 
-  const teamRev = deals.reduce((s, d) => s + d.amount, 0);
-  const teamSql = meetings.length;
-  const teamCalls = calls.length;
+  const callsByAgent = new Map<string, number>();
+  for (const c of calls) callsByAgent.set(c.agent ?? "", (callsByAgent.get(c.agent ?? "") ?? 0) + 1);
 
-  const aes = users.filter((u) => AE_FIRST.includes(u.name.split(" ")[0].toLowerCase()));
-  const rows = aes.map((u) => {
-    const first = u.name.split(" ")[0].toLowerCase();
-    const g = goals.individual[first] ?? { revenue: 6000, sqls: 4, calls: 120 };
-    const rev = deals.filter((d) => d.ownerId === u.id).reduce((s, d) => s + d.amount, 0);
-    const sql = meetings.filter((m) => m.aeId === u.id).length;
-    const myCalls = calls.filter((c) => c.agent === u.name).length;
-    return { name: u.name, rev, sql, myCalls, goal: g, pct: Math.round((rev / Math.max(1, g.revenue)) * 100) };
-  }).sort((a, b) => b.rev - a.rev);
+  const goalFor = (first: string): Weekly => {
+    const w = goals.weekly[first] ?? { revenue: 0, sql: 0, sqm: 0, sqo: 0, calls: 0 };
+    return period === "monthly" ? toMonthly(w) : w;
+  };
 
-  const TeamGoal = ({ label, actual, goal, fmt }: { label: string; actual: number; goal: number; fmt?: (n: number) => string }) => {
-    const pct = Math.min(100, Math.round((actual / Math.max(1, goal)) * 100));
-    const f = fmt ?? ((n: number) => String(n));
+  // Build per-rep rows with actuals + goals.
+  type Row = { name: string; first: string; kind: "AE" | "BDR"; actual: RepMetrics; goal: Weekly };
+  const rows: Row[] = ROSTER.map(({ first, kind }) => {
+    const u = users.find((x) => x.name.split(" ")[0].toLowerCase() === first);
+    const actual = u ? metricsForOwner(deals, u.id, callsByAgent.get(u.name) ?? 0)
+      : { revenue: 0, sql: 0, sqm: 0, sqo: 0, calls: 0 };
+    return { name: u?.name ?? first.charAt(0).toUpperCase() + first.slice(1), first, kind, actual, goal: goalFor(first) };
+  });
+
+  const aeRows = rows.filter((r) => r.kind === "AE");
+  const bdrRows = rows.filter((r) => r.kind === "BDR");
+
+  const team = teamTotals(goals, period);
+  const teamActual = rows.reduce((acc, r) => {
+    acc.revenue += r.actual.revenue; acc.sql += r.actual.sql; acc.sqm += r.actual.sqm; acc.sqo += r.actual.sqo; acc.calls += r.actual.calls;
+    return acc;
+  }, { revenue: 0, sql: 0, sqm: 0, sqo: 0, calls: 0 });
+
+  const pct = (a: number, g: number) => Math.min(100, Math.round((a / Math.max(1, g)) * 100));
+
+  const TeamCard = ({ label, actual, goal, fmt }: { label: string; actual: number; goal: number; fmt?: (n: number) => string }) => {
+    const f = fmt ?? ((n: number) => n.toLocaleString("en-US"));
+    const p = pct(actual, goal);
     return (
       <div className="kpi" style={{ minHeight: 0 }}>
         <span className="bar" />
         <div className="lbl">{label}</div>
         <div className="val neon">{f(actual)}</div>
-        <div className="delta">{pct}% of {f(goal)} goal</div>
-        <div className="goal-track" style={{ marginTop: 10 }}><i style={{ width: `${pct}%` }} /></div>
+        <div className="delta">{p}% of {f(goal)}</div>
+        <div className="goal-track" style={{ marginTop: 10 }}><i style={{ width: `${p}%` }} /></div>
       </div>
+    );
+  };
+
+  const Cell = ({ a, g, fmt }: { a: number; g: number; fmt?: (n: number) => string }) => {
+    const f = fmt ?? ((n: number) => n.toLocaleString("en-US"));
+    const p = pct(a, g);
+    return (
+      <td style={{ minWidth: 116 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, marginBottom: 4 }}>
+          <b className="tabular-nums" style={{ color: p >= 100 ? "var(--neon)" : "var(--text)" }}>{f(a)}</b>
+          <span className="tabular-nums" style={{ color: "var(--faint)" }}>/ {f(g)}</span>
+        </div>
+        <div className="goal-track"><i style={{ width: `${p}%`, background: p >= 100 ? "var(--neon)" : "var(--muted)" }} /></div>
+      </td>
     );
   };
 
   return (
     <>
-      <Topbar title="Goals" sub="Team & individual monthly targets — revenue, SQLs, calls" />
+      <Topbar title="Sales Goals" sub="Team & individual targets — SQL · SQM · SQO · Closed Won · Calls" />
+      <PeriodTabs period={period} basePath="/goals" options={["weekly", "monthly"]} />
 
-      <div className="kpis" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
-        <TeamGoal label="Team revenue" actual={teamRev} goal={goals.team.revenue} fmt={money} />
-        <TeamGoal label="Team SQLs" actual={teamSql} goal={goals.team.sqls} />
-        <TeamGoal label="Team calls" actual={teamCalls} goal={goals.team.calls} />
+      <div className="kpis" style={{ gridTemplateColumns: "repeat(5,1fr)" }}>
+        <TeamCard label={`Team Closed Won`} actual={teamActual.revenue} goal={team.revenue} fmt={money} />
+        <TeamCard label="Team SQL" actual={teamActual.sql} goal={team.sql} />
+        <TeamCard label="Team SQM" actual={teamActual.sqm} goal={team.sqm} />
+        <TeamCard label="Team SQO" actual={teamActual.sqo} goal={team.sqo} />
+        <TeamCard label="Team Calls" actual={teamActual.calls} goal={team.calls} />
       </div>
 
       <section className="panel">
-        <div className="panel-h"><h2>Individual targets</h2><span className="count">monthly{user.isAdmin ? " · edit in Settings → Goals" : ""}</span></div>
+        <div className="panel-h"><h2>Account Executives</h2><span className="count">{period} target{user.isAdmin ? " · edit in Settings → Goals" : ""}</span></div>
         <table>
-          <thead><tr><th>AE</th><th>Revenue</th><th>Attainment</th><th>SQLs</th><th>Calls</th></tr></thead>
+          <thead><tr><th>AE</th><th>{METRIC_LABEL.revenue}</th><th>SQL</th><th>SQM</th><th>SQO</th><th>Calls</th></tr></thead>
           <tbody>
-            {rows.map((r) => (
-              <tr className="row" key={r.name}>
+            {aeRows.map((r) => (
+              <tr className="row" key={r.first}>
                 <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span className="mini-av">{initials(r.name)}</span>{r.name}</span></td>
-                <td className="tabular-nums" style={{ color: "var(--neon)", fontWeight: 700 }}>{money(r.rev)}<small style={{ display: "block", color: "var(--faint)", fontWeight: 500 }}>goal {money(r.goal.revenue)}</small></td>
-                <td style={{ minWidth: 160 }}>
-                  <div className="goal-track"><i style={{ width: `${Math.min(100, r.pct)}%`, background: r.pct >= 100 ? "var(--neon)" : "var(--muted)" }} /></div>
-                  <span style={{ fontSize: 10, color: "var(--faint)" }}>{r.pct}%{r.pct >= 100 ? " 🎯" : ""}</span>
-                </td>
-                <td className="tabular-nums">{r.sql}<small style={{ color: "var(--faint)" }}> / {r.goal.sqls}</small></td>
-                <td className="tabular-nums">{r.myCalls.toLocaleString("en-US")}<small style={{ color: "var(--faint)" }}> / {r.goal.calls}</small></td>
+                <Cell a={r.actual.revenue} g={r.goal.revenue} fmt={money} />
+                <Cell a={r.actual.sql} g={r.goal.sql} />
+                <Cell a={r.actual.sqm} g={r.goal.sqm} />
+                <Cell a={r.actual.sqo} g={r.goal.sqo} />
+                <Cell a={r.actual.calls} g={r.goal.calls} />
               </tr>
             ))}
           </tbody>
         </table>
       </section>
+
+      <section className="panel">
+        <div className="panel-h"><h2>Business Development Reps</h2><span className="count">top-of-funnel: SQL · SQM · Calls</span></div>
+        <table>
+          <thead><tr><th>BDR</th><th>SQL</th><th>SQM</th><th>Calls</th></tr></thead>
+          <tbody>
+            {bdrRows.map((r) => (
+              <tr className="row" key={r.first}>
+                <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span className="mini-av">{initials(r.name)}</span>{r.name}</span></td>
+                <Cell a={r.actual.sql} g={r.goal.sql} />
+                <Cell a={r.actual.sqm} g={r.goal.sqm} />
+                <Cell a={r.actual.calls} g={r.goal.calls} />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <p className="q-note" style={{ textAlign: "center", padding: "10px 0", fontSize: 11.5, color: "var(--faint)" }}>
+        Monthly goal = weekly × {WEEKS_PER_MONTH}. Team goal = sum of every rep. A deal that jumps straight to a deeper stage still credits the shallower metrics it passed (e.g. booked → Initiation counts SQL, SQM &amp; SQO).
+      </p>
     </>
   );
 }

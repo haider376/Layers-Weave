@@ -6,7 +6,7 @@ import { showToast } from "@/components/Toast";
 import Select from "@/components/ui/Select";
 import { createDealAction } from "../../sales/record-actions";
 
-const STAGES = ["Appointment Scheduled", "Showed up", "Initiation", "Handpick / Bulk Vintage", "Closed Won"];
+const STAGES = ["Appointment Scheduled", "Showed up", "Initiation", "Closed Won"];
 
 export default function NewDealForm({
   companies,

@@ -8,7 +8,6 @@ const STAGES = [
   "Showed up",
   "No Show / Reschedule",
   "Initiation",
-  "Handpick / Bulk Vintage",
   "Closed Won",
   "Closed Lost",
   "Disqualified",

@@ -7,7 +7,7 @@ import { celebrate } from "@/components/Celebration";
 import Select from "@/components/ui/Select";
 import { updateDealAction } from "../../sales/record-actions";
 
-const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
+const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Closed Won", "Closed Lost", "Disqualified"];
 
 export default function DealEditor({
   dealId, name, amount, stage, requestType, contactId, contacts,
