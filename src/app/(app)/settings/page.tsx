@@ -8,6 +8,9 @@ import { getSalesGoals, ROSTER } from "@/lib/goals";
 import { getPermissionMatrix, getAppConfig } from "@/lib/appConfig";
 import { getConnection, googleConfigured } from "@/lib/google";
 
+// Always render fresh — integration connection state must not be cached.
+export const dynamic = "force-dynamic";
+
 export default async function SettingsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");

@@ -6,6 +6,10 @@ import { getConnection, listGoogleEvents, googleConfigured } from "@/lib/google"
 import Topbar from "@/components/Topbar";
 import CalendarView, { type CalEvent } from "./CalendarView";
 
+// Render fresh every request so integration config (env vars) + Google events
+// are never served from a stale cache.
+export const dynamic = "force-dynamic";
+
 export default async function CalendarPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
