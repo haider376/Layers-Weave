@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { showToast } from "@/components/Toast";
 import { updateProfileAction } from "@/app/actions/session";
+import { disconnectGoogleAction } from "@/app/actions/google";
 import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
 import { useEffect } from "react";
 import GoalsSettings, { type AeMeta } from "./GoalsSettings";
@@ -43,7 +44,9 @@ function Field({ label, value, type = "text", disabled }: { label: string; value
   return <div className="dg-row"><span className="dg-label">{label}</span><input className="dg-input" type={type} value={v} disabled={disabled} onChange={(e) => setV(e.target.value)} /></div>;
 }
 
-export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig }) {
+type GoogleState = { connected: boolean; email: string | null; configured: boolean };
+
+export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config, google }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig; google: GoogleState }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Profile");
   const [name, setName] = useState(me.name);
@@ -53,6 +56,7 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
   const tabs = TABS.filter((t) => !ADMIN_ONLY.includes(t) || isAdmin);
 
   function saveProfile() { start(async () => { await updateProfileAction({ name, title }); showToast("Profile saved"); router.refresh(); }); }
+  function disconnectGoogle() { start(async () => { await disconnectGoogleAction(); showToast("Google Calendar disconnected"); router.refresh(); }); }
 
   return (
     <div className="settings">
@@ -109,8 +113,26 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
           )}
           {tab === "Integrations" && (
             <div className="set-list">
-              {[["Zoom Phone", "Click-to-call + logging", "Z", "#2D8CFF"], ["Gmail", "2-way email sync", "G", "#EA4335"], ["Outlook", "2-way email sync", "O", "#0078D4"], ["Google Calendar", "Meeting sync", "C", "#1A73E8"], ["Fireflies", "Call recordings", "F", "#7C3AED"], ["WhatsApp Business", "Client comms", "W", "#25D366"], ["Slack", "Deal-won alerts", "S", "#611f69"]].map(([n, s, ic, col]) => (
-                <div className="set-row" key={n}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><span className="itg-ic" style={{ background: col as string, color: "#fff" }}>{ic}</span><div><div className="set-row-t">{n}</div><div className="set-row-s">{s}</div></div></div><button className="itg-cta" onClick={() => showToast(`Connecting ${n}… (OAuth)`)}>Connect</button></div>
+              {/* Google Calendar — live OAuth integration */}
+              <div className="set-row">
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <span className="itg-ic" style={{ background: "#1A73E8", color: "#fff" }}>C</span>
+                  <div>
+                    <div className="set-row-t">Google Calendar {google.connected && <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Connected</span>}</div>
+                    <div className="set-row-s">{google.connected ? (google.email ?? "Two-way event sync + invites") : google.configured ? "Sync events & send invites" : "Needs Google API keys (admin setup)"}</div>
+                  </div>
+                </div>
+                {google.connected ? (
+                  <button className="itg-cta" style={{ borderColor: "var(--line-2)", color: "var(--muted)" }} disabled={pending} onClick={disconnectGoogle}>Disconnect</button>
+                ) : google.configured ? (
+                  <a className="itg-cta" href="/api/integrations/google/connect">Connect</a>
+                ) : (
+                  <span className="set-row-s" style={{ fontStyle: "italic" }}>Not configured</span>
+                )}
+              </div>
+              {/* Remaining integrations — coming soon */}
+              {[["Zoom Phone", "Click-to-call + logging", "Z", "#2D8CFF"], ["Gmail", "2-way email sync", "G", "#EA4335"], ["Outlook", "2-way email sync", "O", "#0078D4"], ["Fireflies", "Call recordings", "F", "#7C3AED"], ["WhatsApp Business", "Client comms", "W", "#25D366"], ["Slack", "Deal-won alerts", "S", "#611f69"]].map(([n, s, ic, col]) => (
+                <div className="set-row" key={n}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><span className="itg-ic" style={{ background: col as string, color: "#fff" }}>{ic}</span><div><div className="set-row-t">{n}</div><div className="set-row-s">{s}</div></div></div><button className="itg-cta" onClick={() => showToast(`${n} integration — coming soon`)}>Connect</button></div>
               ))}
             </div>
           )}

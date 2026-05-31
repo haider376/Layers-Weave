@@ -412,6 +412,22 @@ model AppSetting {
   updatedAt DateTime @updatedAt @default(now())
 }
 
+// Per-user OAuth connections (Google Calendar, later Gmail/Zoom, …).
+model Integration {
+  id           String   @id @default(cuid())
+  userId       String
+  provider     String // "google-calendar" | "gmail" | "zoom" | …
+  accountEmail String? // the connected account, for display
+  accessToken  String   @db.Text
+  refreshToken String?  @db.Text
+  expiresAt    DateTime? // access-token expiry
+  scope        String? // granted scopes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt @default(now())
+
+  @@unique([userId, provider])
+}
+
 // ─────────────────────────────────────────────────────────────
 // Cadences — Salesloft-style repeatable outreach sequences
 // ─────────────────────────────────────────────────────────────

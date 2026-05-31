@@ -1,21 +1,24 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { addTaskAction } from "../tasks/actions";
+import { createCalendarEventAction, disconnectGoogleAction } from "@/app/actions/google";
 import { showToast } from "@/components/Toast";
 
-export type CalEvent = { id: string; title: string; date: string; kind: "meeting" | "task"; status: string; dealId: string | null };
+export type CalEvent = { id: string; title: string; date: string; kind: "meeting" | "task" | "google"; status: string; dealId: string | null; link?: string };
+type GoogleState = { connected: boolean; email: string | null; configured: boolean };
 
 // Google-Calendar-style calendars/colours, mapped onto our event kinds + statuses.
-type CalKey = "meeting" | "task" | "done";
+type CalKey = "meeting" | "task" | "done" | "google";
 const KINDS: { key: CalKey; label: string; color: string }[] = [
   { key: "meeting", label: "Meetings & SQLs", color: "#1a73e8" },
   { key: "task", label: "Tasks", color: "#f09300" },
   { key: "done", label: "Completed", color: "#0b8043" },
+  { key: "google", label: "Google Calendar", color: "#C6F542" },
 ];
-function calOf(e: CalEvent): CalKey { return e.kind === "task" ? (e.status === "Done" ? "done" : "task") : "meeting"; }
+function calOf(e: CalEvent): CalKey { return e.kind === "google" ? "google" : e.kind === "task" ? (e.status === "Done" ? "done" : "task") : "meeting"; }
 const COLOR = (k: CalKey) => KINDS.find((x) => x.key === k)!.color;
 
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -28,14 +31,29 @@ const fmt12 = (mins: number) => { const h = Math.floor(mins / 60), m = mins % 60
 type View = "month" | "week" | "day";
 type Item = CalEvent & { d: Date; mins: number; cal: CalKey };
 
-export default function CalendarView({ events }: { events: CalEvent[] }) {
+export default function CalendarView({ events, google }: { events: CalEvent[]; google: GoogleState }) {
   const router = useRouter();
+  const params = useSearchParams();
   const [, start] = useTransition();
   const [view, setView] = useState<View>("month");
   const [cursor, setCursor] = useState(() => new Date());
   const [mini, setMini] = useState(() => new Date());
   const [hidden, setHidden] = useState<Set<CalKey>>(new Set());
   const [creating, setCreating] = useState<null | { date: string; time: string }>(null);
+
+  // Surface the OAuth round-trip result (?gcal=…) as a toast, then clean the URL.
+  useEffect(() => {
+    const s = params.get("gcal");
+    if (!s) return;
+    const msg: Record<string, string> = {
+      connected: "Google Calendar connected ✓",
+      denied: "Google connection cancelled",
+      error: "Couldn't connect Google Calendar — try again",
+      unconfigured: "Google Calendar isn't configured yet (admin setup needed)",
+    };
+    showToast(msg[s] ?? "Google Calendar");
+    router.replace("/calendar");
+  }, [params, router]);
 
   const items: Item[] = useMemo(() => events.map((e) => {
     const d = new Date(e.date);
@@ -66,14 +84,30 @@ export default function CalendarView({ events }: { events: CalEvent[] }) {
 
   function saveEvent(ev: { title: string; date: string; time: string; duration: number; invitees: string[] }) {
     start(async () => {
+      // When Google Calendar is connected, push a real event (with invites);
+      // otherwise fall back to a local task so the workspace still tracks it.
+      if (google.connected) {
+        const r = await createCalendarEventAction({ title: ev.title, date: ev.date, time: ev.time, durationMin: ev.duration, invitees: ev.invitees });
+        if (r.pushedToGoogle) {
+          setCreating(null);
+          showToast(ev.invitees.length ? "Event created on Google + invites sent" : "Event created on Google Calendar");
+          router.refresh();
+          return;
+        }
+        // fall through to local task if the push failed
+      }
       const dur = ev.duration >= 60 && ev.duration % 60 === 0 ? `${ev.duration / 60}h` : `${ev.duration}m`;
       const who = ev.invitees.length ? ` · with ${ev.invitees.join(", ")}` : "";
       const title = `${ev.title} (${dur})${who}`;
       await addTaskAction({ title, type: "Meeting", priority: "Medium", dueDate: new Date(`${ev.date}T${ev.time}`).toISOString() });
       setCreating(null);
-      showToast("Event added to calendar");
+      showToast(google.connected ? "Saved locally (Google push failed)" : "Event added to calendar");
       router.refresh();
     });
+  }
+
+  function disconnectGoogle() {
+    start(async () => { await disconnectGoogleAction(); showToast("Google Calendar disconnected"); router.refresh(); });
   }
 
   return (
@@ -92,6 +126,27 @@ export default function CalendarView({ events }: { events: CalEvent[] }) {
               <span>{k.label}</span>
             </label>
           ))}
+        </div>
+
+        {/* Google Calendar connection */}
+        <div className="gcal-conn">
+          <div className="gcal-conn-h">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#C6F542" strokeWidth="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="#C6F542" strokeWidth="2" strokeLinecap="round"/></svg>
+            Google Calendar
+          </div>
+          {google.connected ? (
+            <>
+              <div className="gcal-conn-on"><span className="gcal-conn-dot" />{google.email ?? "Connected"}</div>
+              <button className="gcal-conn-btn ghost" onClick={disconnectGoogle}>Disconnect</button>
+            </>
+          ) : google.configured ? (
+            <>
+              <div className="gcal-conn-sub">Sync events & send invites from here.</div>
+              <a className="gcal-conn-btn" href="/api/integrations/google/connect">Connect</a>
+            </>
+          ) : (
+            <div className="gcal-conn-sub">Not configured yet — admin needs to add Google API keys.</div>
+          )}
         </div>
       </aside>
 
@@ -190,7 +245,9 @@ function Chip({ e }: { e: Item }) {
       <span className="gcal-chip-t">{e.title}</span>
     </div>
   );
-  return e.dealId ? <Link href={`?deal=${e.dealId}`} scroll={false} onClick={(ev) => ev.stopPropagation()} style={{ textDecoration: "none" }}>{inner}</Link> : inner;
+  if (e.dealId) return <Link href={`?deal=${e.dealId}`} scroll={false} onClick={(ev) => ev.stopPropagation()} style={{ textDecoration: "none" }}>{inner}</Link>;
+  if (e.kind === "google" && e.link) return <a href={e.link} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()} style={{ textDecoration: "none" }}>{inner}</a>;
+  return inner;
 }
 
 function TimeGrid({ days, byDay, onSlot }: { days: Date[]; byDay: Record<string, Item[]>; onSlot: (date: string, time: string) => void }) {

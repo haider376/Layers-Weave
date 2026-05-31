@@ -351,6 +351,22 @@ CREATE TABLE "AppSetting" (
 );
 
 -- CreateTable
+CREATE TABLE "Integration" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "accountEmail" TEXT,
+    "accessToken" TEXT NOT NULL,
+    "refreshToken" TEXT,
+    "expiresAt" TIMESTAMP(3),
+    "scope" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Integration_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Cadence" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -428,6 +444,9 @@ CREATE UNIQUE INDEX "Raghouse_name_key" ON "Raghouse"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Carrier_name_key" ON "Carrier"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Integration_userId_provider_key" ON "Integration"("userId", "provider");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "CadenceMembership_cadenceId_contactId_key" ON "CadenceMembership"("cadenceId", "contactId");

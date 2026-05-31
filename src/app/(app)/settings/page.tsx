@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { ROLE_LABEL, type Role } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
 import SettingsView from "./SettingsView";
 import { getSalesGoals, ROSTER } from "@/lib/goals";
 import { getPermissionMatrix, getAppConfig } from "@/lib/appConfig";
+import { getConnection, googleConfigured } from "@/lib/google";
 
 export default async function SettingsPage() {
   const user = await getCurrentUser();
@@ -27,7 +28,10 @@ export default async function SettingsPage() {
         return { first, kind, name: u?.name ?? first.charAt(0).toUpperCase() + first.slice(1) };
       })
     : [];
-  const [goals, permissions, config] = await Promise.all([getSalesGoals(), getPermissionMatrix(), getAppConfig()]);
+  const [goals, permissions, config, gconn] = await Promise.all([
+    getSalesGoals(), getPermissionMatrix(), getAppConfig(),
+    safe(getConnection(user.id), { connected: false, accountEmail: null }),
+  ]);
 
   return (
     <>
@@ -40,6 +44,7 @@ export default async function SettingsPage() {
         reps={reps}
         permissions={permissions}
         config={config}
+        google={{ connected: gconn.connected, email: gconn.accountEmail, configured: googleConfigured() }}
       />
     </>
   );
