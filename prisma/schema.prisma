@@ -401,3 +401,10 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+// Generic key/value store for app-level config (e.g. sales goals JSON).
+model AppSetting {
+  key       String   @id
+  value     String // JSON-encoded payload
+  updatedAt DateTime @updatedAt @default(now())
+}

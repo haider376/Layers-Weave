@@ -1,132 +1,257 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { addTaskAction } from "../tasks/actions";
 import { showToast } from "@/components/Toast";
 
 export type CalEvent = { id: string; title: string; date: string; kind: "meeting" | "task"; status: string; dealId: string | null };
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const START_HOUR = 8, END_HOUR = 19, ROW = 50;
+// Google-Calendar-style calendars/colours, mapped onto our event kinds + statuses.
+type CalKey = "meeting" | "task" | "done";
+const KINDS: { key: CalKey; label: string; color: string }[] = [
+  { key: "meeting", label: "Meetings & SQLs", color: "#1a73e8" },
+  { key: "task", label: "Tasks", color: "#f09300" },
+  { key: "done", label: "Completed", color: "#0b8043" },
+];
+function calOf(e: CalEvent): CalKey { return e.kind === "task" ? (e.status === "Done" ? "done" : "task") : "meeting"; }
+const COLOR = (k: CalKey) => KINDS.find((x) => x.key === k)!.color;
 
-function startOfWeek(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - x.getDay()); return x; }
-function sameDay(a: Date, b: Date) { return a.toDateString() === b.toDateString(); }
-function evColor(e: CalEvent) {
-  if (e.kind === "task") return e.status === "Done" ? "var(--faint)" : e.status === "High" ? "var(--red)" : "var(--amber)";
-  return e.status === "Showed up" ? "var(--neon)" : e.status === "No Show" ? "var(--red)" : "var(--violet)";
-}
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const sameDay = (a: Date, b: Date) => iso(a) === iso(b);
+const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const startOfWeek = (d: Date) => addDays(d, -d.getDay());
+const fmt12 = (mins: number) => { const h = Math.floor(mins / 60), m = mins % 60; const ap = h < 12 ? "AM" : "PM"; const hh = h % 12 === 0 ? 12 : h % 12; return m ? `${hh}:${String(m).padStart(2, "0")} ${ap}` : `${hh} ${ap}`; };
+
+type View = "month" | "week" | "day";
+type Item = CalEvent & { d: Date; mins: number; cal: CalKey };
 
 export default function CalendarView({ events }: { events: CalEvent[] }) {
   const router = useRouter();
   const [, start] = useTransition();
-  const [view, setView] = useState<"week" | "month">("week");
+  const [view, setView] = useState<View>("month");
   const [cursor, setCursor] = useState(() => new Date());
-  const [adding, setAdding] = useState<string | null>(null); // ISO date for the day being added to
-  const [title, setTitle] = useState("");
-  const today = new Date();
+  const [mini, setMini] = useState(() => new Date());
+  const [hidden, setHidden] = useState<Set<CalKey>>(new Set());
+  const [creating, setCreating] = useState<null | { date: string; time: string }>(null);
 
-  const weekStart = useMemo(() => startOfWeek(cursor), [cursor]);
-  const days = useMemo(() => Array.from({ length: 7 }, (_, i) => { const d = new Date(weekStart); d.setDate(d.getDate() + i); return d; }), [weekStart]);
+  const items: Item[] = useMemo(() => events.map((e) => {
+    const d = new Date(e.date);
+    return { ...e, d, mins: d.getHours() * 60 + d.getMinutes(), cal: calOf(e) };
+  }), [events]);
 
-  // month grid (6 weeks)
-  const monthCells = useMemo(() => {
-    const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
-    const gridStart = startOfWeek(first);
-    return Array.from({ length: 42 }, (_, i) => { const d = new Date(gridStart); d.setDate(d.getDate() + i); return d; });
-  }, [cursor]);
+  const byDay = useMemo(() => {
+    const m: Record<string, Item[]> = {};
+    for (const it of items) { if (hidden.has(it.cal)) continue; (m[iso(it.d)] ??= []).push(it); }
+    for (const k in m) m[k].sort((a, b) => a.mins - b.mins);
+    return m;
+  }, [items, hidden]);
 
-  const evOn = (d: Date) => events.filter((e) => sameDay(new Date(e.date), d));
-  const label = view === "month"
-    ? cursor.toLocaleDateString("en-GB", { month: "long", year: "numeric" })
-    : `${weekStart.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} – ${days[6].toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`;
+  const toggleKind = (k: CalKey) => setHidden((s) => { const n = new Set(s); if (n.has(k)) n.delete(k); else n.add(k); return n; });
 
-  function shift(n: number) { const d = new Date(cursor); if (view === "month") d.setMonth(d.getMonth() + n); else d.setDate(d.getDate() + n * 7); setCursor(d); }
-  function addOn(dayIso: string) {
-    if (!title.trim()) return;
-    start(async () => { await addTaskAction({ title, type: "To-do", priority: "Medium", dueDate: dayIso }); setTitle(""); setAdding(null); showToast("Added to calendar"); router.refresh(); });
+  const periodLabel = useMemo(() => {
+    if (view === "month") return cursor.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+    if (view === "day") return cursor.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    const s = startOfWeek(cursor), e = addDays(s, 6);
+    return s.getMonth() === e.getMonth()
+      ? `${s.toLocaleDateString("en-GB", { month: "long" })} ${s.getDate()}–${e.getDate()}, ${e.getFullYear()}`
+      : `${s.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} – ${e.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`;
+  }, [view, cursor]);
+
+  const nav = (dir: number) => setCursor((c) => view === "month" ? new Date(c.getFullYear(), c.getMonth() + dir, 1) : addDays(c, dir * (view === "week" ? 7 : 1)));
+  const goToday = () => { const t = new Date(); setCursor(t); setMini(t); };
+  const jump = (d: Date, v?: View) => { setCursor(d); setMini(d); if (v) setView(v); };
+
+  function saveEvent(title: string, date: string, time: string) {
+    start(async () => {
+      await addTaskAction({ title, type: "Follow-up", priority: "Medium", dueDate: new Date(`${date}T${time}`).toISOString() });
+      setCreating(null);
+      showToast("Added to calendar");
+      router.refresh();
+    });
   }
 
-  const hours = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => START_HOUR + i);
-
   return (
-    <div className="cal">
-      <div className="cal-bar">
-        <div className="cal-month font-display">{label}</div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <div className="seg">
-            <button className={view === "week" ? "on" : ""} onClick={() => setView("week")}>Week</button>
-            <button className={view === "month" ? "on" : ""} onClick={() => setView("month")}>Month</button>
+    <div className="gcal">
+      <aside className="gcal-side">
+        <button className="gcal-create" onClick={() => setCreating({ date: iso(cursor), time: "09:00" })}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+          Create
+        </button>
+        <MiniMonth mini={mini} setMini={setMini} cursor={cursor} onPick={(d) => jump(d, view === "month" ? undefined : view)} byDay={byDay} />
+        <div className="gcal-mycal">
+          <div className="gcal-mycal-h">My calendars</div>
+          {KINDS.map((k) => (
+            <label key={k.key} className="gcal-cal-item">
+              <input type="checkbox" checked={!hidden.has(k.key)} onChange={() => toggleKind(k.key)} style={{ ["--c" as string]: k.color }} />
+              <span>{k.label}</span>
+            </label>
+          ))}
+        </div>
+      </aside>
+
+      <div className="gcal-main">
+        <div className="gcal-toolbar">
+          <button className="gcal-today" onClick={goToday}>Today</button>
+          <div className="gcal-arrows">
+            <button onClick={() => nav(-1)} aria-label="Previous"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg></button>
+            <button onClick={() => nav(1)} aria-label="Next"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6" /></svg></button>
           </div>
-          <div className="cal-nav">
-            <button onClick={() => shift(-1)}>‹</button>
-            <button className="cal-today" onClick={() => setCursor(new Date())}>Today</button>
-            <button onClick={() => shift(1)}>›</button>
+          <h2 className="gcal-period">{periodLabel}</h2>
+          <span style={{ flex: 1 }} />
+          <div className="gcal-views">
+            {(["day", "week", "month"] as View[]).map((v) => (
+              <button key={v} className={view === v ? "on" : ""} onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>
+            ))}
           </div>
         </div>
+
+        {view === "month" && <MonthGrid cursor={cursor} byDay={byDay} onDay={(d) => jump(d, "day")} />}
+        {view === "week" && <TimeGrid days={Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(cursor), i))} byDay={byDay} onSlot={(date, time) => setCreating({ date, time })} />}
+        {view === "day" && <TimeGrid days={[cursor]} byDay={byDay} onSlot={(date, time) => setCreating({ date, time })} />}
       </div>
 
-      {view === "week" ? (
-        <div className="cal-grid">
-          <div className="cal-head">
-            <div className="cal-gutter" />
-            {days.map((d, i) => (
-              <div key={i} className={`cal-day-h${sameDay(d, today) ? " today" : ""}`}>
-                <span className="cal-dow">{DAYS[i]}</span><span className="cal-dnum">{d.getDate()}</span>
-              </div>
-            ))}
-          </div>
-          <div className="cal-body" style={{ height: hours.length * ROW }}>
-            <div className="cal-gutter-col">{hours.map((h) => <div className="cal-hour" key={h} style={{ height: ROW }}>{h % 12 === 0 ? 12 : h % 12}{h < 12 ? "am" : "pm"}</div>)}</div>
-            {days.map((d, i) => (
-              <div className="cal-col" key={i} onDoubleClick={() => { setAdding(d.toISOString()); }}>
-                {hours.map((h) => <div className="cal-cell" key={h} style={{ height: ROW }} />)}
-                {evOn(d).map((e) => {
-                  const dt = new Date(e.date);
-                  const top = e.kind === "meeting" ? (dt.getHours() + dt.getMinutes() / 60 - START_HOUR) * ROW : 2 + (evOn(d).filter((x) => x.kind === "task").indexOf(e)) * 26;
-                  return (
-                    <motion.div key={e.id} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="cal-ev" style={{ top: Math.max(0, top), borderLeftColor: evColor(e) }}>
-                      {e.dealId ? <Link href={`?deal=${e.dealId}`}><span className="cal-ev-t">{e.title}</span></Link> : <span className="cal-ev-t">{e.title}</span>}
-                      <span className="cal-ev-m">{e.kind === "meeting" ? dt.toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit" }) : "task"} · {e.status}</span>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="cal-month-grid">
-          {DAYS.map((d) => <div className="cmg-dow" key={d}>{d}</div>)}
-          {monthCells.map((d, i) => {
-            const inMonth = d.getMonth() === cursor.getMonth();
-            const evs = evOn(d);
-            return (
-              <div key={i} className={`cmg-cell${inMonth ? "" : " out"}${sameDay(d, today) ? " today" : ""}`} onClick={() => setAdding(d.toISOString())}>
-                <div className="cmg-num">{d.getDate()}</div>
-                {evs.slice(0, 3).map((e) => (
-                  <div className="cmg-ev" key={e.id} style={{ background: evColor(e) }} title={e.title}>{e.title}</div>
-                ))}
-                {evs.length > 3 && <div className="cmg-more">+{evs.length - 3}</div>}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {creating && <CreateModal init={creating} onClose={() => setCreating(null)} onSave={saveEvent} />}
+    </div>
+  );
+}
 
-      <AnimatePresence>
-        {adding && (
-          <motion.div className="cal-add-pop" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-            <span className="eyebrow">New on {new Date(adding).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span>
-            <input className="ed" autoFocus style={{ border: "1px solid var(--line-2)", flex: 1 }} placeholder="Event / task title…" value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addOn(adding)} />
-            <button className="btn primary" style={{ flex: "none", padding: "8px 16px" }} onClick={() => addOn(adding)}>Add</button>
-            <button className="btn ghost" style={{ flex: "none", padding: "8px 14px" }} onClick={() => { setAdding(null); setTitle(""); }}>Cancel</button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <div className="cal-hint">Double-click a day{view === "month" ? "" : " column"} to add an event</div>
+function MiniMonth({ mini, setMini, cursor, onPick, byDay }: { mini: Date; setMini: (d: Date) => void; cursor: Date; onPick: (d: Date) => void; byDay: Record<string, Item[]> }) {
+  const y = mini.getFullYear(), m = mini.getMonth();
+  const start = addDays(new Date(y, m, 1), -new Date(y, m, 1).getDay());
+  const cells = Array.from({ length: 42 }, (_, i) => addDays(start, i));
+  const today = new Date();
+  return (
+    <div className="gcal-mini">
+      <div className="gcal-mini-h">
+        <span>{mini.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</span>
+        <span className="gcal-mini-nav">
+          <button onClick={() => setMini(new Date(y, m - 1, 1))}>‹</button>
+          <button onClick={() => setMini(new Date(y, m + 1, 1))}>›</button>
+        </span>
+      </div>
+      <div className="gcal-mini-grid">
+        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => <span key={i} className="gcal-mini-dow">{d}</span>)}
+        {cells.map((d, i) => {
+          const out = d.getMonth() !== m;
+          const has = (byDay[iso(d)] ?? []).length > 0;
+          return (
+            <button key={i} className={`gcal-mini-cell${out ? " out" : ""}${sameDay(d, today) ? " today" : ""}${sameDay(d, cursor) ? " sel" : ""}`} onClick={() => onPick(d)}>
+              {d.getDate()}{has && <i className="gcal-mini-dot" />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MonthGrid({ cursor, byDay, onDay }: { cursor: Date; byDay: Record<string, Item[]>; onDay: (d: Date) => void }) {
+  const y = cursor.getFullYear(), m = cursor.getMonth();
+  const start = addDays(new Date(y, m, 1), -new Date(y, m, 1).getDay());
+  const cells = Array.from({ length: 42 }, (_, i) => addDays(start, i));
+  const today = new Date();
+  return (
+    <div className="gcal-month">
+      <div className="gcal-month-dow">{DOW.map((d) => <div key={d}>{d}</div>)}</div>
+      <div className="gcal-month-grid">
+        {cells.map((d, i) => {
+          const out = d.getMonth() !== m;
+          const evs = byDay[iso(d)] ?? [];
+          return (
+            <div key={i} className={`gcal-mcell${out ? " out" : ""}`} onClick={() => onDay(d)}>
+              <div className="gcal-mcell-h">
+                <span className={`gcal-mcell-num${sameDay(d, today) ? " today" : ""}`}>{d.getDate()}</span>
+              </div>
+              <div className="gcal-mcell-evs">
+                {evs.slice(0, 3).map((e) => (
+                  <Chip key={e.id} e={e} />
+                ))}
+                {evs.length > 3 && <button className="gcal-more" onClick={(ev) => { ev.stopPropagation(); onDay(d); }}>{evs.length - 3} more</button>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Chip({ e }: { e: Item }) {
+  const inner = (
+    <div className="gcal-chip" style={{ ["--c" as string]: COLOR(e.cal) }} title={`${fmt12(e.mins)} · ${e.title}`}>
+      <i className="gcal-chip-dot" />
+      <b>{fmt12(e.mins)}</b>
+      <span className="gcal-chip-t">{e.title}</span>
+    </div>
+  );
+  return e.dealId ? <Link href={`?deal=${e.dealId}`} scroll={false} onClick={(ev) => ev.stopPropagation()} style={{ textDecoration: "none" }}>{inner}</Link> : inner;
+}
+
+function TimeGrid({ days, byDay, onSlot }: { days: Date[]; byDay: Record<string, Item[]>; onSlot: (date: string, time: string) => void }) {
+  const hours = Array.from({ length: 24 }, (_, h) => h);
+  const today = new Date();
+  const HOUR = 48;
+  const nowMin = today.getHours() * 60 + today.getMinutes();
+  return (
+    <div className="gcal-time" style={{ ["--cols" as string]: days.length }}>
+      <div className="gcal-time-head">
+        <div className="gcal-tz" />
+        {days.map((d, i) => (
+          <div key={i} className="gcal-time-col-h">
+            <span className="gcal-th-dow">{DOW[d.getDay()]}</span>
+            <span className={`gcal-th-num${sameDay(d, today) ? " today" : ""}`}>{d.getDate()}</span>
+          </div>
+        ))}
+      </div>
+      <div className="gcal-time-body">
+        <div className="gcal-gutter">
+          {hours.map((h) => <div key={h} className="gcal-hr" style={{ height: HOUR }}>{h === 0 ? "" : fmt12(h * 60)}</div>)}
+        </div>
+        {days.map((d, ci) => {
+          const evs = byDay[iso(d)] ?? [];
+          return (
+            <div key={ci} className="gcal-time-col">
+              <div className="gcal-slots" style={{ height: HOUR * 24 }}>
+                {hours.map((h) => <div key={h} className="gcal-slot" style={{ height: HOUR }} onClick={() => onSlot(iso(d), `${String(h).padStart(2, "0")}:00`)} />)}
+                {sameDay(d, today) && <div className="gcal-now" style={{ top: (nowMin / 60) * HOUR }}><span /></div>}
+                {evs.map((e) => (
+                  <div key={e.id} className="gcal-ev" style={{ top: (e.mins / 60) * HOUR, height: HOUR * 0.92, ["--c" as string]: COLOR(e.cal) }} title={e.title}>
+                    <b>{e.title}</b>
+                    <span>{fmt12(e.mins)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CreateModal({ init, onClose, onSave }: { init: { date: string; time: string }; onClose: () => void; onSave: (title: string, date: string, time: string) => void }) {
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState(init.date);
+  const [time, setTime] = useState(init.time);
+  return (
+    <div className="gcal-modal-wrap" onClick={onClose}>
+      <div className="gcal-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="gcal-modal-h">
+          <input className="gcal-modal-title" placeholder="Add title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
+          <button className="gcal-modal-x" onClick={onClose}>×</button>
+        </div>
+        <div className="gcal-modal-body">
+          <label className="gcal-field"><span>Date</span><input className="ui-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
+          <label className="gcal-field"><span>Time</span><input className="ui-input" type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
+        </div>
+        <div className="gcal-modal-foot">
+          <button className="btn ghost" onClick={onClose}>Cancel</button>
+          <button className="btn primary" onClick={() => title.trim() && onSave(title.trim(), date, time)}>Save</button>
+        </div>
+      </div>
     </div>
   );
 }

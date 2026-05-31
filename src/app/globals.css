@@ -1170,3 +1170,23 @@ tbody td{padding:15px 22px}
 .gcal-modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--line); }
 
 @media (max-width: 900px) { .gcal { grid-template-columns: 1fr; } .gcal-side { display: none; } }
+
+/* ── Goals settings editor (Settings → Goals) ── */
+.gs{display:flex;flex-direction:column;gap:24px;max-width:680px}
+.gs-block{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:18px}
+.gs-block-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.gs-sync{background:var(--panel);border:1px solid var(--line-2);color:var(--muted);border-radius:8px;padding:7px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.gs-sync:hover{border-color:var(--neon);color:var(--neon)}
+.gs-team{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.gs-field{display:flex;flex-direction:column;gap:6px;font-size:11.5px;font-weight:600;color:var(--faint)}
+.gs-num{display:flex;align-items:center;background:var(--panel);border:1px solid var(--line-2);border-radius:9px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.gs-num:focus-within{border-color:var(--neon);box-shadow:0 0 0 3px var(--neon-soft)}
+.gs-pre{padding:0 0 0 10px;color:var(--faint);font-size:12.5px}
+.gs-num input{flex:1;background:none;border:0;outline:none;color:var(--text);font-family:inherit;font-size:13px;font-weight:600;padding:9px 11px;width:100%}
+.gs-num input::-webkit-outer-spin-button,.gs-num input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.gs-hint{margin-top:12px;font-size:11.5px;color:var(--faint)}
+.gs-hint b{color:var(--text)}
+.gs-table{width:100%}
+.gs-table th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);text-align:left;padding:6px 8px}
+.gs-table td{padding:5px 8px;border-top:1px solid var(--line)}
+.gs-table td .gs-num{max-width:130px}

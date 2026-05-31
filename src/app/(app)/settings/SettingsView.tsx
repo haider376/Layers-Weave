@@ -7,9 +7,11 @@ import { showToast } from "@/components/Toast";
 import { updateProfileAction } from "@/app/actions/session";
 import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
 import { useEffect } from "react";
+import GoalsSettings, { type AeMeta } from "./GoalsSettings";
+import type { SalesGoals } from "@/lib/goals";
 
 type Team = { name: string; email: string; role: string; active: boolean }[];
-const TABS = ["Profile", "Account", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
+const TABS = ["Profile", "Account", "Goals", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
 type Tab = (typeof TABS)[number];
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
 
@@ -38,13 +40,13 @@ function Field({ label, value, type = "text", disabled }: { label: string; value
   return <div className="dg-row"><span className="dg-label">{label}</span><input className="dg-input" type={type} value={v} disabled={disabled} onChange={(e) => setV(e.target.value)} /></div>;
 }
 
-export default function SettingsView({ me, isAdmin, team }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team }) {
+export default function SettingsView({ me, isAdmin, team, goals, aes }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; aes: AeMeta[] }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Profile");
   const [name, setName] = useState(me.name);
   const [title, setTitle] = useState(me.role);
   const [pending, start] = useTransition();
-  const tabs = TABS.filter((t) => t !== "Team" || isAdmin);
+  const tabs = TABS.filter((t) => (t !== "Team" && t !== "Goals") || isAdmin);
 
   function saveProfile() { start(async () => { await updateProfileAction({ name, title }); showToast("Profile saved"); router.refresh(); }); }
 
@@ -77,6 +79,7 @@ export default function SettingsView({ me, isAdmin, team }: { me: { name: string
               <div className="set-row" style={{ borderColor: "rgba(226,87,78,.4)" }}><div><div className="set-row-t" style={{ color: "var(--red)" }}>Sign out everywhere</div><div className="set-row-s">End all other sessions</div></div><button className="btn ghost" style={{ flex: "none", padding: "8px 14px" }} onClick={() => showToast("Other sessions ended")}>Sign out all</button></div>
             </div>
           )}
+          {tab === "Goals" && <GoalsSettings initial={goals} aes={aes} />}
           {tab === "Notifications" && (
             <div className="set-list">
               <Toggle label="New SQL booked" sub="When a meeting is booked" />
