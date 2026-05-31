@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { showToast } from "./Toast";
 import Select from "./ui/Select";
 
+const BADGE = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
+
 export type FieldDef = {
   key: string;
   label: string;
@@ -44,7 +46,7 @@ export default function EditableDetails({
         <div className="dg-row" key={f.key}>
           <span className="dg-label">{f.label}</span>
           {f.type === "select" ? (
-            <Select value={f.value} disabled={pending} options={f.options ?? []} onValueChange={(v) => save(f.key, v, f.value)} className="dg-select" />
+            <Select value={f.value} disabled={pending} options={f.key === "leadStatus" ? (f.options ?? []).map((s) => ({ value: s, label: s, badge: BADGE(s) })) : (f.options ?? [])} onValueChange={(v) => save(f.key, v, f.value)} className="dg-select" />
           ) : f.type === "textarea" ? (
             <textarea className="ui-textarea" rows={3} defaultValue={f.value} onBlur={(e) => save(f.key, e.target.value, f.value)} />
           ) : (
