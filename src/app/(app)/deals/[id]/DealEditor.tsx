@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
 import { celebrate } from "@/components/Celebration";
+import Select from "@/components/ui/Select";
 import { updateDealAction } from "../../sales/record-actions";
 
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
@@ -34,32 +35,23 @@ export default function DealEditor({
     <div className="detail-grid">
       <div className="dg-row">
         <span className="dg-label">Deal name</span>
-        <input className="dg-input" defaultValue={name} onBlur={(e) => e.target.value !== name && save({ name: e.target.value })} />
+        <input className="ui-input" defaultValue={name} onBlur={(e) => e.target.value !== name && save({ name: e.target.value })} />
       </div>
       <div className="dg-row">
         <span className="dg-label">Amount ($)</span>
-        <input className="dg-input" type="number" defaultValue={amount} onBlur={(e) => Number(e.target.value) !== amount && save({ amount: Number(e.target.value) })} />
+        <input className="ui-input" type="number" defaultValue={amount} onBlur={(e) => Number(e.target.value) !== amount && save({ amount: Number(e.target.value) })} />
       </div>
       <div className="dg-row">
         <span className="dg-label">Stage</span>
-        <select className="dg-input" defaultValue={stage} disabled={pending} onChange={(e) => save({ stage: e.target.value }, `Stage → ${e.target.value}`, e.target.value === "Closed Won")}>
-          {STAGES.map((s) => <option key={s}>{s}</option>)}
-        </select>
+        <Select value={stage} disabled={pending} options={STAGES} onValueChange={(v) => save({ stage: v }, `Stage → ${v}`, v === "Closed Won")} />
       </div>
       <div className="dg-row">
         <span className="dg-label">Request type</span>
-        <select className="dg-input" defaultValue={requestType} disabled={pending} onChange={(e) => save({ requestType: e.target.value })}>
-          <option value="">—</option>
-          <option>Bulk</option>
-          <option>Handpick</option>
-        </select>
+        <Select value={requestType} disabled={pending} options={[{ value: "", label: "—" }, { value: "Bulk", label: "Bulk" }, { value: "Handpick", label: "Handpick" }]} onValueChange={(v) => save({ requestType: v })} />
       </div>
       <div className="dg-row">
         <span className="dg-label">Primary contact</span>
-        <select className="dg-input" defaultValue={contactId} disabled={pending} onChange={(e) => save({ contactId: e.target.value })}>
-          <option value="">—</option>
-          {contacts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <Select value={contactId} disabled={pending} options={[{ value: "", label: "—" }, ...contacts.map((c) => ({ value: c.id, label: c.name }))]} onValueChange={(v) => save({ contactId: v })} />
       </div>
     </div>
   );

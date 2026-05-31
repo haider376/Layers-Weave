@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
+import Select from "@/components/ui/Select";
 import { createDealAction } from "../../sales/record-actions";
 
 const STAGES = ["Appointment Scheduled", "Showed up", "Initiation", "Handpick / Bulk Vintage", "Closed Won"];
@@ -52,38 +53,27 @@ export default function NewDealForm({
         <div className="detail-grid">
           <div className="dg-row">
             <span className="dg-label">Company *</span>
-            <select className="dg-input" value={companyId} onChange={(e) => { setCompanyId(e.target.value); setContactId(""); }}>
-              {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            <Select value={companyId} options={companies.map((c) => ({ value: c.id, label: c.name }))} onValueChange={(v) => { setCompanyId(v); setContactId(""); }} />
           </div>
           <div className="dg-row">
             <span className="dg-label">Contact</span>
-            <select className="dg-input" value={contactId} onChange={(e) => setContactId(e.target.value)}>
-              <option value="">—</option>
-              {contacts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            <Select value={contactId} options={[{ value: "", label: "—" }, ...contacts.map((c) => ({ value: c.id, label: c.name }))]} onValueChange={setContactId} />
           </div>
           <div className="dg-row">
             <span className="dg-label">Deal name</span>
-            <input className="dg-input" placeholder={`${companyName} × Layers`} value={name} onChange={(e) => setName(e.target.value)} />
+            <input className="ui-input" placeholder={`${companyName} × Layers`} value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="dg-row">
             <span className="dg-label">Amount ($)</span>
-            <input className="dg-input" type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value) || 0)} />
+            <input className="ui-input" type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value) || 0)} />
           </div>
           <div className="dg-row">
             <span className="dg-label">Stage</span>
-            <select className="dg-input" value={stage} onChange={(e) => setStage(e.target.value)}>
-              {STAGES.map((s) => <option key={s}>{s}</option>)}
-            </select>
+            <Select value={stage} options={STAGES} onValueChange={setStage} />
           </div>
           <div className="dg-row">
             <span className="dg-label">Request type</span>
-            <select className="dg-input" value={requestType} onChange={(e) => setRequestType(e.target.value)}>
-              <option value="">—</option>
-              <option>Bulk</option>
-              <option>Handpick</option>
-            </select>
+            <Select value={requestType} options={[{ value: "", label: "—" }, { value: "Bulk", label: "Bulk" }, { value: "Handpick", label: "Handpick" }]} onValueChange={setRequestType} />
           </div>
         </div>
         <div className="cact">

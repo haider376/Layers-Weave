@@ -10,6 +10,7 @@ import {
 } from "@/app/(app)/sales/record-actions";
 import { celebrate } from "./Celebration";
 import { showToast } from "./Toast";
+import Select from "./ui/Select";
 
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
 const money = (n: number) => "$" + n.toLocaleString("en-US");
@@ -89,7 +90,7 @@ export default function DealDrawer() {
                 <div className="drawer-title font-display">{data.name}</div>
                 <div className="drawer-amt">{money(data.amount)} <span className="q-id" style={{ marginLeft: 8 }}>{data.dealId}</span></div>
                 <div className="drawer-kv">
-                  <div><span>Stage</span><select className="dg-input" value={data.stage} onChange={(e) => setStage(e.target.value)}>{STAGES.map((s) => <option key={s}>{s}</option>)}</select></div>
+                  <div><span>Stage</span><Select value={data.stage} options={STAGES} onValueChange={setStage} /></div>
                   <div><span>Company</span><Link href={`?company=${data.company.id}`} className="drawer-link">{data.company.name}</Link></div>
                   <div><span>Contact</span><b>{data.contact?.name ?? "—"}</b></div>
                   <div><span>Owner</span><b>{data.owner}</b></div>
@@ -121,9 +122,9 @@ export default function DealDrawer() {
                       <input className="ed" style={{ border: "1px solid var(--line-2)", width: "100%", marginBottom: 6 }} placeholder={`${data.name} × Layers`} value={nd.name} onChange={(e) => setNd({ ...nd, name: e.target.value })} />
                       <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
                         <input className="ed num" style={{ border: "1px solid var(--line-2)", flex: 1 }} type="number" value={nd.amount} onChange={(e) => setNd({ ...nd, amount: +e.target.value || 0 })} />
-                        <select className="ed" style={{ border: "1px solid var(--line-2)", flex: 1 }} value={nd.contactId} onChange={(e) => setNd({ ...nd, contactId: e.target.value })}><option value="">No contact</option>{data.contacts.map((c: Data) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+                        <Select value={nd.contactId} options={[{ value: "", label: "No contact" }, ...data.contacts.map((c: Data) => ({ value: c.id, label: c.name }))]} onValueChange={(v) => setNd({ ...nd, contactId: v })} className="ui-grow" />
                       </div>
-                      <select className="ed" style={{ border: "1px solid var(--line-2)", width: "100%", marginBottom: 8 }} value={nd.stage} onChange={(e) => setNd({ ...nd, stage: e.target.value })}>{STAGES.slice(0, 5).map((s) => <option key={s}>{s}</option>)}</select>
+                      <Select value={nd.stage} options={STAGES.slice(0, 5)} onValueChange={(v) => setNd({ ...nd, stage: v })} className="ui-block" />
                       <button className="btn primary" style={{ width: "100%" }} onClick={createDeal}>Create deal</button>
                     </div>
                   )}

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "./Toast";
+import Select from "./ui/Select";
 
 export type FieldDef = {
   key: string;
@@ -43,13 +44,11 @@ export default function EditableDetails({
         <div className="dg-row" key={f.key}>
           <span className="dg-label">{f.label}</span>
           {f.type === "select" ? (
-            <select className="dg-input" defaultValue={f.value} disabled={pending} onChange={(e) => save(f.key, e.target.value, f.value)}>
-              {f.options?.map((o) => <option key={o} value={o}>{o || "—"}</option>)}
-            </select>
+            <Select value={f.value} disabled={pending} options={f.options ?? []} onValueChange={(v) => save(f.key, v, f.value)} className="dg-select" />
           ) : f.type === "textarea" ? (
-            <textarea className="dg-input" rows={3} defaultValue={f.value} onBlur={(e) => save(f.key, e.target.value, f.value)} />
+            <textarea className="ui-textarea" rows={3} defaultValue={f.value} onBlur={(e) => save(f.key, e.target.value, f.value)} />
           ) : (
-            <input className="dg-input" type={f.type === "number" ? "number" : "text"} defaultValue={f.value} onBlur={(e) => save(f.key, e.target.value, f.value)} />
+            <input className="ui-input" type={f.type === "number" ? "number" : "text"} defaultValue={f.value} onBlur={(e) => save(f.key, e.target.value, f.value)} />
           )}
         </div>
       ))}

@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { showToast } from "@/components/Toast";
+import Select from "@/components/ui/Select";
 import { addTaskAction, toggleTaskAction, deleteTaskAction } from "./actions";
 
 export type TaskRow = { id: string; title: string; type: string; priority: string; done: boolean; dueDate: string | null; company: string | null; dealId: string | null };
@@ -42,9 +43,9 @@ export default function TaskList({ tasks }: { tasks: TaskRow[] }) {
     <div>
       <div className="task-add">
         <input className="ed" style={{ border: "1px solid var(--line-2)", flex: 1, minWidth: 220 }} placeholder="Add a task…" value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && title.trim()) { run(() => addTaskAction({ title, type, priority: prio, dueDate: due || undefined }), "Task added"); setTitle(""); setDue(""); } }} />
-        <select className="ed" style={{ border: "1px solid var(--line-2)" }} value={type} onChange={(e) => setType(e.target.value)}>{TYPES.map((t) => <option key={t}>{t}</option>)}</select>
-        <select className="ed" style={{ border: "1px solid var(--line-2)" }} value={prio} onChange={(e) => setPrio(e.target.value)}>{PRIOS.map((p) => <option key={p}>{p}</option>)}</select>
-        <input className="ed" style={{ border: "1px solid var(--line-2)" }} type="date" value={due} onChange={(e) => setDue(e.target.value)} />
+        <Select value={type} options={TYPES} onValueChange={setType} />
+        <Select value={prio} options={PRIOS} onValueChange={setPrio} />
+        <input className="ui-input" style={{ width: "auto" }} type="date" value={due} onChange={(e) => setDue(e.target.value)} />
         <button className="btn primary" style={{ flex: "none", padding: "9px 18px" }} disabled={!title.trim()} onClick={() => { run(() => addTaskAction({ title, type, priority: prio, dueDate: due || undefined }), "Task added"); setTitle(""); setDue(""); }}>Add</button>
       </div>
 

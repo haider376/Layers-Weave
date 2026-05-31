@@ -7,6 +7,8 @@ import Logo, { initials } from "./Logo";
 import { logoutAction, updateAvatarAction, setViewAsAction } from "@/app/actions/session";
 import { ROLE_LABEL, type Role } from "@/lib/permissions";
 import AvatarCropper from "./AvatarCropper";
+import Select from "./ui/Select";
+import WeaveMark from "./WeaveMark";
 import { showToast } from "./Toast";
 
 const ICONS = {
@@ -74,9 +76,9 @@ export default function Sidebar({
 
   return (
     <aside className="side">
-      <div className="logo-wrap">
-        <Logo />
-        <div className="logo-sub">Layers Weave</div>
+      <div className="logo-wrap logo-row">
+        <WeaveMark size={28} />
+        <div className="logo-text"><Logo /><div className="logo-sub">Weave</div></div>
       </div>
 
       <div className="side-scroll">
@@ -118,11 +120,12 @@ export default function Sidebar({
       {user.isAdmin && (
         <div className="nav-group">
           <div className="nav-label">View as</div>
-          <select className="viewas-select" value={user.viewingAs ?? user.realRole} onChange={(e) => onViewAs(e.target.value)}>
-            {viewableRoles.map((r) => (
-              <option key={r.value} value={r.value}>{r.value === user.realRole ? `${r.label} (you)` : r.label}</option>
-            ))}
-          </select>
+          <Select
+            value={user.viewingAs ?? user.realRole}
+            onValueChange={onViewAs}
+            className="ui-block"
+            options={viewableRoles.map((r) => ({ value: r.value, label: r.value === user.realRole ? `${r.label} (you)` : r.label }))}
+          />
         </div>
       )}
 

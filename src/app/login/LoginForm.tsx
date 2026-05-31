@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
+import WeaveMark from "@/components/WeaveMark";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -38,7 +39,8 @@ export default function LoginForm() {
   return (
     <div className="login">
       <div className="lcard">
-        <div className="lg">
+        <div className="lg lg-row">
+          <WeaveMark size={34} />
           <Logo />
         </div>
         <h2>Sign in</h2>

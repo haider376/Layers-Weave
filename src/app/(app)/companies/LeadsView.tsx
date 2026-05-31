@@ -5,6 +5,7 @@ import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
 import { initials } from "@/components/Logo";
+import Select from "@/components/ui/Select";
 import { createLeadAction, importLeadsAction, updateCompanyAction } from "../sales/record-actions";
 
 export type Lead = {
@@ -82,7 +83,7 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
       <div className="lv-toolbar">
         <div className="seg">{(["table", "board", "report"] as const).map((v) => <button key={v} className={view === v ? "on" : ""} onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}</div>
         <input className="ed lv-search" style={{ border: "1px solid var(--line-2)" }} placeholder="Filter leads…" value={q} onChange={(e) => setQ(e.target.value)} />
-        <select className="ed" style={{ border: "1px solid var(--line-2)" }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}><option>All</option>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select>
+        <Select value={statusFilter} options={["All", ...STATUSES]} onValueChange={setStatusFilter} />
         <span style={{ flex: 1 }} />
         <button className="btn ghost lv-btn" onClick={() => fileRef.current?.click()}>Import</button>
         <button className="btn ghost lv-btn" onClick={exportCSV}>Export</button>
@@ -95,9 +96,9 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
           <div className="af-grid">
             <input className="ed" style={{ border: "1px solid var(--line-2)" }} placeholder="Company name *" value={nl.name} onChange={(e) => setNl({ ...nl, name: e.target.value })} />
             <input className="ed" style={{ border: "1px solid var(--line-2)" }} placeholder="Country" value={nl.country} onChange={(e) => setNl({ ...nl, country: e.target.value })} />
-            <select className="ed" style={{ border: "1px solid var(--line-2)" }} value={nl.leadStatus} onChange={(e) => setNl({ ...nl, leadStatus: e.target.value })}>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select>
-            <select className="ed" style={{ border: "1px solid var(--line-2)" }} value={nl.type} onChange={(e) => setNl({ ...nl, type: e.target.value })}><option>Wholesaler</option><option>Retailer</option><option>Reseller</option></select>
-            <select className="ed" style={{ border: "1px solid var(--line-2)" }} value={nl.tier} onChange={(e) => setNl({ ...nl, tier: e.target.value })}><option>A</option><option>B</option><option>C</option></select>
+            <Select value={nl.leadStatus} options={STATUSES} onValueChange={(v) => setNl({ ...nl, leadStatus: v })} />
+            <Select value={nl.type} options={["Wholesaler", "Retailer", "Reseller"]} onValueChange={(v) => setNl({ ...nl, type: v })} />
+            <Select value={nl.tier} options={["A", "B", "C"]} onValueChange={(v) => setNl({ ...nl, tier: v })} />
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 10 }}>
             <button className="btn ghost" style={{ flex: "none", padding: "8px 14px" }} onClick={() => setAdding(false)}>Cancel</button>
