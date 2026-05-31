@@ -271,20 +271,19 @@ export async function sendGmail(userId: string, input: {
     ? (input.fromName ? `${encodeHeader(input.fromName)} <${conn.accountEmail}>` : conn.accountEmail)
     : undefined;
 
-  // Build a minimal RFC 822 message. The HTML body is included as raw UTF-8 in
-  // the message; only the WHOLE message is base64url-encoded for the API.
-  // (Previously the body was ALSO base64-encoded inside the MIME part, which
-  // Gmail didn't decode → recipients saw an empty body.)
-  const lines = [
-    from ? `From: ${from}` : "",
+  // Build a minimal RFC 822 message. CRITICAL: there must be ONE blank line
+  // between the headers and the body — earlier this used `.filter(Boolean)`,
+  // which deleted that blank separator, so Gmail treated the body as a header
+  // and recipients saw only the subject.
+  const headers = [
     `To: ${input.to}`,
     `Subject: ${encodeHeader(input.subject)}`,
     "MIME-Version: 1.0",
     'Content-Type: text/html; charset="UTF-8"',
-    "",
-    input.body,
-  ].filter(Boolean);
-  const raw = b64url(lines.join("\r\n"));
+  ];
+  if (from) headers.unshift(`From: ${from}`);
+  const message = headers.join("\r\n") + "\r\n\r\n" + input.body;
+  const raw = b64url(message);
 
   const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST",

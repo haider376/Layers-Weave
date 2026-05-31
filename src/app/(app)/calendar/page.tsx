@@ -31,7 +31,7 @@ export default async function CalendarPage() {
   const events: CalEvent[] = [
     ...meetings.map((m) => ({ id: m.id, title: m.deal?.company.name ? `${m.deal.company.name} × Layers` : m.title, date: (m.meetingDate ?? m.bookedDate).toISOString(), kind: "meeting" as const, status: m.status, dealId: m.dealId })),
     ...tasks.map((t) => ({ id: t.id, title: t.title, date: t.dueDate!.toISOString(), kind: "task" as const, status: t.done ? "Done" : t.priority, dealId: t.dealId })),
-    ...googleEvents.map((g) => ({ id: "g" + g.id, title: g.title, date: g.start, kind: "google" as const, status: "Google", dealId: null, link: g.htmlLink })),
+    ...googleEvents.map((g) => ({ id: "g" + g.id, title: g.title, date: g.start, kind: "google" as const, status: "Google", dealId: null, link: g.htmlLink, allDay: g.allDay })),
   ];
 
   return (

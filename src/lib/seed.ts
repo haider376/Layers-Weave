@@ -141,6 +141,7 @@ export async function seedDatabase(prisma: PrismaClient) {
   const companyByClient: Record<string, string> = {};
   const dealRows: { id: string; companyId: string; contactId: string; name: string; stage: string; ownerKey: string }[] = [];
 
+  let _mtgIdx = 0;
   for (const [name, ownerKey, amount, stage, quoteId] of DEALS) {
     const country = COUNTRY_BY_CLIENT[name] ?? "United Kingdom";
     const company = await prisma.company.create({
@@ -182,12 +183,18 @@ export async function seedDatabase(prisma: PrismaClient) {
       },
     });
     dealRows.push({ id: deal.id, companyId: company.id, contactId: contact.id, name, stage, ownerKey });
+    // Spread demo meetings across the next two weeks at realistic business
+    // hours (09:00–17:00) so the calendar doesn't pile everything at midnight.
+    const _md = new Date();
+    _md.setDate(_md.getDate() + ((_mtgIdx % 14) - 3)); // -3 .. +10 days
+    _md.setHours(9 + (_mtgIdx % 8), (_mtgIdx % 2) * 30, 0, 0); // 9am-4:30pm, :00/:30
+    _mtgIdx++;
     await prisma.salesMeeting.create({
       data: {
         title: `${name} × Layers`,
         status: stage === "No Show / Reschedule" ? "No Show" : stage === "Appointment Scheduled" ? "Booked" : "Showed up",
         outcome: quoteId ? "Requested a Quote" : null,
-        meetingDate: new Date(),
+        meetingDate: _md,
         dealId: deal.id,
         aeId: userByKey[ownerKey],
         bdrId: userByKey["huzaifa"],

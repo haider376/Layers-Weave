@@ -7,7 +7,7 @@ import { addTaskAction } from "../tasks/actions";
 import { createCalendarEventAction, disconnectGoogleAction } from "@/app/actions/google";
 import { showToast } from "@/components/Toast";
 
-export type CalEvent = { id: string; title: string; date: string; kind: "meeting" | "task" | "google"; status: string; dealId: string | null; link?: string };
+export type CalEvent = { id: string; title: string; date: string; kind: "meeting" | "task" | "google"; status: string; dealId: string | null; link?: string; allDay?: boolean };
 type GoogleState = { connected: boolean; email: string | null; configured: boolean };
 
 // Google-Calendar-style calendars/colours, mapped onto our event kinds + statuses.
@@ -242,10 +242,11 @@ function MonthGrid({ cursor, byDay, onDay }: { cursor: Date; byDay: Record<strin
 }
 
 function Chip({ e }: { e: Item }) {
+  const timeLabel = e.allDay ? "All day" : fmt12(e.mins);
   const inner = (
-    <div className="gcal-chip" style={{ ["--c" as string]: COLOR(e.cal) }} title={`${fmt12(e.mins)} · ${e.title}`}>
+    <div className="gcal-chip" style={{ ["--c" as string]: COLOR(e.cal) }} title={`${timeLabel} · ${e.title}`}>
       <i className="gcal-chip-dot" />
-      <b>{fmt12(e.mins)}</b>
+      <b>{timeLabel}</b>
       <span className="gcal-chip-t">{e.title}</span>
     </div>
   );
