@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
 import { initials } from "@/components/Logo";
 import Select from "@/components/ui/Select";
+import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
 import { createLeadAction, importLeadsAction, updateCompanyAction } from "../sales/record-actions";
+
+const BADGE = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
 
 export type Lead = {
   id: string; name: string; clientId: string; owner: string; bdr: string; leadStatus: string;
@@ -34,7 +37,7 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
   const [, start] = useTransition();
   const [view, setView] = useState<"table" | "board" | "report">("table");
   const [q, setQ] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [fstate, setFstate] = useState<FilterState>({});
   const [sortKey, setSortKey] = useState<keyof Lead>("createdAt");
   const [dir, setDir] = useState<1 | -1>(-1);
   const [adding, setAdding] = useState(false);
@@ -42,12 +45,39 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
   const [dragId, setDragId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const filterDefs: FilterDef[] = useMemo(() => {
+    const uniq = (arr: string[]) => [...new Set(arr.filter((x) => x && x !== "—"))].sort();
+    return [
+      { key: "leadStatus", label: "Lead status", type: "multi", options: STATUSES.map((s) => ({ value: s, label: s, badge: BADGE(s) })) },
+      { key: "owner", label: "Owner", type: "multi", options: uniq(leads.map((l) => l.owner)).map((o) => ({ value: o, label: o })) },
+      { key: "bdr", label: "BDR", type: "multi", options: uniq(leads.map((l) => l.bdr)).map((o) => ({ value: o, label: o })) },
+      { key: "country", label: "Country", type: "multi", options: uniq(leads.map((l) => l.country)).map((o) => ({ value: o, label: o })) },
+      { key: "tier", label: "Tier", type: "multi", options: uniq(leads.map((l) => l.tier)).map((o) => ({ value: o, label: `Tier ${o}` })) },
+      { key: "createdAt", label: "Create date", type: "date" },
+      { key: "lastActivity", label: "Last activity", type: "date" },
+    ];
+  }, [leads]);
+
   const filtered = useMemo(() => {
     let r = leads;
-    if (statusFilter !== "All") r = r.filter((l) => l.leadStatus === statusFilter);
+    for (const def of filterDefs) {
+      const v = fstate[def.key];
+      if (def.type === "multi" && Array.isArray(v) && v.length) {
+        r = r.filter((l) => v.includes(String((l as unknown as Record<string, string>)[def.key])));
+      } else if (def.type === "date" && v && !Array.isArray(v) && (v.from || v.to)) {
+        r = r.filter((l) => {
+          const raw = (l as unknown as Record<string, string | null>)[def.key];
+          if (!raw) return false;
+          const d = raw.slice(0, 10);
+          if (v.from && d < v.from) return false;
+          if (v.to && d > v.to) return false;
+          return true;
+        });
+      }
+    }
     if (q.trim()) { const t = q.toLowerCase(); r = r.filter((l) => l.name.toLowerCase().includes(t) || l.owner.toLowerCase().includes(t) || l.country.toLowerCase().includes(t)); }
     return [...r].sort((a, b) => { const av = a[sortKey] ?? ""; const bv = b[sortKey] ?? ""; return av < bv ? -dir : av > bv ? dir : 0; });
-  }, [leads, q, statusFilter, sortKey, dir]);
+  }, [leads, q, fstate, filterDefs, sortKey, dir]);
 
   function sortBy(k: keyof Lead) { if (sortKey === k) setDir((d) => (d === 1 ? -1 : 1)); else { setSortKey(k); setDir(1); } }
 
@@ -83,13 +113,14 @@ export default function LeadsView({ leads }: { leads: Lead[] }) {
       <div className="lv-toolbar">
         <div className="seg">{(["table", "board", "report"] as const).map((v) => <button key={v} className={view === v ? "on" : ""} onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}</div>
         <input className="ed lv-search" style={{ border: "1px solid var(--line-2)" }} placeholder="Filter leads…" value={q} onChange={(e) => setQ(e.target.value)} />
-        <Select value={statusFilter} options={["All", ...STATUSES]} onValueChange={setStatusFilter} />
         <span style={{ flex: 1 }} />
         <button className="btn ghost lv-btn" onClick={() => fileRef.current?.click()}>Import</button>
         <button className="btn ghost lv-btn" onClick={exportCSV}>Export</button>
         <button className="btn primary lv-btn" onClick={() => setAdding((a) => !a)}>+ Add lead</button>
         <input ref={fileRef} type="file" accept=".csv" hidden onChange={importCSV} />
       </div>
+
+      <FilterBar filters={filterDefs} state={fstate} onChange={(k, v) => setFstate((s) => ({ ...s, [k]: v }))} onClear={() => setFstate({})} />
 
       {adding && (
         <div className="answer-form" style={{ marginBottom: 14, borderRadius: 11 }}>
