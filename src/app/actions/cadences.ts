@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import { ensureCadenceSchema, isMissingTable } from "@/lib/ensureCadenceSchema";
+import { CADENCE_TEMPLATES } from "@/lib/cadences";
 
 async function guard() {
   const user = await requireUser();
@@ -65,6 +66,21 @@ export async function createAndOpenCadenceAction() {
       priority: "Medium",
       ownerId: user.id,
       steps: { create: [{ day: 0, type: "call", subject: "First touch", position: 0 }] },
+    },
+  }));
+  revalidatePath("/cadences");
+  redirect(`/cadences/${cadence.id}`);
+}
+
+// Create a cadence from a ready-made template and open its builder.
+export async function createFromTemplateAction(templateId: string) {
+  const user = await guard();
+  const tpl = CADENCE_TEMPLATES.find((t) => t.id === templateId);
+  if (!tpl) throw new Error("Unknown template");
+  const cadence = await withSchema(() => prisma.cadence.create({
+    data: {
+      name: tpl.name, function: tpl.function, priority: tpl.priority, ownerId: user.id,
+      steps: { create: tpl.steps.map((s, i) => ({ day: s.day, type: s.type, subject: s.subject, position: i })) },
     },
   }));
   revalidatePath("/cadences");

@@ -95,6 +95,13 @@ export async function seedDatabase(prisma: PrismaClient) {
   const nextClientId = () => `C-${clientCounter++}`;
 
   // Order matters for FK constraints
+  // Cadence tables may not exist on older databases — clear them defensively.
+  try {
+    await prisma.cadenceStepRun.deleteMany();
+    await prisma.cadenceMembership.deleteMany();
+    await prisma.cadenceStep.deleteMany();
+    await prisma.cadence.deleteMany();
+  } catch { /* tables not present yet */ }
   await prisma.callLog.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.activity.deleteMany();
@@ -396,7 +403,7 @@ export async function seedDatabase(prisma: PrismaClient) {
       ],
     },
     {
-      // The requested call-only cadence: 5 days, 8 calls.
+      // 5-day call-only blitz (7–8 calls).
       name: "Call Blitz — 5 day / 8 call", function: "Outbound", priority: "High", owner: "huzaifa",
       steps: [
         { day: 0, type: "call", subject: "Call 1 — opener" },
@@ -407,6 +414,35 @@ export async function seedDatabase(prisma: PrismaClient) {
         { day: 3, type: "call", subject: "Call 6 — value reminder" },
         { day: 4, type: "call", subject: "Call 7 — last attempt" },
         { day: 5, type: "call", subject: "Call 8 — break-up call" },
+      ],
+    },
+    {
+      // 5-day Call + Email cadence.
+      name: "Call + Email — 5 day", function: "Outbound", priority: "High", owner: "zikriya",
+      steps: [
+        { day: 0, type: "call", subject: "Call 1 — opener" },
+        { day: 0, type: "email", subject: "Email 1 — intro + catalogue" },
+        { day: 1, type: "call", subject: "Call 2 — follow up on email" },
+        { day: 2, type: "email", subject: "Email 2 — Carhartt case study" },
+        { day: 3, type: "call", subject: "Call 3 — value reminder" },
+        { day: 4, type: "email", subject: "Email 3 — pricing + next steps" },
+        { day: 5, type: "call", subject: "Call 4 — break-up call" },
+      ],
+    },
+    {
+      // 10-day Call + Email + Voicemail cadence.
+      name: "Call + Email + VM — 10 day", function: "Outbound", priority: "Medium", owner: "haider",
+      steps: [
+        { day: 0, type: "call", subject: "Call 1 — opener" },
+        { day: 0, type: "email", subject: "Email 1 — personalised intro" },
+        { day: 1, type: "call", subject: "Call 2 — leave voicemail" },
+        { day: 2, type: "email", subject: "Email 2 — social proof" },
+        { day: 3, type: "call", subject: "Call 3 — leave voicemail" },
+        { day: 5, type: "email", subject: "Email 3 — case study" },
+        { day: 6, type: "call", subject: "Call 4 — afternoon dial" },
+        { day: 8, type: "call", subject: "Call 5 — leave voicemail" },
+        { day: 8, type: "email", subject: "Email 4 — pricing" },
+        { day: 10, type: "call", subject: "Call 6 — break-up call + VM" },
       ],
     },
     {

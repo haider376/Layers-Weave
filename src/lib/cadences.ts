@@ -13,6 +13,62 @@ export const STEP_META: Record<StepType, { label: string; color: string; icon: s
 
 export const FUNCTIONS = ["Inbound", "Outbound", "Event", "Other"] as const;
 
+// ── Ready-made cadence templates (one-click create from the dashboard) ──────
+export type CadenceTemplateStep = { day: number; type: StepType; subject: string };
+export type CadenceTemplate = { id: string; name: string; function: string; priority: string; blurb: string; steps: CadenceTemplateStep[] };
+
+export const CADENCE_TEMPLATES: CadenceTemplate[] = [
+  {
+    id: "call-5d-8",
+    name: "Call Blitz — 5 day / 8 call",
+    function: "Outbound", priority: "High",
+    blurb: "Call-only · 5 days · 8 dials",
+    steps: [
+      { day: 0, type: "call", subject: "Call 1 — opener" },
+      { day: 0, type: "call", subject: "Call 2 — afternoon retry" },
+      { day: 1, type: "call", subject: "Call 3 — morning dial" },
+      { day: 1, type: "call", subject: "Call 4 — afternoon dial" },
+      { day: 2, type: "call", subject: "Call 5 — switch time block" },
+      { day: 3, type: "call", subject: "Call 6 — value reminder" },
+      { day: 4, type: "call", subject: "Call 7 — last attempt" },
+      { day: 5, type: "call", subject: "Call 8 — break-up call" },
+    ],
+  },
+  {
+    id: "call-email-5d",
+    name: "Call + Email — 5 day",
+    function: "Outbound", priority: "High",
+    blurb: "Call + email · 5 days · 7 touches",
+    steps: [
+      { day: 0, type: "call", subject: "Call 1 — opener" },
+      { day: 0, type: "email", subject: "Email 1 — intro + catalogue" },
+      { day: 1, type: "call", subject: "Call 2 — follow up on email" },
+      { day: 2, type: "email", subject: "Email 2 — Carhartt case study" },
+      { day: 3, type: "call", subject: "Call 3 — value reminder" },
+      { day: 4, type: "email", subject: "Email 3 — pricing + next steps" },
+      { day: 5, type: "call", subject: "Call 4 — break-up call" },
+    ],
+  },
+  {
+    id: "call-email-vm-10d",
+    name: "Call + Email + VM — 10 day",
+    function: "Outbound", priority: "Medium",
+    blurb: "Call + email + voicemail · 10 days · 10 touches",
+    steps: [
+      { day: 0, type: "call", subject: "Call 1 — opener" },
+      { day: 0, type: "email", subject: "Email 1 — personalised intro" },
+      { day: 1, type: "call", subject: "Call 2 — leave voicemail" },
+      { day: 2, type: "email", subject: "Email 2 — social proof" },
+      { day: 3, type: "call", subject: "Call 3 — leave voicemail" },
+      { day: 5, type: "email", subject: "Email 3 — case study" },
+      { day: 6, type: "call", subject: "Call 4 — afternoon dial" },
+      { day: 8, type: "call", subject: "Call 5 — leave voicemail" },
+      { day: 8, type: "email", subject: "Email 4 — pricing" },
+      { day: 10, type: "call", subject: "Call 6 — break-up call + VM" },
+    ],
+  },
+];
+
 const startOfToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 const dayMs = 86400000;
 

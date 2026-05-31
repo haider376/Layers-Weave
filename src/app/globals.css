@@ -1299,7 +1299,10 @@ tbody td{padding:15px 22px}
 .seq-step-top{display:flex;align-items:center;gap:10px}
 .seq-step-n{font-weight:700;font-size:12px;color:var(--text);min-width:54px}
 .seq-step-when{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--faint);font-weight:600}
-.seq-day{width:64px}
+.seq-day{width:60px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;font-weight:600;padding:8px 10px;outline:none;text-align:center;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;appearance:textfield}
+.seq-day::-webkit-outer-spin-button,.seq-day::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.seq-day:hover{border-color:rgba(255,255,255,.2)}
+.seq-day:focus{border-color:var(--neon);box-shadow:0 0 0 3px var(--neon-soft)}
 .seq-step-x{margin-left:auto;background:none;border:0;color:var(--faint);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
 .seq-step-x:hover{color:var(--red)}
 @media(max-width:820px){.seqs{grid-template-columns:1fr}.fcast-board{grid-template-columns:1fr}}
@@ -1441,6 +1444,7 @@ html.compact .kpis,html.compact .grid2,html.compact .an-grid{gap:14px}
 .cad-feed-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none;background:var(--faint)}
 .cad-feed-dot.call{background:#0b8043}.cad-feed-dot.meeting{background:#1a73e8}
 .cad-feed-dot.ok{box-shadow:0 0 0 3px var(--neon-soft)}
+.cad-feed-b{flex:1;min-width:0}
 .cad-feed-t{font-size:12px;color:var(--text)}.cad-feed-t b{font-weight:600}
 .cad-feed-m{font-size:10.5px;color:var(--faint);margin-top:2px}
 
@@ -1614,3 +1618,17 @@ tbody tr.row.sel:hover{background:color-mix(in srgb,var(--neon) 16%,transparent)
 .ev.sale .ic .navpunk{color:var(--neon)}
 .ev.supply .ic .navpunk{color:var(--amber)}
 .ev.ship .ic .navpunk{color:var(--violet-br)}
+
+/* Global safety net — no number input anywhere shows the native spinner chrome */
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* ── Cadence template picker ── */
+.cadtpl-pop{width:300px}
+.cadtpl-h{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:700;margin:10px 4px 6px}
+.cadtpl{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-family:inherit;transition:border-color .14s,background .14s,transform .12s}
+.cadtpl:hover{border-color:var(--neon);background:var(--neon-soft);transform:translateX(2px)}
+.cadtpl:disabled{opacity:.5;cursor:default}
+.cadtpl-blank{border-style:dashed}
+.cadtpl-n{font-size:13px;font-weight:600;color:var(--text)}
+.cadtpl-b{font-size:11px;color:var(--faint)}
