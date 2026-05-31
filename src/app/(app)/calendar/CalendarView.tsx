@@ -120,12 +120,16 @@ export default function CalendarView({ events, google }: { events: CalEvent[]; g
         <MiniMonth mini={mini} setMini={setMini} cursor={cursor} onPick={(d) => jump(d, view === "month" ? undefined : view)} byDay={byDay} />
         <div className="gcal-mycal">
           <div className="gcal-mycal-h">My calendars</div>
-          {KINDS.map((k) => (
-            <label key={k.key} className="gcal-cal-item">
-              <input type="checkbox" checked={!hidden.has(k.key)} onChange={() => toggleKind(k.key)} style={{ ["--c" as string]: k.color }} />
-              <span>{k.label}</span>
-            </label>
-          ))}
+          {KINDS.map((k) => {
+            const count = items.filter((it) => it.cal === k.key).length;
+            return (
+              <label key={k.key} className="gcal-cal-item">
+                <input type="checkbox" checked={!hidden.has(k.key)} onChange={() => toggleKind(k.key)} style={{ ["--c" as string]: k.color }} />
+                <span>{k.label}</span>
+                {count > 0 && <span className="gcal-cal-count">{count}</span>}
+              </label>
+            );
+          })}
         </div>
 
         {/* Google Calendar connection */}
