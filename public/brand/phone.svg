@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+
+  <defs>
+    <filter id="rough_11" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="3" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="grain_11">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.2 1.05"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g filter="url(#rough_11)" stroke="#6FE01A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none">
+
+  <path d="M170 90 C150 90 120 110 120 150 C120 300 220 400 370 400 C410 400 430 370 430 350 C430 335 420 325 400 315 L350 295 C335 290 322 295 312 308 L295 330 C250 310 210 270 190 225 L212 208 C225 198 230 185 225 170 L205 120 C197 100 187 90 170 90 Z"/>
+
+  </g>
+  <g filter="url(#rough_11)">
+<path d="M146.5,230 C146.5,272 144.05,294.05 150,300 C155.95,294.05 153.5,272 153.5,230 Z" fill="#6FE01A"/>
+  <circle cx="150" cy="300" r="5.95" fill="#6FE01A"/>
+<path d="M376.5,400 C376.5,439 374.05,459.05 380,465 C385.95,459.05 383.5,439 383.5,400 Z" fill="#6FE01A"/>
+  <circle cx="380" cy="465" r="5.95" fill="#6FE01A"/>
+  </g>
+</svg>
