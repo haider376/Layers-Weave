@@ -5,7 +5,7 @@ import { ROLE_LABEL, type Role } from "@/lib/permissions";
 import Topbar from "@/components/Topbar";
 import SettingsView from "./SettingsView";
 import { getSalesGoals, ROSTER } from "@/lib/goals";
-import { getPermissionMatrix } from "@/lib/appConfig";
+import { getPermissionMatrix, getAppConfig } from "@/lib/appConfig";
 
 export default async function SettingsPage() {
   const user = await getCurrentUser();
@@ -27,11 +27,11 @@ export default async function SettingsPage() {
         return { first, kind, name: u?.name ?? first.charAt(0).toUpperCase() + first.slice(1) };
       })
     : [];
-  const [goals, permissions] = await Promise.all([getSalesGoals(), getPermissionMatrix()]);
+  const [goals, permissions, config] = await Promise.all([getSalesGoals(), getPermissionMatrix(), getAppConfig()]);
 
   return (
     <>
-      <Topbar title="Settings" sub="Profile, goals, permissions, integrations & team" />
+      <Topbar title="Settings" sub="Profile, goals, permissions, workspace & team" />
       <SettingsView
         me={{ name: user.name, email: user.email, role: ROLE_LABEL[user.role as Role] ?? user.role }}
         isAdmin={user.isAdmin}
@@ -39,6 +39,7 @@ export default async function SettingsPage() {
         goals={goals}
         reps={reps}
         permissions={permissions}
+        config={config}
       />
     </>
   );

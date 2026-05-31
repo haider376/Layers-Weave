@@ -9,11 +9,12 @@ import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
 import { useEffect } from "react";
 import GoalsSettings, { type AeMeta } from "./GoalsSettings";
 import PermissionsSettings from "./PermissionsSettings";
+import ConfigSettings from "./ConfigSettings";
 import type { SalesGoals } from "@/lib/goals";
-import type { PermissionMatrix } from "@/lib/appConfig";
+import type { PermissionMatrix, AppConfig } from "@/lib/appConfig";
 
 type Team = { name: string; email: string; role: string; active: boolean }[];
-const TABS = ["Profile", "Account", "Goals", "Permissions", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
+const TABS = ["Profile", "Account", "Goals", "Permissions", "Workspace", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
 type Tab = (typeof TABS)[number];
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Closed Won", "Closed Lost", "Disqualified"];
 
@@ -42,13 +43,13 @@ function Field({ label, value, type = "text", disabled }: { label: string; value
   return <div className="dg-row"><span className="dg-label">{label}</span><input className="dg-input" type={type} value={v} disabled={disabled} onChange={(e) => setV(e.target.value)} /></div>;
 }
 
-export default function SettingsView({ me, isAdmin, team, goals, reps, permissions }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix }) {
+export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Profile");
   const [name, setName] = useState(me.name);
   const [title, setTitle] = useState(me.role);
   const [pending, start] = useTransition();
-  const ADMIN_ONLY: Tab[] = ["Team", "Goals", "Permissions"];
+  const ADMIN_ONLY: Tab[] = ["Team", "Goals", "Permissions", "Workspace"];
   const tabs = TABS.filter((t) => !ADMIN_ONLY.includes(t) || isAdmin);
 
   function saveProfile() { start(async () => { await updateProfileAction({ name, title }); showToast("Profile saved"); router.refresh(); }); }
@@ -84,6 +85,7 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
           )}
           {tab === "Goals" && <GoalsSettings initial={goals} reps={reps} />}
           {tab === "Permissions" && <PermissionsSettings initial={permissions} />}
+          {tab === "Workspace" && <ConfigSettings initial={config} />}
           {tab === "Notifications" && (
             <div className="set-list">
               <Toggle label="New SQL booked" sub="When a meeting is booked" />
