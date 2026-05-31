@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+
+  <defs>
+    <filter id="rough_13" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="3" seed="13" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="grain_13">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="13" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.2 1.05"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g filter="url(#rough_13)" stroke="#6FE01A" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" fill="none">
+
+  <path d="M256 70 L256 442"/>
+  <path d="M340 140 C320 110 285 100 256 100 C200 100 165 130 165 175 C165 260 350 230 350 320 C350 370 305 400 256 400 C220 400 180 388 160 355"/>
+
+  </g>
+  <g filter="url(#rough_13)">
+<path d="M253,445 C253,478 250.9,494.9 256,500 C261.1,494.9 259,478 259,445 Z" fill="#6FE01A"/>
+  <circle cx="256" cy="500" r="5.1" fill="#6FE01A"/>
+<path d="M172,360 C172,396 169.9,414.9 175,420 C180.1,414.9 178,396 178,360 Z" fill="#6FE01A"/>
+  <circle cx="175" cy="420" r="5.1" fill="#6FE01A"/>
+  </g>
+</svg>

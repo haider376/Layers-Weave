@@ -1517,3 +1517,80 @@ html.compact .kpis,html.compact .grid2,html.compact .an-grid{gap:14px}
 .lv-check:indeterminate::after{content:"";position:absolute;left:3px;top:6.5px;width:9px;height:0;border-top:2px solid var(--neon-ink);transform:none}
 tbody tr.row.sel{background:var(--neon-soft)}
 tbody tr.row.sel:hover{background:color-mix(in srgb,var(--neon) 16%,transparent)}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PUNK BRAND MARKS — animated lime graffiti assets
+   ════════════════════════════════════════════════════════════════════════ */
+.punk{display:inline-block;user-select:none;-webkit-user-drag:none}
+
+/* gentle perpetual float/sway */
+@keyframes punkFloat{
+  0%{transform:translateY(0) rotate(var(--rot,0deg))}
+  50%{transform:translateY(-9px) rotate(calc(var(--rot,0deg) + 2deg))}
+  100%{transform:translateY(0) rotate(var(--rot,0deg))}
+}
+.punk-float{animation:punkFloat var(--dur,6s) ease-in-out infinite}
+
+/* spray-on pop (scale + fade), used on hover/mount */
+@keyframes punkPop{0%{transform:scale(.4) rotate(-10deg);opacity:0}60%{transform:scale(1.08) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.punk-pop{animation:punkPop .5s cubic-bezier(.34,1.56,.64,1) both}
+
+/* hand-jitter wobble (graffiti energy) */
+@keyframes punkWobble{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.punk-wobble{animation:punkWobble 2.4s ease-in-out infinite}
+
+@keyframes punkSpin{to{transform:rotate(360deg)}}
+.punk-spin{animation:punkSpin 9s linear infinite}
+
+@media(prefers-reduced-motion:reduce){
+  .punk-float,.punk-pop,.punk-wobble,.punk-spin{animation:none}
+}
+
+/* ── Sign-in page decor ── */
+.login-decor{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ldecor{
+  position:absolute;opacity:0;
+  filter:drop-shadow(0 0 18px rgba(198,245,66,.18));
+  animation:ldecorIn .6s ease forwards;
+  animation-delay:var(--d,0s);
+}
+.ldecor .punk{opacity:var(--op,.8)}
+@keyframes ldecorIn{from{opacity:0;transform:scale(.5) translateY(14px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.ldecor{animation:none;opacity:1}}
+@media(max-width:720px){.login-decor{display:none}}
+
+/* card header floating globe mark */
+.lcard{position:relative}
+.lcard-mark{
+  position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  filter:drop-shadow(0 8px 22px rgba(198,245,66,.3));z-index:2;
+  animation:punkPop .6s cubic-bezier(.34,1.56,.64,1) both;
+}
+.lcard-mark + .lg{margin-top:24px}
+
+/* ── Punk nav icons (CSS-mask so they take the link's text color) ── */
+.navpunk{
+  display:inline-block;flex:none;
+  background-color:currentColor;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),background-color .16s ease;
+}
+.nav a .navpunk{color:var(--muted)}
+.nav a:hover .navpunk{color:var(--text);transform:rotate(-6deg) scale(1.12)}
+.nav a.active .navpunk{color:var(--neon);transform:rotate(0) scale(1.05)}
+
+/* Sidebar nav icons pop in with a gentle stagger on load — gives the shell life */
+@keyframes navIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.nav a{animation:navIn .4s ease both}
+.nav-group:nth-child(1) .nav a:nth-child(1){animation-delay:.02s}
+.nav-group:nth-child(1) .nav a:nth-child(2){animation-delay:.06s}
+.nav-group:nth-child(1) .nav a:nth-child(3){animation-delay:.10s}
+.nav-group:nth-child(1) .nav a:nth-child(4){animation-delay:.14s}
+.nav a:nth-child(1){animation-delay:.04s}
+.nav a:nth-child(2){animation-delay:.08s}
+.nav a:nth-child(3){animation-delay:.12s}
+.nav a:nth-child(4){animation-delay:.16s}
+.nav a:nth-child(5){animation-delay:.20s}
+@media(prefers-reduced-motion:reduce){.nav a{animation:none}}

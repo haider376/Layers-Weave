@@ -126,7 +126,96 @@ assets.trophy = svg(12, `
   <path d="M196 410 C196 380 316 380 316 410 Z"/>
 `, [{ x: 150, y: 200, len: 60, w: 6 }, { x: 256, y: 410, len: 70, w: 7 }, { x: 300, y: 405, len: 50, w: 6 }]);
 
-// Write all SVGs
+// ── Expansion pack — more brand marks ──────────────────────────────────────
+
+// 13) DOLLAR
+assets.dollar = svg(13, `
+  <path d="M256 70 L256 442"/>
+  <path d="M340 140 C320 110 285 100 256 100 C200 100 165 130 165 175 C165 260 350 230 350 320 C350 370 305 400 256 400 C220 400 180 388 160 355"/>
+`, [{ x: 256, y: 445, len: 55, w: 6 }, { x: 175, y: 360, len: 60, w: 6 }], { sw: 15 });
+
+// 14) FIST (raised — rebellion / hype)
+assets.fist = svg(14, `
+  <path d="M160 250 L160 180 C160 162 188 162 188 180 L188 240 M188 240 L188 150 C188 132 216 132 216 150 L216 240 M216 240 L216 140 C216 122 244 122 244 140 L244 240 M244 240 L244 160 C244 142 272 142 272 160 L272 250"/>
+  <path d="M160 250 C140 240 120 250 120 280 L120 330 C120 390 170 440 240 440 C320 440 360 390 360 320 L360 230 C360 212 332 212 332 230 L332 270"/>
+`, [{ x: 150, y: 400, len: 60, w: 6 }, { x: 320, y: 400, len: 70, w: 7 }], { sw: 13 });
+
+// 15) EYE
+assets.eye = svg(15, `
+  <path d="M60 256 C140 150 372 150 452 256 C372 362 140 362 60 256 Z"/>
+  <circle cx="256" cy="256" r="60"/>
+  <circle cx="256" cy="256" r="16" stroke="none" fill="${LIME}"/>
+`, [{ x: 150, y: 320, len: 60, w: 6 }, { x: 360, y: 320, len: 70, w: 7 }]);
+
+// 16) CLOCK (speed-to-lead)
+assets.clock = svg(16, `
+  <circle cx="256" cy="256" r="180"/>
+  <path d="M256 150 L256 256 L330 300"/>
+`, [{ x: 130, y: 370, len: 65, w: 7 }, { x: 380, y: 360, len: 55, w: 6 }, { x: 256, y: 440, len: 50, w: 6 }]);
+
+// 17) SCISSORS (handpick / cut)
+assets.scissors = svg(17, `
+  <circle cx="150" cy="360" r="42"/>
+  <circle cx="362" cy="360" r="42"/>
+  <path d="M180 330 L400 110"/>
+  <path d="M332 330 L112 110"/>
+`, [{ x: 256, y: 240, len: 50, w: 5 }, { x: 150, y: 405, len: 50, w: 6 }], { sw: 14 });
+
+// 18) ROCKET (launch / growth)
+assets.rocket = svg(18, `
+  <path d="M256 60 C320 110 350 190 350 270 L350 330 L162 330 L162 270 C162 190 192 110 256 60 Z"/>
+  <circle cx="256" cy="210" r="34"/>
+  <path d="M162 300 L110 360 L150 350 L150 410 L185 360"/>
+  <path d="M350 300 L402 360 L362 350 L362 410 L327 360"/>
+  <path d="M225 330 C225 380 256 430 256 430 C256 430 287 380 287 330"/>
+`, [{ x: 200, y: 410, len: 55, w: 6 }, { x: 312, y: 410, len: 55, w: 6 }, { x: 256, y: 440, len: 45, w: 6 }]);
+
+// 19) TAG (price / deal)
+assets.tag = svg(19, `
+  <path d="M250 90 L420 90 L420 260 L240 440 L70 270 L250 90 Z"/>
+  <circle cx="360" cy="150" r="22"/>
+`, [{ x: 130, y: 320, len: 60, w: 6 }, { x: 240, y: 440, len: 55, w: 6 }], { sw: 15 });
+
+// 20) CHAT BUBBLE
+assets.chat = svg(20, `
+  <path d="M90 130 L422 130 L422 330 L230 330 L150 400 L150 330 L90 330 Z"/>
+  <circle cx="180" cy="230" r="9" stroke="none" fill="${LIME}"/>
+  <circle cx="256" cy="230" r="9" stroke="none" fill="${LIME}"/>
+  <circle cx="332" cy="230" r="9" stroke="none" fill="${LIME}"/>
+`, [{ x: 130, y: 335, len: 60, w: 6 }, { x: 360, y: 335, len: 70, w: 7 }]);
+
+// 21) PIN (location / territory)
+assets.pin = svg(21, `
+  <path d="M256 70 C180 70 130 125 130 200 C130 300 256 440 256 440 C256 440 382 300 382 200 C382 125 332 70 256 70 Z"/>
+  <circle cx="256" cy="195" r="50"/>
+`, [{ x: 200, y: 380, len: 55, w: 6 }, { x: 256, y: 440, len: 50, w: 7 }]);
+
+// 22) DIAMOND (premium tier)
+assets.diamond = svg(22, `
+  <path d="M150 90 L362 90 L440 200 L256 440 L72 200 Z"/>
+  <path d="M72 200 L440 200"/>
+  <path d="M150 90 L210 200 L256 440 L302 200 L362 90"/>
+`, [{ x: 130, y: 250, len: 55, w: 6 }, { x: 380, y: 250, len: 60, w: 6 }]);
+
+// 23) SKULL (punk staple)
+assets.skull = svg(23, `
+  <path d="M256 80 C160 80 100 150 100 240 C100 300 130 330 150 350 L150 400 L362 400 L362 350 C382 330 412 300 412 240 C412 150 352 80 256 80 Z"/>
+  <circle cx="195" cy="245" r="34" stroke="none" fill="${LIME}"/>
+  <circle cx="317" cy="245" r="34" stroke="none" fill="${LIME}"/>
+  <path d="M256 300 L240 345 M256 300 L272 345"/>
+  <path d="M210 400 L210 430 M256 400 L256 430 M302 400 L302 430"/>
+`, [{ x: 150, y: 410, len: 55, w: 6 }, { x: 362, y: 410, len: 55, w: 6 }]);
+
+// 24) HEADSET (BDR / support)
+assets.headset = svg(24, `
+  <path d="M120 280 L120 230 C120 130 200 80 256 80 C312 80 392 130 392 230 L392 280"/>
+  <path d="M90 290 C90 270 140 270 140 290 L140 350 C140 370 90 370 90 350 Z"/>
+  <path d="M422 290 C422 270 372 270 372 290 L372 350 C372 370 422 370 422 350 Z"/>
+  <path d="M392 350 C392 410 330 420 290 420"/>
+  <path d="M250 400 L290 400 L290 440 L250 440 Z"/>
+`, [{ x: 110, y: 360, len: 55, w: 6 }, { x: 402, y: 360, len: 55, w: 6 }], { sw: 13 });
+
+// ── Write all SVGs ──────────────────────────────────────────────────────────
 for (const [name, content] of Object.entries(assets)) {
   fs.writeFileSync(path.join(OUT, `${name}.svg`), content.trim() + "\n");
 }
