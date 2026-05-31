@@ -121,7 +121,7 @@ export default function CadenceDashboard({ cadences, dueSteps, feed, me, stats }
                     <button key={t} className={typeFilter === t ? "on" : ""} onClick={() => setTypeFilter(t)} title={STEP_META[t].label}>{STEP_META[t].label}</button>
                   ))}
                 </div>
-                <label className="cad-mine"><input type="checkbox" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} /> Mine</label>
+                <label className="cad-mine"><input type="checkbox" className="lv-check" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} /> Mine</label>
               </div>
             </div>
 

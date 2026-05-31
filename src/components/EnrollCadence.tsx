@@ -46,7 +46,7 @@ export default function EnrollCadence({
                 {contacts!.length === 0 && <div className="q-note" style={{ padding: 8, fontSize: 11 }}>No contacts on this account.</div>}
                 {contacts!.map((c) => (
                   <label key={c.id} className="enroll-person">
-                    <input type="checkbox" checked={picked.includes(c.id)} onChange={(e) => setPicked((p) => e.target.checked ? [...p, c.id] : p.filter((x) => x !== c.id))} />
+                    <input type="checkbox" className="lv-check" checked={picked.includes(c.id)} onChange={(e) => setPicked((p) => e.target.checked ? [...p, c.id] : p.filter((x) => x !== c.id))} />
                     {c.name}
                   </label>
                 ))}
