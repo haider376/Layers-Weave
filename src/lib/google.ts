@@ -33,8 +33,17 @@ export function googleConfigured(): boolean {
 }
 
 export function appOrigin(): string {
-  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, "");
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  // Accept a messy APP_URL (full path, trailing slash, etc.) and keep only the
+  // scheme+host origin — so a pasted callback URL can't double up the path.
+  const raw = process.env.APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+  if (raw) {
+    try {
+      const withScheme = /^https?:\/\//.test(raw) ? raw : `https://${raw}`;
+      return new URL(withScheme).origin;
+    } catch {
+      return raw.replace(/\/.*$/, "").replace(/\/$/, "");
+    }
+  }
   return "http://localhost:3000";
 }
 
