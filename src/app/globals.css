@@ -1210,3 +1210,16 @@ tbody td{padding:15px 22px}
 .ni-pre{padding:0 0 0 11px;color:var(--faint);font-size:12.5px}
 .ni-wrap input{flex:1;background:none;border:0;outline:none;color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;padding:9px 11px;width:100%}
 .ni-wrap input::-webkit-outer-spin-button,.ni-wrap input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* Bare NumberInput that slots into an existing .inp wrapper (calc / weight) */
+.inp .wc-bare{flex:1;background:none;border:0;outline:none;color:var(--text);font-family:inherit;font-size:inherit;font-weight:inherit;padding:0;width:100%}
+.inp .wc-bare::-webkit-outer-spin-button,.inp .wc-bare::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* Calendar create-modal extras: duration + invitees */
+.gcal-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gcal-dur{display:flex;gap:6px;flex-wrap:wrap}
+.gcal-dur button{flex:1;min-width:48px;padding:8px 0;border:1px solid var(--line-2);background:var(--panel-2);color:var(--muted);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.12s}
+.gcal-dur button:hover{border-color:var(--neon);color:var(--text)}
+.gcal-dur button.on{background:var(--neon);color:var(--neon-ink);border-color:var(--neon)}
+.gcal-chips{display:flex;flex-wrap:wrap;gap:6px}
+.gcal-invitee{background:var(--neon-soft);border:1px solid var(--neon);color:var(--text);border-radius:20px;padding:4px 11px;font-size:11.5px;font-weight:600}

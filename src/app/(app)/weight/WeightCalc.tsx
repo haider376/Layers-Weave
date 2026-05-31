@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Select from "@/components/ui/Select";
+import NumberInput from "@/components/ui/NumberInput";
 import { showToast } from "@/components/Toast";
 
 // Per-unit weight presets (kg) for common second-hand categories — "high estimate"
@@ -71,8 +72,8 @@ export default function WeightCalc() {
           {rows.map((r) => (
             <div className="wc-line" key={r.id}>
               <Select value={r.cat} options={PRESETS.map((p) => p.cat)} onValueChange={(v) => setLine(r.id, { cat: v })} className="ui-grow" />
-              <input className="ed num" type="number" min={0} value={r.qty} onChange={(e) => setLine(r.id, { qty: +e.target.value || 0 })} />
-              <input className="ed num" type="number" min={0} value={r.packaging} onChange={(e) => setLine(r.id, { packaging: +e.target.value || 0 })} />
+              <NumberInput className="ed num" value={r.qty} onValueChange={(v) => setLine(r.id, { qty: v })} min={0} />
+              <NumberInput className="ed num" value={r.packaging} onValueChange={(v) => setLine(r.id, { packaging: v })} min={0} />
               <span className="wc-peritem">{kg(r.perItemHigh)}<small>{kg(r.perItemLow)} low</small></span>
               <button className="rm" onClick={() => rm(r.id)}>×</button>
             </div>
@@ -84,7 +85,7 @@ export default function WeightCalc() {
           <div className="ccard-h"><span className="n">2</span><h2>Freight rate</h2></div>
           <div className="field" style={{ maxWidth: 220 }}>
             <label>Shipping rate / kg</label>
-            <div className="inp"><span className="pre">£</span><input type="number" step="0.01" value={ratePerKg} onChange={(e) => setRatePerKg(+e.target.value || 0)} /></div>
+            <div className="inp"><span className="pre">£</span><NumberInput className="wc-bare" value={ratePerKg} onValueChange={setRatePerKg} min={0} step={0.01} /></div>
           </div>
           <p className="note" style={{ marginTop: 14 }}>
             <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>

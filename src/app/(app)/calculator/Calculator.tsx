@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import NumberInput from "@/components/ui/NumberInput";
 import { showToast } from "@/components/Toast";
 
 const money = (n: number) => "£" + (Math.round(n * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -67,7 +68,7 @@ export default function Calculator({ quoteId, canMargin }: { quoteId: string | n
             </div>
           </div>
           <div className="inrow" style={{ marginTop: 16 }}>
-            <div className="field"><label>Shipping rate / kg</label><div className="inp"><span className="pre">£</span><input type="number" step="0.01" value={ratePerKg} onChange={(e) => setRatePerKg(+e.target.value || 0)} /></div></div>
+            <div className="field"><label>Shipping rate / kg</label><div className="inp"><span className="pre">£</span><NumberInput className="wc-bare" value={ratePerKg} onValueChange={setRatePerKg} min={0} step={0.01} /></div></div>
             <div className="field"><label>Shipping hike</label>
               <div className="ships">{HIKES.map((h) => <div key={h} className={`tier${shipHike === h ? " on" : ""}`} onClick={() => setShipHike(h)}><div className="pc">{h}%</div></div>)}</div>
             </div>
@@ -84,9 +85,9 @@ export default function Calculator({ quoteId, canMargin }: { quoteId: string | n
           {calc.rows.map((r) => (
             <div className="inv-line" key={r.id}>
               <input className="ed" value={r.category} placeholder="e.g. Carhartt jackets" onChange={(e) => setLine(r.id, { category: e.target.value })} />
-              <input className="ed num" type="number" step="0.01" value={r.buy} onChange={(e) => setLine(r.id, { buy: +e.target.value || 0 })} />
-              <input className="ed num" type="number" value={r.qty} onChange={(e) => setLine(r.id, { qty: +e.target.value || 0 })} />
-              <input className="ed num" type="number" step="0.01" value={r.kg} onChange={(e) => setLine(r.id, { kg: +e.target.value || 0 })} />
+              <NumberInput className="ed num" value={r.buy} onValueChange={(v) => setLine(r.id, { buy: v })} min={0} step={0.01} />
+              <NumberInput className="ed num" value={r.qty} onValueChange={(v) => setLine(r.id, { qty: v })} min={0} />
+              <NumberInput className="ed num" value={r.kg} onValueChange={(v) => setLine(r.id, { kg: v })} min={0} step={0.01} />
               <button className="rm" onClick={() => rmLine(r.id)}>×</button>
             </div>
           ))}

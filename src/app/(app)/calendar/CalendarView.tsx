@@ -64,11 +64,14 @@ export default function CalendarView({ events }: { events: CalEvent[] }) {
   const goToday = () => { const t = new Date(); setCursor(t); setMini(t); };
   const jump = (d: Date, v?: View) => { setCursor(d); setMini(d); if (v) setView(v); };
 
-  function saveEvent(title: string, date: string, time: string) {
+  function saveEvent(ev: { title: string; date: string; time: string; duration: number; invitees: string[] }) {
     start(async () => {
-      await addTaskAction({ title, type: "Follow-up", priority: "Medium", dueDate: new Date(`${date}T${time}`).toISOString() });
+      const dur = ev.duration >= 60 && ev.duration % 60 === 0 ? `${ev.duration / 60}h` : `${ev.duration}m`;
+      const who = ev.invitees.length ? ` · with ${ev.invitees.join(", ")}` : "";
+      const title = `${ev.title} (${dur})${who}`;
+      await addTaskAction({ title, type: "Meeting", priority: "Medium", dueDate: new Date(`${ev.date}T${ev.time}`).toISOString() });
       setCreating(null);
-      showToast("Added to calendar");
+      showToast("Event added to calendar");
       router.refresh();
     });
   }
@@ -232,10 +235,22 @@ function TimeGrid({ days, byDay, onSlot }: { days: Date[]; byDay: Record<string,
   );
 }
 
-function CreateModal({ init, onClose, onSave }: { init: { date: string; time: string }; onClose: () => void; onSave: (title: string, date: string, time: string) => void }) {
+const DURATIONS = [15, 30, 45, 60, 90, 120];
+
+function CreateModal({ init, onClose, onSave }: { init: { date: string; time: string }; onClose: () => void; onSave: (ev: { title: string; date: string; time: string; duration: number; invitees: string[] }) => void }) {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState(init.date);
   const [time, setTime] = useState(init.time);
+  const [duration, setDuration] = useState(30);
+  const [inviteeText, setInviteeText] = useState("");
+
+  const invitees = inviteeText.split(",").map((s) => s.trim()).filter(Boolean);
+  const endTime = (() => {
+    const [h, m] = time.split(":").map(Number);
+    const end = new Date(0, 0, 0, h, m + duration);
+    return `${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`;
+  })();
+
   return (
     <div className="gcal-modal-wrap" onClick={onClose}>
       <div className="gcal-modal" onClick={(e) => e.stopPropagation()}>
@@ -244,12 +259,29 @@ function CreateModal({ init, onClose, onSave }: { init: { date: string; time: st
           <button className="gcal-modal-x" onClick={onClose}>×</button>
         </div>
         <div className="gcal-modal-body">
-          <label className="gcal-field"><span>Date</span><input className="ui-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
-          <label className="gcal-field"><span>Time</span><input className="ui-input" type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
+          <div className="gcal-field-row">
+            <label className="gcal-field"><span>Date</span><input className="ui-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
+            <label className="gcal-field"><span>Start</span><input className="ui-input" type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
+          </div>
+          <label className="gcal-field">
+            <span>Duration <small style={{ color: "var(--faint)", fontWeight: 500 }}>· ends {endTime}</small></span>
+            <div className="gcal-dur">
+              {DURATIONS.map((d) => (
+                <button key={d} className={duration === d ? "on" : ""} onClick={() => setDuration(d)}>{d >= 60 && d % 60 === 0 ? `${d / 60}h` : `${d}m`}</button>
+              ))}
+            </div>
+          </label>
+          <label className="gcal-field">
+            <span>Invitees <small style={{ color: "var(--faint)", fontWeight: 500 }}>· comma-separated emails or names</small></span>
+            <input className="ui-input" placeholder="alex@client.com, Priya…" value={inviteeText} onChange={(e) => setInviteeText(e.target.value)} />
+          </label>
+          {invitees.length > 0 && (
+            <div className="gcal-chips">{invitees.map((p, i) => <span className="gcal-invitee" key={i}>{p}</span>)}</div>
+          )}
         </div>
         <div className="gcal-modal-foot">
           <button className="btn ghost" onClick={onClose}>Cancel</button>
-          <button className="btn primary" onClick={() => title.trim() && onSave(title.trim(), date, time)}>Save</button>
+          <button className="btn primary" onClick={() => title.trim() && onSave({ title: title.trim(), date, time, duration, invitees })}>Save</button>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
 import Select from "@/components/ui/Select";
+import NumberInput from "@/components/ui/NumberInput";
 import { createDealAction } from "../../sales/record-actions";
 
 const STAGES = ["Appointment Scheduled", "Showed up", "Initiation", "Closed Won"];
@@ -65,7 +66,7 @@ export default function NewDealForm({
           </div>
           <div className="dg-row">
             <span className="dg-label">Amount ($)</span>
-            <input className="ui-input" type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value) || 0)} />
+            <NumberInput value={amount} onValueChange={setAmount} min={0} prefix="$" />
           </div>
           <div className="dg-row">
             <span className="dg-label">Stage</span>

@@ -49,7 +49,6 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
       <Topbar title={company.name} sub={`${company.clientId} · ${company.type ?? "Account"}`} />
       <div style={{ marginBottom: 12 }}>
         <Link href="/companies" className="back-link">← Leads</Link>
-        <Link href={`/deals/new?company=${company.id}`} className="addq" style={{ marginLeft: 12 }}>+ New deal</Link>
       </div>
 
       <div className="record-3">
@@ -120,6 +119,9 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
                 </Link>
               ))}
               {company.deals.length === 0 && <div className="q-note" style={{ padding: 16 }}>No deals yet.</div>}
+              <div style={{ padding: "8px 16px" }}>
+                <Link href={`/deals/new?company=${company.id}`} className="addline">+ New deal</Link>
+              </div>
             </div>
           </section>
 
