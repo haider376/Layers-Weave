@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Sparkline from "@/components/Sparkline";
 import { showToast } from "@/components/Toast";
 import { STEP_META, type StepType, type DueStep } from "@/lib/cadences";
-import { completeStepAction, createCadenceAction } from "@/app/actions/cadences";
+import { completeStepAction, createAndOpenCadenceAction } from "@/app/actions/cadences";
 import DialPad from "./DialPad";
 import CadenceList, { type CadenceRow } from "./CadenceList";
 
@@ -64,12 +64,6 @@ export default function CadenceDashboard({ cadences, dueSteps, feed, me, stats }
     });
   }
 
-  function newCadence() {
-    start(async () => {
-      const r = await createCadenceAction({ name: "Untitled cadence" });
-      router.push(`/cadences/${r.id}`);
-    });
-  }
 
   return (
     <div className="cad">
@@ -102,7 +96,9 @@ export default function CadenceDashboard({ cadences, dueSteps, feed, me, stats }
         <button className={tab === "rhythm" ? "on" : ""} onClick={() => setTab("rhythm")}>Rhythm</button>
         <button className={tab === "cadences" ? "on" : ""} onClick={() => setTab("cadences")}>Cadences</button>
         <span style={{ flex: 1 }} />
-        <button className="btn primary" style={{ flex: "none", padding: "8px 16px" }} onClick={newCadence}>+ Create cadence</button>
+        <form action={createAndOpenCadenceAction}>
+          <button type="submit" className="btn primary" style={{ flex: "none", padding: "8px 16px" }}>+ Create cadence</button>
+        </form>
       </div>
 
       {tab === "rhythm" ? (

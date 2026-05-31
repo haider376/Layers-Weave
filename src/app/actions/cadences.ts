@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
@@ -33,6 +34,24 @@ export async function createCadenceAction(input: { name: string; function?: stri
   });
   revalidate();
   return { id: cadence.id };
+}
+
+// Create a cadence and navigate straight to its builder. Redirecting from the
+// server action is the reliable way to open a freshly-created dynamic route
+// (client-side router.push after a revalidating action can no-op).
+export async function createAndOpenCadenceAction() {
+  const user = await guard();
+  const cadence = await prisma.cadence.create({
+    data: {
+      name: "Untitled cadence",
+      function: "Outbound",
+      priority: "Medium",
+      ownerId: user.id,
+      steps: { create: [{ day: 0, type: "call", subject: "First touch", position: 0 }] },
+    },
+  });
+  revalidatePath("/cadences");
+  redirect(`/cadences/${cadence.id}`);
 }
 
 export async function updateCadenceAction(id: string, data: { name?: string; function?: string; priority?: string; active?: boolean }) {
