@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 
-export default function PeriodTabs({ period }: { period: string }) {
+export default function PeriodTabs({ period, basePath = "/reports" }: { period: string; basePath?: string }) {
   const tabs = [
     { k: "daily", label: "Daily" },
     { k: "weekly", label: "Weekly" },
     { k: "monthly", label: "Monthly" },
   ];
   return (
-    <div className="roles" style={{ marginBottom: 18 }}>
+    <div className="seg" style={{ marginBottom: 18 }}>
       {tabs.map((t) => (
-        <Link key={t.k} href={`/reports?period=${t.k}`} className={`rl${period === t.k ? " on" : ""}`}>
+        <Link key={t.k} href={`${basePath}?period=${t.k}`} className={period === t.k ? "on" : ""}>
           {t.label}
         </Link>
       ))}

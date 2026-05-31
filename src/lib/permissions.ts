@@ -80,13 +80,10 @@ export function canAccessLogistics(role: string): boolean {
   return LOGISTICS_ROLES.includes(role as Role);
 }
 
-// Which notification audiences a role should see.
-export function audiencesFor(role: string): string[] {
-  const base = ["All"];
-  if (isAdmin(role)) return ["All", "Sales", "Supply", "Logistics", "Client"];
-  if (canAccessSupply(role) && (role === "Head of Supply" || role === "Womenswear")) return [...base, "Supply"];
-  if (role === "Logistics Coordinator") return [...base, "Logistics"];
-  return [...base, "Sales"]; // AEs, BDRs, lead gen
+// Which notification audiences a role should see. Sales-only CRM — no
+// Supply/Logistics/Client audiences surface anywhere.
+export function audiencesFor(_role: string): string[] {
+  return ["All", "Sales"];
 }
 
 // Who can reassign AE / BDR owners on accounts (CRM specialist, manager, CRO, Rija).

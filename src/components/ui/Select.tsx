@@ -1,11 +1,12 @@
 "use client";
 
 import * as RS from "@radix-ui/react-select";
-import { motion } from "framer-motion";
 
-export type Opt = { value: string; label: string };
+export type Opt = { value: string; label: string; badge?: string };
 
 // Brand-styled, animated select — replaces native <select> everywhere.
+// Animation is CSS-driven (on [data-state]) so it never conflicts with Radix's
+// popper positioning (which is what made menus fly in from the top-left).
 export default function Select({
   value, onValueChange, options, placeholder = "Select…", className = "", disabled, size = "md",
 }: {
@@ -17,7 +18,6 @@ export default function Select({
   disabled?: boolean;
   size?: "sm" | "md";
 }) {
-  // Radix forbids empty-string item values, so map "" <-> a sentinel internally.
   const EMPTY = "__none__";
   const opts: Opt[] = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
   const toRadix = (v: string) => (v === "" ? EMPTY : v);
@@ -31,19 +31,17 @@ export default function Select({
         </RS.Icon>
       </RS.Trigger>
       <RS.Portal>
-        <RS.Content position="popper" sideOffset={6} className="ui-select-content" asChild>
-          <motion.div initial={{ opacity: 0, y: -4, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.14, ease: [0.2, 0.7, 0.2, 1] }}>
-            <RS.Viewport>
-              {opts.map((o) => (
-                <RS.Item key={o.value || EMPTY} value={toRadix(o.value)} className="ui-select-item">
-                  <RS.ItemText>{o.label}</RS.ItemText>
-                  <RS.ItemIndicator className="ui-select-check">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  </RS.ItemIndicator>
-                </RS.Item>
-              ))}
-            </RS.Viewport>
-          </motion.div>
+        <RS.Content position="popper" sideOffset={6} collisionPadding={10} className="ui-select-content">
+          <RS.Viewport className="ui-select-vp">
+            {opts.map((o) => (
+              <RS.Item key={o.value || EMPTY} value={toRadix(o.value)} className="ui-select-item">
+                <RS.ItemText>{o.badge ? <span className={`badge badge-${o.badge}`}>{o.label}</span> : o.label}</RS.ItemText>
+                <RS.ItemIndicator className="ui-select-check">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                </RS.ItemIndicator>
+              </RS.Item>
+            ))}
+          </RS.Viewport>
         </RS.Content>
       </RS.Portal>
     </RS.Root>

@@ -907,3 +907,22 @@ tbody tr.row{transition:background .14s ease}
 .btn:active,.lbtn:active{transform:translateY(1px)}
 .nav a,.nav-btn{transition:background .15s ease,color .15s ease,transform .12s ease}
 .nav a:hover,.nav-btn:hover{transform:translateX(2px)}
+
+/* Radix Select — CSS-driven entrance that respects popper positioning */
+.ui-select-content{transform-origin:var(--radix-select-content-transform-origin);
+  animation:uiSelIn .14s cubic-bezier(.2,.7,.2,1)}
+.ui-select-content[data-state=closed]{animation:uiSelOut .1s ease}
+@keyframes uiSelIn{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes uiSelOut{from{opacity:1}to{opacity:0}}
+
+/* Empty reports keep full size (no awkward gaps) */
+.an-card{min-height:240px;display:flex;flex-direction:column}
+.an-card .an-body{flex:1;display:flex;flex-direction:column}
+.an-card .q-note{margin:auto;text-align:center;color:var(--faint)}
+.coach{min-height:0}
+
+/* Goals progress track + seg links */
+.goal-track{height:7px;background:var(--panel-2);border-radius:5px;overflow:hidden}
+.goal-track i{display:block;height:100%;background:var(--neon);border-radius:5px;transform-origin:left;animation:growBar .8s cubic-bezier(.22,.61,.36,1) both}
+.seg a{display:inline-flex;align-items:center;text-decoration:none;color:var(--muted);font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;transition:.14s}
+.seg a.on{background:var(--neon);color:var(--neon-ink)}

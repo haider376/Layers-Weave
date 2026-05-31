@@ -4,16 +4,17 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import Logo, { initials } from "./Logo";
-import { logoutAction, updateAvatarAction, setViewAsAction } from "@/app/actions/session";
-import { ROLE_LABEL, type Role } from "@/lib/permissions";
+import { updateAvatarAction } from "@/app/actions/session";
 import AvatarCropper from "./AvatarCropper";
-import Select from "./ui/Select";
 import WeaveMark from "./WeaveMark";
 import { showToast } from "./Toast";
 
 const ICONS = {
   dash: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" /></svg>,
   analytics: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M18 9l-5 5-3-3-4 4" /></svg>,
+  revenue: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>,
+  goals: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></svg>,
+  activity: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>,
   pipeline: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="13" width="3" height="4" /></svg>,
   companies: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-4" /></svg>,
   contacts: <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" /><path d="M4 21v-1a6 6 0 0112 0v1" /></svg>,
@@ -30,25 +31,15 @@ const ICONS = {
 export default function Sidebar({
   user,
   salesCount,
-  viewableRoles,
-  leaderboard = [],
 }: {
-  user: { name: string; role: string; realRole: string; isAdmin: boolean; viewingAs: string | null; avatarUrl: string | null };
+  user: { name: string; avatarUrl: string | null };
   salesCount: number;
-  access: { sales: boolean; supply: boolean; logistics: boolean };
-  viewableRoles: { value: string; label: string }[];
-  leaderboard?: { name: string; wins: number }[];
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState(user.avatarUrl);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
 
-  async function onViewAs(role: string) {
-    await setViewAsAction(role === user.realRole ? null : role);
-    router.refresh();
-  }
   function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -72,8 +63,6 @@ export default function Sidebar({
     </Link>
   );
 
-  const roleLabel = ROLE_LABEL[user.role as Role] ?? user.role;
-
   return (
     <aside className="side">
       <div className="logo-wrap logo-row">
@@ -86,7 +75,8 @@ export default function Sidebar({
         <div className="nav-label">Overview</div>
         <nav className="nav">
           <Nav href="/dashboard" label="Dashboard" icon={ICONS.dash} />
-          <Nav href="/reports" label="Analytics" icon={ICONS.analytics} />
+          <Nav href="/reports" label="Sales Analytics" icon={ICONS.analytics} />
+          <Nav href="/revenue" label="Revenue Analytics" icon={ICONS.revenue} />
         </nav>
       </div>
 
@@ -105,8 +95,10 @@ export default function Sidebar({
         <nav className="nav">
           <Nav href="/calendar" label="Calendar" icon={ICONS.calendar} />
           <Nav href="/inbox" label="Inbox" icon={ICONS.inbox} />
+          <Nav href="/activity" label="Activity Feed" icon={ICONS.activity} />
           <Nav href="/calls" label="Coaching" icon={ICONS.calls} />
           <Nav href="/leaderboard" label="Leaderboard" icon={ICONS.trophy} />
+          <Nav href="/goals" label="Goals" icon={ICONS.goals} />
         </nav>
       </div>
 
@@ -116,18 +108,6 @@ export default function Sidebar({
           <Nav href="/calculator" label="Price Calculator" icon={ICONS.calc} />
         </nav>
       </div>
-
-      {user.isAdmin && (
-        <div className="nav-group">
-          <div className="nav-label">View as</div>
-          <Select
-            value={user.viewingAs ?? user.realRole}
-            onValueChange={onViewAs}
-            className="ui-block"
-            options={viewableRoles.map((r) => ({ value: r.value, label: r.value === user.realRole ? `${r.label} (you)` : r.label }))}
-          />
-        </div>
-      )}
 
       </div>
 

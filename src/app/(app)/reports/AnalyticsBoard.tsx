@@ -24,12 +24,13 @@ export type Card =
 
 export type Kpi = { label: string; value: string; sub: string; accent?: "neon" | "vio" };
 
-export default function AnalyticsBoard({ kpis, cards }: { kpis: Kpi[]; cards: Card[] }) {
+export default function AnalyticsBoard({ kpis, cards, storageKey = "analytics-order" }: { kpis: Kpi[]; cards: Card[]; storageKey?: string }) {
+  const KEY = `lw-${storageKey}`;
   const [order, setOrder] = useState<string[]>(cards.map((c) => c.id));
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem("lw-analytics-order") : null;
+    const saved = typeof window !== "undefined" ? localStorage.getItem(KEY) : null;
     if (saved) {
       try {
         const ids = JSON.parse(saved) as string[];
@@ -38,11 +39,11 @@ export default function AnalyticsBoard({ kpis, cards }: { kpis: Kpi[]; cards: Ca
         setOrder([...valid, ...missing]);
       } catch { /* ignore */ }
     }
-  }, [cards]);
+  }, [cards, KEY]);
 
   function persist(next: string[]) {
     setOrder(next);
-    try { localStorage.setItem("lw-analytics-order", JSON.stringify(next)); } catch { /* ignore */ }
+    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore */ }
   }
 
   const byId = Object.fromEntries(cards.map((c) => [c.id, c]));

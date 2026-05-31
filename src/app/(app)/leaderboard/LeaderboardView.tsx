@@ -20,7 +20,7 @@ function Board({ title, rows, accent }: { title: string; rows: LbRow[]; accent: 
     <section className="lb-board">
       <div className="lb-h">
         <span className="eyebrow">{title}</span>
-        <h2 className="font-display">{title === "Account Executives" ? "AE ARENA" : "BDR ARENA"}</h2>
+        <h2 className="font-display">{title === "Account Executives" ? "AE Leaderboard" : "BDR Leaderboard"}</h2>
       </div>
 
       <div className="lb-podium">

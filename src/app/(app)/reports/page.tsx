@@ -39,7 +39,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     { label: "SQLs", value: String(meetings), sub: "booked", accent: "vio" },
     { label: "Calls", value: callsInPeriod.toLocaleString("en-US"), sub: "logged" },
     { label: "Emails", value: String(emails), sub: "sent" },
-    { label: "Quotes", value: String(quotes.filter((q) => q.status === "In Progress").length), sub: `${fulfilments.filter((f) => f.orderStage !== "Delivered").length} shipping`, accent: "vio" },
+    { label: "Win rate", value: `${deals.filter((d) => d.stage.startsWith("Closed")).length ? Math.round((won.length / deals.filter((d) => d.stage.startsWith("Closed")).length) * 100) : 0}%`, sub: "closed deals", accent: "vio" },
   ];
 
   // donut: pipeline by stage
@@ -64,7 +64,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   // bars: deal count by owner
   const dealsByOwner = new Map<string, number>();
   for (const d of deals) { const n = d.owner?.name ?? "—"; dealsByOwner.set(n, (dealsByOwner.get(n) ?? 0) + 1); }
-  const dealBars = [...dealsByOwner.entries()].sort((a, b) => b[1] - a[1]).map(([label, n]) => ({ label, value: String(n), pct: n, color: "var(--violet-br)" }));
+  const dealBars = [...dealsByOwner.entries()].sort((a, b) => b[1] - a[1]).map(([label, n]) => ({ label, value: String(n), pct: n, color: "var(--muted)" }));
 
   // stacked: call outcomes by rep
   const byAgent = new Map<string, Map<string, number>>();
@@ -114,9 +114,9 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <Topbar title="Analytics" sub="Drag to rearrange · click ⤢ to expand any chart" />
+      <Topbar title="Sales Analytics" sub="Pipeline, conversion, calls & sales KPIs" />
       <PeriodTabs period={period} />
-      <AnalyticsBoard kpis={kpis} cards={cards} />
+      <AnalyticsBoard kpis={kpis} cards={cards} storageKey="sales-order" />
     </>
   );
 }

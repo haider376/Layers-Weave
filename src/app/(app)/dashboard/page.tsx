@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { initials } from "@/components/Logo";
 import Topbar from "@/components/Topbar";
@@ -29,22 +29,18 @@ function timeAgo(d: Date) {
 export default async function DashboardPage() {
   await getCurrentUser();
 
-  const [deals, quotes, fulfilments, activities] = await Promise.all([
+  const [deals, meetings, calls, activities] = await Promise.all([
     prisma.deal.findMany({ include: { owner: true } }),
-    prisma.quote.findMany(),
-    prisma.fulfilment.findMany(),
-    prisma.activity.findMany({ orderBy: { createdAt: "desc" }, take: 6 }),
+    prisma.salesMeeting.count({ where: { bookedDate: { gte: new Date(Date.now() - 7 * 86400000) } } }),
+    safe(prisma.callLog.count({ where: { createdAt: { gte: new Date(Date.now() - 7 * 86400000) } } }), 0),
+    // Sales-only activity feed (no supply/ship)
+    prisma.activity.findMany({ where: { kind: "sale" }, orderBy: { createdAt: "desc" }, take: 7 }),
   ]);
 
   const open = deals.filter((d) => !["Closed Won", "Closed Lost", "Disqualified"].includes(d.stage));
   const pipelineValue = open.reduce((s, d) => s + d.amount, 0);
   const won = deals.filter((d) => d.stage === "Closed Won");
   const wonValue = won.reduce((s, d) => s + d.amount, 0);
-
-  const activeQuotes = quotes.filter((q) => q.status === "In Progress");
-  const bulk = activeQuotes.filter((q) => q.type === "Bulk").length;
-  const handpick = activeQuotes.filter((q) => q.type === "Handpick").length;
-  const inTransit = fulfilments.filter((f) => f.orderStage !== "Delivered").length;
 
   // Funnel
   const funnel = STAGES.map((s) => ({ name: s, count: deals.filter((d) => d.stage === s).length }));
@@ -62,7 +58,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <Topbar title="Dashboard" sub="Company-wide view across Sales, Supply and Logistics" />
+      <Topbar title="Dashboard" sub="Your sales floor at a glance" />
 
       <div className="kpis">
         <div className="kpi">
@@ -86,20 +82,20 @@ export default async function DashboardPage() {
         <div className="kpi v">
           <span className="bar" />
           <div className="lbl">
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6" /></svg>
-            Active quotes
+            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+            SQLs booked
           </div>
-          <div className="val vio">{activeQuotes.length}</div>
-          <div className="delta">{bulk} bulk · {handpick} handpick</div>
+          <div className="val vio">{meetings}</div>
+          <div className="delta">last 7 days</div>
         </div>
-        <div className="kpi a">
+        <div className="kpi">
           <span className="bar" />
           <div className="lbl">
-            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 7h11v8H3z" /><path d="M14 10h4l3 3v2h-7z" /></svg>
-            In transit
+            <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z" /></svg>
+            Calls
           </div>
-          <div className="val">{inTransit}</div>
-          <div className="delta">Expost · ECL · Rapidex</div>
+          <div className="val">{calls.toLocaleString("en-US")}</div>
+          <div className="delta">last 7 days</div>
         </div>
       </div>
 
@@ -117,16 +113,14 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <section className="panel">
-            <div className="panel-h"><h2>Cross-team activity</h2></div>
+            <div className="panel-h"><h2>Recent activity</h2></div>
             <div className="feed">
               {activities.map((a) => (
-                <div className={`ev ${a.kind}`} key={a.id}>
+                <div className="ev sale" key={a.id}>
                   <div className="ic">
-                    {a.kind === "sale" && <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>}
-                    {a.kind === "supply" && <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4 8 4 8-4z" /><path d="M4 7v10l8 4 8-4V7" /></svg>}
-                    {a.kind === "ship" && <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M3 7h11v8H3z" /><path d="M14 10h4l3 3v2h-7z" /><circle cx="7" cy="17" r="2" /><circle cx="17" cy="17" r="2" /></svg>}
+                    <svg fill="none" strokeWidth={2} viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
                   </div>
                   <div>
                     <div className="bd">{a.body}</div>
@@ -134,6 +128,7 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               ))}
+              {activities.length === 0 && <div className="q-note" style={{ padding: 16 }}>No activity yet.</div>}
             </div>
           </section>
 
