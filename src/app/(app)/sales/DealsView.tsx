@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
 import Board, { type BoardDeal } from "./Board";
 
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Handpick / Bulk Vintage", "Closed Won", "Closed Lost", "Disqualified"];
@@ -12,22 +13,51 @@ function stageCls(s: string) {
 
 export default function DealsView({ deals }: { deals: BoardDeal[] }) {
   const [view, setView] = useState<"board" | "table" | "report">("board");
+  const [q, setQ] = useState("");
+  const [fstate, setFstate] = useState<FilterState>({});
+
+  const filterDefs: FilterDef[] = useMemo(() => {
+    const uniq = (arr: (string | null | undefined)[]) => [...new Set(arr.filter((x): x is string => !!x && x !== "—"))].sort();
+    return [
+      { key: "stage", label: "Stage", type: "multi", options: STAGES.map((s) => ({ value: s, label: s })) },
+      { key: "ownerName", label: "Owner", type: "multi", options: uniq(deals.map((d) => d.ownerName)).map((o) => ({ value: o, label: o })) },
+      { key: "company", label: "Company", type: "multi", options: uniq(deals.map((d) => d.company)).map((c) => ({ value: c, label: c })) },
+    ];
+  }, [deals]);
+
+  const filtered = useMemo(() => {
+    let r = deals;
+    for (const def of filterDefs) {
+      const v = fstate[def.key];
+      if (def.type === "multi" && Array.isArray(v) && v.length) {
+        r = r.filter((d) => v.includes(String((d as unknown as Record<string, unknown>)[def.key] ?? "")));
+      }
+    }
+    if (q.trim()) {
+      const t = q.toLowerCase();
+      r = r.filter((d) => d.name.toLowerCase().includes(t) || (d.company ?? "").toLowerCase().includes(t) || (d.ownerName ?? "").toLowerCase().includes(t));
+    }
+    return r;
+  }, [deals, q, fstate, filterDefs]);
 
   return (
     <div>
       <div className="lv-toolbar">
         <div className="seg">{(["board", "table", "report"] as const).map((v) => <button key={v} className={view === v ? "on" : ""} onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}</div>
+        <input className="ed lv-search" style={{ border: "1px solid var(--line-2)" }} placeholder="Filter deals…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
 
-      {view === "board" && <Board deals={deals} />}
+      <FilterBar filters={filterDefs} state={fstate} onChange={(k, v) => setFstate((s) => ({ ...s, [k]: v }))} onClear={() => setFstate({})} />
+
+      {view === "board" && <Board deals={filtered} />}
 
       {view === "table" && (
         <section className="panel">
-          <div className="panel-h"><h2>All deals</h2><span className="count">{deals.length}</span></div>
+          <div className="panel-h"><h2>All deals</h2><span className="count">{filtered.length}</span></div>
           <table>
             <thead><tr><th>Deal</th><th>Company</th><th>Stage</th><th>Owner</th><th>Amount</th></tr></thead>
             <tbody>
-              {deals.map((d) => (
+              {filtered.map((d) => (
                 <tr className="row" key={d.id}>
                   <td><Link href={`?deal=${d.id}`} scroll={false} style={{ fontWeight: 600, textDecoration: "none" }}>{d.name}</Link></td>
                   <td>{d.company ?? "—"}</td>
@@ -41,7 +71,7 @@ export default function DealsView({ deals }: { deals: BoardDeal[] }) {
         </section>
       )}
 
-      {view === "report" && <DealsReport deals={deals} />}
+      {view === "report" && <DealsReport deals={filtered} />}
     </div>
   );
 }
