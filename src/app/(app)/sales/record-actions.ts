@@ -131,12 +131,26 @@ export async function logNoteAction(input: { companyId: string; dealId?: string;
 
 export async function sendEmailAction(input: { companyId: string; dealId?: string; contactId?: string; toAddr: string; subject: string; body: string }) {
   const user = await guard();
-  if (!input.subject.trim() && !input.body.trim()) return;
+  if (!input.subject.trim() && !input.body.trim()) return { sentVia: "none" as const };
+
+  // If the rep has connected Google (Gmail scope), actually send the email from
+  // their own account; otherwise just log it as an outbound touch.
+  let sentVia: "gmail" | "logged" = "logged";
+  let deliveryError: string | undefined;
+  const conn = await getConnection(user.id).catch(() => ({ connected: false, accountEmail: null }));
+  if (conn.connected && input.toAddr && /\S+@\S+\.\S+/.test(input.toAddr)) {
+    const htmlBody = input.body.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+    const r = await sendGmail(user.id, { to: input.toAddr, subject: input.subject.trim() || "(no subject)", body: htmlBody, fromName: user.name });
+    if (r.ok) sentVia = "gmail"; else deliveryError = r.error;
+  }
+
   await prisma.emailMessage.create({
-    data: { direction: "outbound", subject: input.subject.trim() || "(no subject)", body: input.body.trim(), fromAddr: user.email, toAddr: input.toAddr || "client@example.com", companyId: input.companyId, dealId: input.dealId, contactId: input.contactId },
+    data: { direction: "outbound", subject: input.subject.trim() || "(no subject)", body: input.body.trim(), fromAddr: conn.accountEmail || user.email, toAddr: input.toAddr || "client@example.com", companyId: input.companyId, dealId: input.dealId, contactId: input.contactId },
   });
+  await prisma.activity.create({ data: { kind: "sale", type: "email", body: `${sentVia === "gmail" ? "Email sent via Gmail" : "Email logged"}: ${input.subject.trim() || "(no subject)"}`, actor: user.name, companyId: input.companyId, dealId: input.dealId, contactId: input.contactId } });
   await prisma.company.update({ where: { id: input.companyId }, data: { lastContacted: new Date() } });
   bump(input.companyId);
+  return { sentVia, error: deliveryError };
 }
 
 // Click-to-call (Zoom Phone) — two-step disposition: connected + sentiment.
