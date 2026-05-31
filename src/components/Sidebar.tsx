@@ -91,9 +91,9 @@ export default function Sidebar({
       <div className="nav-group">
         <div className="nav-label">Sales</div>
         <nav className="nav">
-          <Nav href="/sales" label="Pipeline" icon={ICONS.pipeline} pill={salesCount} />
-          <Nav href="/companies" label="Companies" icon={ICONS.companies} />
-          <Nav href="/contacts" label="Contacts" icon={ICONS.contacts} />
+          <Nav href="/sales" label="Deals" icon={ICONS.pipeline} pill={salesCount} />
+          <Nav href="/companies" label="Leads" icon={ICONS.companies} />
+          <Nav href="/contacts" label="People" icon={ICONS.contacts} />
           <Nav href="/tasks" label="Tasks" icon={ICONS.tasks} />
         </nav>
       </div>
@@ -103,7 +103,7 @@ export default function Sidebar({
         <nav className="nav">
           <Nav href="/calendar" label="Calendar" icon={ICONS.calendar} />
           <Nav href="/inbox" label="Inbox" icon={ICONS.inbox} />
-          <Nav href="/calls" label="Call Analyzer" icon={ICONS.calls} />
+          <Nav href="/calls" label="Coaching" icon={ICONS.calls} />
           <Nav href="/leaderboard" label="Leaderboard" icon={ICONS.trophy} />
         </nav>
       </div>
@@ -112,11 +112,6 @@ export default function Sidebar({
         <div className="nav-label">Tools</div>
         <nav className="nav">
           <Nav href="/calculator" label="Price Calculator" icon={ICONS.calc} />
-          <Nav href="/settings" label="Settings" icon={ICONS.settings} />
-          <button className="nav-btn" onClick={() => logoutAction()}>
-            {ICONS.signout}
-            Sign out
-          </button>
         </nav>
       </div>
 
@@ -141,7 +136,6 @@ export default function Sidebar({
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={onAvatarChange} />
         <div className="side-foot-id">
           <div className="nm">{user.name}</div>
-          <div className="rl">{roleLabel}</div>
         </div>
       </div>
 

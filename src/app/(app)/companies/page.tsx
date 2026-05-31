@@ -31,7 +31,7 @@ export default async function CompaniesPage() {
 
   return (
     <>
-      <Topbar title="Companies" sub={`${companies.length} accounts across your book of business`} />
+      <Topbar title="Leads" sub={`${companies.length} accounts across your book of business`} />
       <div className="with-rail">
        <div style={{ minWidth: 0 }}>
       <section className="panel">

@@ -40,7 +40,7 @@ export default async function SalesPage() {
 
   return (
     <>
-      <Topbar title="Sales Pipeline" sub="Deals from appointment to close — your 8 HubSpot stages" />
+      <Topbar title="Deals" sub="Drag deals across your 8 stages — appointment to close" />
       <div className="with-rail">
         <div style={{ minWidth: 0 }}>
           <Board deals={data} />

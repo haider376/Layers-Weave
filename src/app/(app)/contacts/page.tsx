@@ -19,7 +19,7 @@ export default async function ContactsPage() {
 
   return (
     <>
-      <Topbar title="Contacts" sub={`${contacts.length} people across your accounts`} />
+      <Topbar title="People" sub={`${contacts.length} people across your accounts`} />
       <div className="with-rail">
        <div style={{ minWidth: 0 }}>
       <section className="panel">

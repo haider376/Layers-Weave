@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { showToast } from "@/components/Toast";
 import { celebrate } from "@/components/Celebration";
@@ -136,7 +137,7 @@ export default function Board({ deals }: { deals: BoardDeal[] }) {
                       setOverStage(null);
                     }}
                   >
-                    <a className="dn dn-link" href={`?deal=${d.id}`}>{d.name}</a>
+                    <Link className="dn dn-link" href={`?deal=${d.id}`} scroll={false} prefetch={false}>{d.name}</Link>
                     <div className="meta">
                       <span className="amt">${d.amount.toLocaleString("en-US")}</span>
                       {d.quoteId && <span className="qid">{d.quoteId}</span>}
@@ -145,16 +146,6 @@ export default function Board({ deals }: { deals: BoardDeal[] }) {
                       <span className="av">{d.ownerInitials}</span>
                       Owner
                     </div>
-                    <select
-                      className="stage-select"
-                      value={d.stage}
-                      disabled={pending}
-                      onChange={(e) => changeStage(d, e.target.value)}
-                    >
-                      {STAGES.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
                   </div>
                 ))}
                 {colDeals.length === 0 && <div style={{ fontSize: 11, color: "var(--faint)", padding: 4 }}>—</div>}

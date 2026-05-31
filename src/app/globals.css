@@ -796,3 +796,26 @@ html.compact tbody td{padding:8px 14px}
 html.compact .mini-row{padding:7px 14px}
 html.compact .kpis{gap:10px;margin-bottom:14px}
 html.compact .grid2,html.compact .an-grid,html.compact .with-rail{gap:12px}
+
+/* ── Topbar icon cluster + collapsible search ────────────────── */
+.topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.search-c{display:flex;align-items:center;height:38px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:border-radius .2s ease}
+.search-c.open{border-radius:30px;border-color:var(--line-2)}
+.search-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--muted);cursor:pointer;flex:none}
+.search-btn svg{width:17px;height:17px;stroke:currentColor}
+.search-c:hover .search-btn{color:var(--text)}
+.search-inp{width:0;border:none;background:none;outline:none;color:var(--text);font-family:inherit;font-size:12.5px;padding:0;transition:width .25s ease,padding .25s ease}
+.search-c.open .search-inp{width:220px;padding:0 14px 0 2px}
+.search-inp::placeholder{color:var(--faint)}
+
+/* ── Sleek brand dropdowns (custom chevron) ──────────────────── */
+select.ed,select.dg-input,.viewas-select,select.se-input,.stage-select,select.search-c{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C8C93' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center;padding-right:26px;cursor:pointer;
+}
+select.ed:hover,select.dg-input:hover,.viewas-select:hover,select.se-input:hover,.stage-select:hover{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A5EB00' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+select.dg-input,select.ed,.viewas-select,select.se-input{transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
+select.dg-input:focus,select.ed:focus,select.se-input:focus{box-shadow:0 0 0 2px var(--neon-soft)}

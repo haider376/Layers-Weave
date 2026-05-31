@@ -59,7 +59,7 @@ export default async function CallsPage() {
 
   return (
     <>
-      <Topbar title="Call Analyzer" sub="AI call analytics, sentiment & coaching for the sales floor" />
+      <Topbar title="Coaching" sub="AI call analytics, sentiment & coaching for the sales floor" />
 
       <div className="kpis" style={{ gridTemplateColumns: "repeat(4,1fr)" }}>
         <div className="kpi"><span className="bar" /><div className="lbl">Calls analyzed</div><div className="val neon">{total.toLocaleString("en-US")}</div><div className="delta">all reps</div></div>

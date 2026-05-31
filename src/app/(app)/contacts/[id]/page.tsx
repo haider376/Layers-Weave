@@ -25,7 +25,7 @@ export default async function ContactDetail({ params }: { params: Promise<{ id: 
     <>
       <Topbar title={contact.name} sub={`${contact.title ?? "Contact"} · ${contact.company.name}`} />
       <div style={{ marginBottom: 12 }}>
-        <Link href="/contacts" className="back-link">← Contacts</Link>
+        <Link href="/contacts" className="back-link">← People</Link>
         <Link href={`/companies/${contact.companyId}`} className="back-link" style={{ marginLeft: 12 }}>↗ {contact.company.name}</Link>
       </div>
 
