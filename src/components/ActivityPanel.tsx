@@ -133,12 +133,14 @@ export default function ActivityPanel({
               <button className="dial-btn" disabled={!contact?.phone} onClick={async () => {
                 const num = contact?.phone ?? "";
                 if (!num) return;
-                showToast("Calling via Zoom Phone…");
+                // Try Zoom click-to-call; if the account lacks the callout scope
+                // (or Zoom isn't configured), fall back to the device dialer.
+                // Either way, completed Zoom Phone calls auto-log via webhook.
                 try {
                   const r = await zoomCallAction(num);
-                  if (r.placed) showToast("Zoom is ringing your phone — pick up to connect");
-                  else window.location.href = `tel:${num}`; // fallback when Zoom not connected
-                } catch { window.location.href = `tel:${num}`; }
+                  if (r.placed) { showToast("Zoom is ringing your phone — pick up to connect"); return; }
+                } catch { /* fall through */ }
+                window.location.href = `tel:${num}`;
               }}>
                 <span className="dot" /> Dial {contact?.phone ?? "—"} via Zoom
               </button>

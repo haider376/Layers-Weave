@@ -20,11 +20,19 @@ App type shows **"Server-To-Server OAuth"** / **Account-level app**.
 - **Client ID**
 - **Client Secret**
 
-**Scopes** tab → add (search and tick):
-- `phone:read:list_call_logs:admin` (or the closest "call logs read" scope)
-- `phone:write:callout_call:admin` (click-to-call)
-- `phone:read:user:admin` / `user:read:user:admin` (look up the rep)
-- Then **Activate** the app.
+**Scopes** tab → add (search and tick the **:admin** variants):
+- `phone:read:call_log:admin` — "View a call log" **(required for auto-logging)**
+- `phone:read:call_recording:admin` — "View a call recording" (recording links)
+- `phone:read:user:admin` — "View a phone user"
+- `user:read:user:admin` — "View a user"
+
+Add a Scope description (Zoom requires one), then **Activate** the app.
+
+> **Click-to-call (call_out) note:** placing calls *through the API* needs a
+> `phone:write:callout_call` scope, which only appears on higher Zoom Phone /
+> ISV tiers. If your account doesn't list a "Call Out" scope, that's fine —
+> auto-logging works without it, and the "Dial via Zoom" button gracefully
+> falls back to your device dialer.
 
 ---
 
