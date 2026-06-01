@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { canAccessSales, canReassignOwner } from "@/lib/permissions";
 import { automationBookMeeting } from "@/lib/automations";
 import { getConnection, sendGmail } from "@/lib/google";
+import { ensureCadenceSchema } from "@/lib/ensureCadenceSchema";
 
 async function guard() {
   const user = await requireUser();
@@ -156,13 +157,24 @@ export async function sendEmailAction(input: { companyId: string; dealId?: strin
 // Click-to-call (Zoom Phone) — two-step disposition: connected + sentiment.
 export async function logCallAction(input: { companyId: string; dealId?: string; contactId: string; number: string; connected: boolean; sentiment: string; notes?: string }) {
   const user = await guard();
-  await prisma.callLog.create({
-    data: {
-      contactId: input.contactId, companyId: input.companyId, dealId: input.dealId, number: input.number || "—",
-      via: "Zoom Phone", connected: input.connected, outcome: input.sentiment, notes: input.notes,
-      agent: user.name, durationSec: input.connected ? 60 + Math.floor(Math.random() * 400) : 12,
-    },
-  });
+  const callData = {
+    contactId: input.contactId, companyId: input.companyId, dealId: input.dealId, number: input.number || "—",
+    via: "Zoom Phone", connected: input.connected, outcome: input.sentiment, notes: input.notes,
+    agent: user.name, durationSec: input.connected ? 60 + Math.floor(Math.random() * 400) : 12,
+  };
+  try {
+    await prisma.callLog.create({ data: callData });
+  } catch (e) {
+    // Prod DB may be missing the newer CallLog columns (recordingUrl/zoomCallId)
+    // if a migration was skipped — heal the schema once, then retry.
+    const msg = (e instanceof Error ? e.message : String(e)).toLowerCase();
+    if (msg.includes("column") || msg.includes("does not exist") || (e as { code?: string })?.code === "42703") {
+      await ensureCadenceSchema();
+      await prisma.callLog.create({ data: callData });
+    } else {
+      throw e;
+    }
+  }
   // SQL booked from a call → also create a meeting + open deal (auto-handoff #1).
   if (input.sentiment === "SQL Booked") {
     await prisma.activity.create({ data: { kind: "sale", type: "system", body: `SQL booked on a call with ${user.name}`, actor: user.name, companyId: input.companyId, dealId: input.dealId, contactId: input.contactId } });
