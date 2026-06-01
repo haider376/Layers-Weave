@@ -35,7 +35,7 @@ export default async function SettingsPage() {
   const [goals, permissions, config, gconn, zconn] = await Promise.all([
     getSalesGoals(), getPermissionMatrix(), getAppConfig(),
     safe(getConnection(user.id), { connected: false, accountEmail: null }),
-    safe(zoomGetConnection(user.id), { connected: false, accountEmail: null }),
+    safe(zoomGetConnection(), { connected: false, accountEmail: null }),
   ]);
 
   return (

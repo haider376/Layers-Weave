@@ -25,7 +25,7 @@ export default async function CallsPage() {
 
   const [calls, zconn] = await Promise.all([
     safe(prisma.callLog.findMany({ take: 6000, orderBy: { createdAt: "desc" } }), []),
-    safe(zoomGetConnection(user.id), { connected: false, accountEmail: null }),
+    safe(zoomGetConnection(), { connected: false, accountEmail: null }),
   ]);
   const total = calls.length;
   const connected = calls.filter((c) => c.connected).length;

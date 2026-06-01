@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { showToast } from "@/components/Toast";
 import { updateProfileAction } from "@/app/actions/session";
 import { disconnectGoogleAction } from "@/app/actions/google";
-import { disconnectZoomAction } from "@/app/actions/zoom";
 import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
 import { useEffect } from "react";
 import GoalsSettings, { type AeMeta } from "./GoalsSettings";
@@ -58,7 +57,6 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
 
   function saveProfile() { start(async () => { await updateProfileAction({ name, title }); showToast("Profile saved"); router.refresh(); }); }
   function disconnectGoogle() { start(async () => { await disconnectGoogleAction(); showToast("Google Calendar disconnected"); router.refresh(); }); }
-  function disconnectZoom() { start(async () => { await disconnectZoomAction(); showToast("Zoom Phone disconnected"); router.refresh(); }); }
 
   return (
     <div className="settings">
@@ -137,17 +135,13 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span className="itg-ic" style={{ background: "#2D8CFF", color: "#fff" }}>Z</span>
                   <div>
-                    <div className="set-row-t">Zoom Phone {zoom.connected && <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Connected</span>}</div>
-                    <div className="set-row-s">{zoom.connected ? `${zoom.email ?? "Connected"} · click-to-call + auto call logging` : zoom.configured ? "Click-to-call + automatic call logging" : "Needs Zoom API keys (admin setup)"}</div>
+                    <div className="set-row-t">Zoom Phone {zoom.connected
+                      ? <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Active</span>
+                      : <span className="st bad" style={{ marginLeft: 6 }}><span className="d" />Not configured</span>}</div>
+                    <div className="set-row-s">{zoom.connected ? "Account-level · click-to-call + automatic call logging for the whole team" : "Needs Zoom Server-to-Server credentials (admin env setup)"}</div>
                   </div>
                 </div>
-                {zoom.connected ? (
-                  <button className="itg-cta" style={{ borderColor: "var(--line-2)", color: "var(--muted)" }} disabled={pending} onClick={disconnectZoom}>Disconnect</button>
-                ) : zoom.configured ? (
-                  <a className="itg-cta" href="/api/integrations/zoom/connect">Connect</a>
-                ) : (
-                  <span className="set-row-s" style={{ fontStyle: "italic" }}>Not configured</span>
-                )}
+                <span className="set-row-s" style={{ fontStyle: "italic" }}>{zoom.connected ? "Account-level" : "Admin setup"}</span>
               </div>
               {/* Remaining integrations — coming soon */}
               {[["Outlook", "2-way email sync", "O", "#0078D4"], ["Fireflies", "Call recordings", "F", "#7C3AED"], ["WhatsApp Business", "Client comms", "W", "#25D366"], ["Slack", "Deal-won alerts", "S", "#611f69"]].map(([n, s, ic, col]) => (
