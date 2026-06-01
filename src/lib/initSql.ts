@@ -270,6 +270,8 @@ CREATE TABLE "CallLog" (
     "outcome" TEXT,
     "notes" TEXT,
     "transcript" TEXT,
+    "recordingUrl" TEXT,
+    "zoomCallId" TEXT,
     "durationSec" INTEGER,
     "agent" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -444,6 +446,9 @@ CREATE UNIQUE INDEX "Raghouse_name_key" ON "Raghouse"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Carrier_name_key" ON "Carrier"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CallLog_zoomCallId_key" ON "CallLog"("zoomCallId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Integration_userId_provider_key" ON "Integration"("userId", "provider");

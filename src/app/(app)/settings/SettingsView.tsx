@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { showToast } from "@/components/Toast";
 import { updateProfileAction } from "@/app/actions/session";
 import { disconnectGoogleAction } from "@/app/actions/google";
+import { disconnectZoomAction } from "@/app/actions/zoom";
 import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
 import { useEffect } from "react";
 import GoalsSettings, { type AeMeta } from "./GoalsSettings";
@@ -46,7 +47,7 @@ function Field({ label, value, type = "text", disabled }: { label: string; value
 
 type GoogleState = { connected: boolean; email: string | null; configured: boolean };
 
-export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config, google }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig; google: GoogleState }) {
+export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config, google, zoom }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig; google: GoogleState; zoom: GoogleState }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Profile");
   const [name, setName] = useState(me.name);
@@ -57,6 +58,7 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
 
   function saveProfile() { start(async () => { await updateProfileAction({ name, title }); showToast("Profile saved"); router.refresh(); }); }
   function disconnectGoogle() { start(async () => { await disconnectGoogleAction(); showToast("Google Calendar disconnected"); router.refresh(); }); }
+  function disconnectZoom() { start(async () => { await disconnectZoomAction(); showToast("Zoom Phone disconnected"); router.refresh(); }); }
 
   return (
     <div className="settings">
@@ -130,8 +132,25 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
                   <span className="set-row-s" style={{ fontStyle: "italic" }}>Not configured</span>
                 )}
               </div>
+              {/* Zoom Phone — live OAuth integration (click-to-call + auto-log) */}
+              <div className="set-row">
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <span className="itg-ic" style={{ background: "#2D8CFF", color: "#fff" }}>Z</span>
+                  <div>
+                    <div className="set-row-t">Zoom Phone {zoom.connected && <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Connected</span>}</div>
+                    <div className="set-row-s">{zoom.connected ? `${zoom.email ?? "Connected"} · click-to-call + auto call logging` : zoom.configured ? "Click-to-call + automatic call logging" : "Needs Zoom API keys (admin setup)"}</div>
+                  </div>
+                </div>
+                {zoom.connected ? (
+                  <button className="itg-cta" style={{ borderColor: "var(--line-2)", color: "var(--muted)" }} disabled={pending} onClick={disconnectZoom}>Disconnect</button>
+                ) : zoom.configured ? (
+                  <a className="itg-cta" href="/api/integrations/zoom/connect">Connect</a>
+                ) : (
+                  <span className="set-row-s" style={{ fontStyle: "italic" }}>Not configured</span>
+                )}
+              </div>
               {/* Remaining integrations — coming soon */}
-              {[["Zoom Phone", "Click-to-call + logging", "Z", "#2D8CFF"], ["Outlook", "2-way email sync", "O", "#0078D4"], ["Fireflies", "Call recordings", "F", "#7C3AED"], ["WhatsApp Business", "Client comms", "W", "#25D366"], ["Slack", "Deal-won alerts", "S", "#611f69"]].map(([n, s, ic, col]) => (
+              {[["Outlook", "2-way email sync", "O", "#0078D4"], ["Fireflies", "Call recordings", "F", "#7C3AED"], ["WhatsApp Business", "Client comms", "W", "#25D366"], ["Slack", "Deal-won alerts", "S", "#611f69"]].map(([n, s, ic, col]) => (
                 <div className="set-row" key={n}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><span className="itg-ic" style={{ background: col as string, color: "#fff" }}>{ic}</span><div><div className="set-row-t">{n}</div><div className="set-row-s">{s}</div></div></div><button className="itg-cta" onClick={() => showToast(`${n} integration — coming soon`)}>Connect</button></div>
               ))}
             </div>

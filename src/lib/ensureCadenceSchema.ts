@@ -93,6 +93,13 @@ export function isMissingTable(e: unknown): boolean {
   return code === "42P01" || msg.includes("does not exist") || msg.includes("relation") && msg.includes("cadence");
 }
 
+// Columns added to pre-existing tables after their initial migration.
+const COLUMN_PATCHES: string[] = [
+  `ALTER TABLE "CallLog" ADD COLUMN IF NOT EXISTS "recordingUrl" TEXT`,
+  `ALTER TABLE "CallLog" ADD COLUMN IF NOT EXISTS "zoomCallId" TEXT`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS "CallLog_zoomCallId_key" ON "CallLog"("zoomCallId")`,
+];
+
 export async function ensureCadenceSchema(): Promise<void> {
   if (healed) return;
   for (const stmt of DDL) {
@@ -100,6 +107,9 @@ export async function ensureCadenceSchema(): Promise<void> {
   }
   for (const fk of FKS) {
     try { await prisma.$executeRawUnsafe(fk); } catch { /* already exists */ }
+  }
+  for (const patch of COLUMN_PATCHES) {
+    try { await prisma.$executeRawUnsafe(patch); } catch { /* already applied */ }
   }
   healed = true;
 }

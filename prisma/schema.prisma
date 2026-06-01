@@ -345,6 +345,8 @@ model CallLog {
   outcome     String? // sentiment: SQL Booked | Interested / Follow up | Left Voicemail | No Answer | ...
   notes       String?
   transcript  String?
+  recordingUrl String?
+  zoomCallId  String?  @unique
   durationSec Int?
   agent       String?
   createdAt   DateTime @default(now())

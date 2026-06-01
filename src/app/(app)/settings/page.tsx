@@ -7,6 +7,7 @@ import SettingsView from "./SettingsView";
 import { getSalesGoals, ROSTER } from "@/lib/goals";
 import { getPermissionMatrix, getAppConfig } from "@/lib/appConfig";
 import { getConnection, googleConfigured } from "@/lib/google";
+import { zoomGetConnection, zoomConfigured } from "@/lib/zoom";
 
 // Always render fresh — integration connection state must not be cached.
 export const dynamic = "force-dynamic";
@@ -31,9 +32,10 @@ export default async function SettingsPage() {
         return { first, kind, name: u?.name ?? first.charAt(0).toUpperCase() + first.slice(1) };
       })
     : [];
-  const [goals, permissions, config, gconn] = await Promise.all([
+  const [goals, permissions, config, gconn, zconn] = await Promise.all([
     getSalesGoals(), getPermissionMatrix(), getAppConfig(),
     safe(getConnection(user.id), { connected: false, accountEmail: null }),
+    safe(zoomGetConnection(user.id), { connected: false, accountEmail: null }),
   ]);
 
   return (
@@ -48,6 +50,7 @@ export default async function SettingsPage() {
         permissions={permissions}
         config={config}
         google={{ connected: gconn.connected, email: gconn.accountEmail, configured: googleConfigured() }}
+        zoom={{ connected: zconn.connected, email: zconn.accountEmail, configured: zoomConfigured() }}
       />
     </>
   );

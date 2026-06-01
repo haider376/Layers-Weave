@@ -10,6 +10,7 @@ import {
   logCallAction,
   bookMeetingForCompanyAction,
 } from "@/app/(app)/sales/record-actions";
+import { zoomCallAction } from "@/app/actions/zoom";
 import NavPunk from "./NavPunk";
 
 export type TLEvent = { id: string; kind: string; title: string; body?: string; actor?: string; at: string; meta?: string };
@@ -129,9 +130,18 @@ export default function ActivityPanel({
         {tab === "call" && (
           <>
             <div className="call-row">
-              <a className="dial-btn" href={contact?.phone ? `tel:${contact.phone}` : undefined} onClick={() => showToast(`Dialing ${contact?.phone ?? ""} via Zoom Phone…`)}>
+              <button className="dial-btn" disabled={!contact?.phone} onClick={async () => {
+                const num = contact?.phone ?? "";
+                if (!num) return;
+                showToast("Calling via Zoom Phone…");
+                try {
+                  const r = await zoomCallAction(num);
+                  if (r.placed) showToast("Zoom is ringing your phone — pick up to connect");
+                  else window.location.href = `tel:${num}`; // fallback when Zoom not connected
+                } catch { window.location.href = `tel:${num}`; }
+              }}>
                 <span className="dot" /> Dial {contact?.phone ?? "—"} via Zoom
-              </a>
+              </button>
             </div>
             {/* Step 1 — outcome */}
             <div className="disp-label">Outcome</div>

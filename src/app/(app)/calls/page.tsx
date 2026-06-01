@@ -2,10 +2,15 @@ import { redirect } from "next/navigation";
 import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
+import { zoomGetConnection, zoomConfigured } from "@/lib/zoom";
 import { initials } from "@/components/Logo";
 import Topbar from "@/components/Topbar";
 import Sparkline from "@/components/Sparkline";
 import Donut from "@/components/Donut";
+import ZoomBanner from "./ZoomBanner";
+
+// Always fresh — Zoom connection state must not be cached.
+export const dynamic = "force-dynamic";
 
 const SENT_COLORS: Record<string, string> = {
   "SQL Booked": "#C6F542", "Interested / Follow up": "#A9DF1E", "Call Back Later": "#E0B23C",
@@ -18,7 +23,10 @@ export default async function CallsPage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const calls = await safe(prisma.callLog.findMany({ take: 6000, orderBy: { createdAt: "desc" } }), []);
+  const [calls, zconn] = await Promise.all([
+    safe(prisma.callLog.findMany({ take: 6000, orderBy: { createdAt: "desc" } }), []),
+    safe(zoomGetConnection(user.id), { connected: false, accountEmail: null }),
+  ]);
   const total = calls.length;
   const connected = calls.filter((c) => c.connected).length;
   const sqls = calls.filter((c) => c.outcome === "SQL Booked").length;
@@ -60,6 +68,8 @@ export default async function CallsPage() {
   return (
     <>
       <Topbar title="Coaching" sub="AI call analytics, sentiment & coaching for the sales floor" />
+
+      <ZoomBanner zoom={{ connected: zconn.connected, email: zconn.accountEmail, configured: zoomConfigured() }} />
 
       <div className="kpis" style={{ gridTemplateColumns: "repeat(4,1fr)" }}>
         <div className="kpi"><span className="bar" /><div className="lbl">Calls analyzed</div><div className="val neon">{total.toLocaleString("en-US")}</div><div className="delta">all reps</div></div>
