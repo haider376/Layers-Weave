@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { zoomVerifySignature, zoomUrlValidation, logZoomCall } from "@/lib/zoom";
+import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+// Stash the last few webhook payloads so an admin can inspect the EXACT shape
+// Zoom sends (recording URL fields vary by event/version). Best-effort.
+async function capture(event: string, body: unknown) {
+  try {
+    await prisma.appSetting.upsert({
+      where: { key: "zoom-last-webhook" },
+      create: { key: "zoom-last-webhook", value: JSON.stringify({ at: new Date().toISOString(), event, body }).slice(0, 8000) },
+      update: { value: JSON.stringify({ at: new Date().toISOString(), event, body }).slice(0, 8000) },
+    });
+  } catch { /* table may not exist yet — ignore */ }
+}
 
 // GET — reachability + readiness + a self-test of the validation math.
 // Visiting the URL shows whether ZOOM_WEBHOOK_SECRET is set, its exact length
@@ -46,19 +59,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "bad signature" }, { status: 401 });
   }
 
+  // Capture the raw event for inspection (admin debug endpoint reads this).
+  await capture(String(body.event ?? "unknown"), body);
+
   // 3) Auto-log completed calls.
   if (body.event === "phone.call_log_completed" || body.event === "phone.recording_completed") {
     const obj = (body.payload as { object?: Record<string, unknown> } | undefined)?.object ?? {};
-    // Field names vary a little by event; pull the most common ones defensively.
     const direction = String(obj.direction ?? "outbound");
-    const callId = String(obj.id ?? obj.call_id ?? obj.call_log_id ?? `${Date.now()}-${Math.random()}`);
+    const callId = String(obj.id ?? obj.call_id ?? obj.call_log_id ?? obj.call_id_str ?? `${Date.now()}-${Math.random()}`);
     const duration = Number(obj.duration ?? obj.call_duration ?? 0) || undefined;
-    const recordingUrl = (obj.recording_url as string | undefined) ?? (obj.download_url as string | undefined);
-    // The "other party" number depends on direction.
-    const callee = (obj.callee as { phone_number?: string } | undefined)?.phone_number;
-    const caller = (obj.caller as { phone_number?: string } | undefined)?.phone_number;
+
+    // Recording URL — Zoom Phone uses several shapes across events/versions:
+    //   • top-level recording_url / download_url / play_url / file_url
+    //   • a recording_files[] array with download_url / play_url
+    //   • a recordings[] array (newer phone events)
+    const recArrays = [obj.recording_files, obj.recordings].filter(Array.isArray) as Record<string, unknown>[][];
+    let recordingUrl =
+      (obj.recording_url as string | undefined) ??
+      (obj.download_url as string | undefined) ??
+      (obj.play_url as string | undefined) ??
+      (obj.file_url as string | undefined);
+    for (const arr of recArrays) {
+      for (const r of arr) {
+        recordingUrl = recordingUrl ?? (r.download_url as string | undefined) ?? (r.play_url as string | undefined) ?? (r.file_url as string | undefined);
+      }
+    }
+
+    // The "other party" number depends on direction; check several field shapes.
+    const callee = (obj.callee as { phone_number?: string } | undefined)?.phone_number ?? (obj.callee_number as string | undefined);
+    const caller = (obj.caller as { phone_number?: string } | undefined)?.phone_number ?? (obj.caller_number as string | undefined);
     const number = direction === "inbound" ? (caller ?? callee ?? "") : (callee ?? caller ?? "");
-    const agentEmail = (obj.owner as { email?: string } | undefined)?.email ?? (obj.user_email as string | undefined);
+    const agentEmail = (obj.owner as { email?: string } | undefined)?.email ?? (obj.user_email as string | undefined) ?? (obj.email as string | undefined);
 
     if (number) {
       try { await logZoomCall({ zoomCallId: callId, number, direction, durationSec: duration, recordingUrl, agentEmail }); }
