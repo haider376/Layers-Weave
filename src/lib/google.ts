@@ -148,30 +148,46 @@ export type GCalEvent = {
   htmlLink: string;
 };
 
-// Pull events from the user's primary calendar within a window.
+// Pull events from the user's primary calendar within a window. Paginates so a
+// busy calendar (lots of recurring events) doesn't truncate at one page and
+// hide upcoming dates.
 export async function listGoogleEvents(userId: string, timeMin: Date, timeMax: Date): Promise<GCalEvent[]> {
   const token = await freshAccessToken(userId);
   if (!token) return [];
-  const p = new URLSearchParams({
-    timeMin: timeMin.toISOString(),
-    timeMax: timeMax.toISOString(),
-    singleEvents: "true",
-    orderBy: "startTime",
-    maxResults: "250",
-  });
-  const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?${p.toString()}`, {
-    headers: { authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return [];
-  const data = (await res.json()) as { items?: GoogleApiEvent[] };
-  return (data.items ?? []).map((e) => ({
-    id: e.id,
-    title: e.summary ?? "(no title)",
-    start: e.start?.dateTime ?? (e.start?.date ? `${e.start.date}T00:00:00` : ""),
-    end: e.end?.dateTime ?? (e.end?.date ? `${e.end.date}T00:00:00` : null),
-    allDay: !e.start?.dateTime,
-    htmlLink: e.htmlLink ?? "",
-  })).filter((e) => e.start);
+
+  const out: GCalEvent[] = [];
+  let pageToken: string | undefined;
+  let pages = 0;
+  do {
+    const p = new URLSearchParams({
+      timeMin: timeMin.toISOString(),
+      timeMax: timeMax.toISOString(),
+      singleEvents: "true",
+      orderBy: "startTime",
+      maxResults: "250",
+    });
+    if (pageToken) p.set("pageToken", pageToken);
+    const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?${p.toString()}`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) break;
+    const data = (await res.json()) as { items?: GoogleApiEvent[]; nextPageToken?: string };
+    for (const e of data.items ?? []) {
+      const start = e.start?.dateTime ?? (e.start?.date ? `${e.start.date}T00:00:00` : "");
+      if (!start) continue;
+      out.push({
+        id: e.id,
+        title: e.summary ?? "(no title)",
+        start,
+        end: e.end?.dateTime ?? (e.end?.date ? `${e.end.date}T00:00:00` : null),
+        allDay: !e.start?.dateTime,
+        htmlLink: e.htmlLink ?? "",
+      });
+    }
+    pageToken = data.nextPageToken;
+    pages++;
+  } while (pageToken && pages < 8); // safety cap: up to ~2000 events
+  return out;
 }
 
 type GoogleApiEvent = {

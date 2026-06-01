@@ -18,9 +18,11 @@ export default async function CalendarPage() {
 
   const conn = await safe(getConnection(user.id), { connected: false, accountEmail: null });
 
-  // Pull a wide window of Google events when connected (3 months back → 6 ahead).
+  // Window centered on now (1 month back → 6 ahead). Pagination in
+  // listGoogleEvents fetches every page in this range, so busy calendars still
+  // surface upcoming months instead of truncating at the earliest 250 events.
   const now = new Date();
-  const winStart = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+  const winStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const winEnd = new Date(now.getFullYear(), now.getMonth() + 6, 0);
   const googleEvents = conn.connected ? await safe(listGoogleEvents(user.id, winStart, winEnd), []) : [];
 
