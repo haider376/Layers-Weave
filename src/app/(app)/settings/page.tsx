@@ -8,6 +8,8 @@ import { getSalesGoals, ROSTER } from "@/lib/goals";
 import { getPermissionMatrix, getAppConfig } from "@/lib/appConfig";
 import { getConnection, googleConfigured } from "@/lib/google";
 import { zoomGetConnection, zoomConfigured } from "@/lib/zoom";
+import { slackConfigured, slackChannelLabel } from "@/lib/slack";
+import { whatsappConfigured } from "@/lib/whatsapp";
 
 // Always render fresh — integration connection state must not be cached.
 export const dynamic = "force-dynamic";
@@ -51,6 +53,8 @@ export default async function SettingsPage() {
         config={config}
         google={{ connected: gconn.connected, email: gconn.accountEmail, configured: googleConfigured() }}
         zoom={{ connected: zconn.connected, email: zconn.accountEmail, configured: zoomConfigured() }}
+        slack={{ configured: slackConfigured(), channel: slackChannelLabel() }}
+        whatsapp={{ configured: whatsappConfigured() }}
       />
     </>
   );

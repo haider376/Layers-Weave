@@ -46,8 +46,10 @@ function Field({ label, value, type = "text", disabled }: { label: string; value
 }
 
 type GoogleState = { connected: boolean; email: string | null; configured: boolean };
+type SlackState = { configured: boolean; channel: string | null };
+type WhatsAppState = { configured: boolean };
 
-export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config, google, zoom }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig; google: GoogleState; zoom: GoogleState }) {
+export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config, google, zoom, slack, whatsapp }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig; google: GoogleState; zoom: GoogleState; slack: SlackState; whatsapp: WhatsAppState }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Profile");
   const [name, setName] = useState(me.name);
@@ -144,10 +146,42 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
                 </div>
                 <span className="set-row-s" style={{ fontStyle: "italic" }}>{zoom.connected ? "Account-level" : "Admin setup"}</span>
               </div>
-              {/* Remaining integrations — coming soon */}
-              {[["Fireflies", "Call recordings", "fireflies"], ["WhatsApp Business", "Client comms", "whatsapp"], ["Slack", "Deal-won alerts", "slack"]].map(([n, s, logo]) => (
-                <div className="set-row" key={n}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><BrandLogo name={logo} label={n} /><div><div className="set-row-t">{n}</div><div className="set-row-s">{s}</div></div></div><button className="itg-cta" onClick={() => showToast(`${n} integration — coming soon`)}>Connect</button></div>
-              ))}
+              {/* Slack — deal-won alerts (account-level Incoming Webhook) */}
+              <div className="set-row">
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <BrandLogo name="slack" label="Slack" />
+                  <div>
+                    <div className="set-row-t">Slack {slack.configured
+                      ? <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Active</span>
+                      : <span className="st bad" style={{ marginLeft: 6 }}><span className="d" />Not configured</span>}</div>
+                    <div className="set-row-s">{slack.configured ? `Deal-won alerts post to ${slack.channel ?? "your Slack channel"}` : "Needs a Slack Incoming Webhook URL (admin env setup)"}</div>
+                  </div>
+                </div>
+                {slack.configured
+                  ? <a className="itg-cta" href="/api/integrations/slack/test" target="_blank" rel="noopener noreferrer">Send test</a>
+                  : <span className="set-row-s" style={{ fontStyle: "italic" }}>Admin setup</span>}
+              </div>
+              {/* WhatsApp Business — client comms (account-level Cloud API) */}
+              <div className="set-row">
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <BrandLogo name="whatsapp" label="WhatsApp" />
+                  <div>
+                    <div className="set-row-t">WhatsApp Business {whatsapp.configured
+                      ? <span className="st go" style={{ marginLeft: 6 }}><span className="d" />Active</span>
+                      : <span className="st bad" style={{ marginLeft: 6 }}><span className="d" />Not configured</span>}</div>
+                    <div className="set-row-s">{whatsapp.configured ? "Send & receive WhatsApp from a contact's timeline — auto-logged" : "Needs Meta Cloud API credentials (admin env setup)"}</div>
+                  </div>
+                </div>
+                <span className="set-row-s" style={{ fontStyle: "italic" }}>{whatsapp.configured ? "Account-level" : "Admin setup"}</span>
+              </div>
+              {/* Fireflies — coming soon */}
+              <div className="set-row">
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <BrandLogo name="fireflies" label="Fireflies" />
+                  <div><div className="set-row-t">Fireflies</div><div className="set-row-s">Call recordings & AI notes</div></div>
+                </div>
+                <button className="itg-cta" onClick={() => showToast("Fireflies integration — coming soon")}>Connect</button>
+              </div>
             </div>
           )}
           {tab === "Appearance" && (

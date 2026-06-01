@@ -17,7 +17,7 @@ export async function salesLeaderboards() {
 
 export type TimelineEvent = {
   id: string;
-  kind: "note" | "email" | "call" | "meeting" | "system";
+  kind: "note" | "email" | "call" | "meeting" | "system" | "whatsapp";
   title: string;
   body?: string;
   actor?: string;
@@ -34,15 +34,17 @@ export async function getTimeline(opts: { companyId?: string; dealId?: string; c
       ? { contactId: opts.contactId }
       : { companyId: opts.companyId };
 
-  const [activities, emails, calls, meetings] = await Promise.all([
+  const callWhere = opts.contactId ? { contactId: opts.contactId } : opts.dealId ? { dealId: opts.dealId } : { companyId: opts.companyId };
+  const [activities, emails, calls, meetings, whatsapps] = await Promise.all([
     prisma.activity.findMany({ where, orderBy: { createdAt: "desc" }, take: 50 }),
     prisma.emailMessage.findMany({ where, orderBy: { createdAt: "desc" }, take: 50 }),
-    safe(prisma.callLog.findMany({ where: opts.contactId ? { contactId: opts.contactId } : opts.dealId ? { dealId: opts.dealId } : { companyId: opts.companyId }, orderBy: { createdAt: "desc" }, take: 50 }), []),
+    safe(prisma.callLog.findMany({ where: callWhere, orderBy: { createdAt: "desc" }, take: 50 }), []),
     opts.dealId
       ? prisma.salesMeeting.findMany({ where: { dealId: opts.dealId }, orderBy: { bookedDate: "desc" }, take: 20 })
       : opts.companyId
         ? prisma.salesMeeting.findMany({ where: { deal: { companyId: opts.companyId } }, orderBy: { bookedDate: "desc" }, take: 20 })
         : Promise.resolve([]),
+    safe(prisma.whatsAppMessage.findMany({ where: callWhere, orderBy: { createdAt: "desc" }, take: 50 }), []),
   ]);
 
   const events: TimelineEvent[] = [];
@@ -58,6 +60,9 @@ export async function getTimeline(opts: { companyId?: string; dealId?: string; c
   }
   for (const m of meetings) {
     events.push({ id: m.id, kind: "meeting", title: `Meeting — ${m.status}${m.outcome ? ` · ${m.outcome}` : ""}`, at: m.meetingDate ?? m.bookedDate });
+  }
+  for (const w of whatsapps) {
+    events.push({ id: w.id, kind: "whatsapp", title: `WhatsApp — ${w.direction === "outbound" ? "Sent" : "Received"}`, body: w.body, actor: w.agent ?? undefined, at: w.createdAt, meta: w.direction });
   }
 
   return events.sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, 60);

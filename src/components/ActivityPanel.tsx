@@ -11,6 +11,7 @@ import {
   bookMeetingForCompanyAction,
 } from "@/app/(app)/sales/record-actions";
 import { zoomCallAction } from "@/app/actions/zoom";
+import { sendWhatsAppAction } from "@/app/actions/whatsapp";
 import NavPunk from "./NavPunk";
 
 export type TLEvent = { id: string; kind: string; title: string; body?: string; actor?: string; at: string; meta?: string; link?: string };
@@ -20,6 +21,7 @@ const ICONS: Record<string, React.ReactNode> = {
   email: <NavPunk name="mail" size={15} />,
   call: <NavPunk name="phone" size={15} />,
   meeting: <NavPunk name="calendar" size={15} />,
+  whatsapp: <NavPunk name="chat" size={15} />,
   system: <NavPunk name="check" size={15} />,
 };
 
@@ -58,7 +60,8 @@ export default function ActivityPanel({
   contact?: { id: string; name: string; email?: string | null; phone?: string | null } | null;
 }) {
   const router = useRouter();
-  const [tab, setTab] = useState<"note" | "email" | "call" | "meeting">("note");
+  const [tab, setTab] = useState<"note" | "email" | "call" | "meeting" | "whatsapp">("note");
+  const [waBody, setWaBody] = useState("");
   const [pending, start] = useTransition();
   const [note, setNote] = useState("");
   const [subject, setSubject] = useState("");
@@ -100,9 +103,9 @@ export default function ActivityPanel({
       <div className="panel-h">
         <h2>Activity</h2>
         <div className="compose-tabs">
-          {(["note", "email", "call", "meeting"] as const).map((t) => (
+          {(["note", "email", "call", "whatsapp", "meeting"] as const).map((t) => (
             <button key={t} className={`ct-tab${tab === t ? " on" : ""}`} onClick={() => setTab(t)}>
-              {t === "note" ? "Note" : t === "email" ? "Email" : t === "call" ? "Call" : "Meeting"}
+              {t === "note" ? "Note" : t === "email" ? "Email" : t === "call" ? "Call" : t === "whatsapp" ? "WhatsApp" : "Meeting"}
             </button>
           ))}
         </div>
@@ -172,6 +175,26 @@ export default function ActivityPanel({
                   callSentiment === "SQL Booked" ? undefined : "Call logged",
                 )}>
                 Log call
+              </button>
+            </div>
+          </>
+        )}
+        {tab === "whatsapp" && (
+          <>
+            <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 8 }}>To: {contact?.phone ?? "no number on contact"}</div>
+            <textarea className="compose-input" rows={3} placeholder="Write a WhatsApp message…" value={waBody} onChange={(e) => setWaBody(e.target.value)} />
+            <div className="compose-actions">
+              <button className="btn primary" disabled={pending || !waBody.trim() || !contact?.phone}
+                onClick={() => start(async () => {
+                  try {
+                    const r = await sendWhatsAppAction({ companyId, dealId, contactId: contact?.id, toNumber: contact?.phone ?? "", body: waBody });
+                    if (r.sentVia === "whatsapp") showToast("WhatsApp sent ✓");
+                    else if (r.sentVia === "logged") showToast("Logged — connect WhatsApp to send for real");
+                    setWaBody("");
+                    router.refresh();
+                  } catch { showToast("Action failed"); }
+                })}>
+                Send WhatsApp
               </button>
             </div>
           </>

@@ -399,6 +399,23 @@ model EmailMessage {
   createdAt DateTime @default(now())
 }
 
+// WhatsApp Business (Cloud API) messages — inbound replies + outbound sends,
+// threaded onto a contact's timeline alongside calls & emails.
+model WhatsAppMessage {
+  id          String   @id @default(cuid())
+  waMessageId String?  @unique // Meta message id (dedupes webhook retries)
+  direction   String   @default("outbound") // inbound | outbound
+  body        String   @db.Text
+  fromNumber  String
+  toNumber    String
+  status      String? // sent | delivered | read | failed (from status webhooks)
+  companyId   String?
+  contactId   String?
+  dealId      String?
+  agent       String?
+  createdAt   DateTime @default(now())
+}
+
 model Notification {
   id        String   @id @default(cuid())
   audience  String // Supply | Logistics | Client | All

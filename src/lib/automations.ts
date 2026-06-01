@@ -3,6 +3,7 @@
 import { prisma } from "./db";
 import { generateQuoteId } from "./quoteId";
 import { deriveOrderType } from "./permissions";
+import { notifyDealWon } from "./slack";
 
 async function logActivity(kind: string, body: string, actor?: string, quoteRef?: string) {
   await prisma.activity.create({ data: { kind, body, actor, quoteRef } });
@@ -133,10 +134,19 @@ export async function automationDealStage(dealId: string, stage: string) {
       stage,
       closeDate: stage === "Closed Won" || stage === "Closed Lost" ? new Date() : undefined,
     },
-    include: { quotes: { include: { items: true, fulfilment: true } }, company: true },
+    include: { quotes: { include: { items: true, fulfilment: true } }, company: true, owner: true },
   });
 
   if (stage === "Closed Won") {
+    // Slack deal-won alert (best-effort — never blocks the close).
+    notifyDealWon({
+      company: deal.company.name,
+      amount: deal.amount,
+      owner: deal.owner?.name ?? null,
+      quoteId: deal.quotes[0]?.quoteId ?? null,
+      dealName: deal.name,
+    }).catch(() => {});
+
     for (const quote of deal.quotes) {
       await prisma.quote.update({ where: { id: quote.id }, data: { status: "Closed/Won" } });
       if (!quote.fulfilment) {

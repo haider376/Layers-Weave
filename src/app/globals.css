@@ -460,6 +460,7 @@ select.dg-input option{background:var(--panel-2)}
 .tl-ev.email .tl-ic{background:var(--violet-soft)}.tl-ev.email .tl-ic svg{stroke:var(--violet-br)}
 .tl-ev.call .tl-ic{background:var(--amber-soft)}.tl-ev.call .tl-ic svg{stroke:var(--amber)}
 .tl-ev.meeting .tl-ic{background:rgba(198,245,66,.1)}.tl-ev.meeting .tl-ic svg{stroke:var(--neon)}
+.tl-ev.whatsapp .tl-ic{background:rgba(37,211,102,.14)}.tl-ev.whatsapp .tl-ic svg{stroke:#25D366}
 .tl-bd{flex:1;min-width:0}
 .tl-title{font-size:12.5px;font-weight:600}
 .tl-meta{color:var(--faint);font-weight:500}
@@ -1616,6 +1617,7 @@ tbody tr.row.sel:hover{background:color-mix(in srgb,var(--neon) 16%,transparent)
 .tl-ev.email .tl-ic .navpunk{color:var(--violet-br)}
 .tl-ev.call .tl-ic .navpunk{color:var(--amber)}
 .tl-ev.meeting .tl-ic .navpunk{color:var(--neon)}
+.tl-ev.whatsapp .tl-ic .navpunk{color:#25D366}
 .rec-act-ic .navpunk{color:currentColor}
 .rec-act:hover .rec-act-ic .navpunk{transform:rotate(-6deg) scale(1.12);transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
 

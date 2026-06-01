@@ -70,6 +70,22 @@ const DDL: string[] = [
     CONSTRAINT "CadenceStepRun_pkey" PRIMARY KEY ("id")
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS "CadenceMembership_cadenceId_contactId_key" ON "CadenceMembership"("cadenceId", "contactId")`,
+  `CREATE TABLE IF NOT EXISTS "WhatsAppMessage" (
+    "id" TEXT NOT NULL,
+    "waMessageId" TEXT,
+    "direction" TEXT NOT NULL DEFAULT 'outbound',
+    "body" TEXT NOT NULL,
+    "fromNumber" TEXT NOT NULL,
+    "toNumber" TEXT NOT NULL,
+    "status" TEXT,
+    "companyId" TEXT,
+    "contactId" TEXT,
+    "dealId" TEXT,
+    "agent" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "WhatsAppMessage_pkey" PRIMARY KEY ("id")
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS "WhatsAppMessage_waMessageId_key" ON "WhatsAppMessage"("waMessageId")`,
 ];
 
 // Foreign keys are added separately and ignored if they already exist (no
