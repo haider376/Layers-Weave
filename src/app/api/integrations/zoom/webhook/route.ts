@@ -4,6 +4,20 @@ import { zoomVerifySignature, zoomUrlValidation, logZoomCall } from "@/lib/zoom"
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// GET — quick reachability + readiness check (visit the URL in a browser).
+// Confirms the endpoint is live and whether ZOOM_WEBHOOK_SECRET is set, so you
+// can verify everything BEFORE clicking "Validate" in the Zoom Marketplace.
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    endpoint: "zoom webhook",
+    webhookSecretSet: !!process.env.ZOOM_WEBHOOK_SECRET,
+    hint: process.env.ZOOM_WEBHOOK_SECRET
+      ? "Ready — set this exact URL in Zoom and click Validate."
+      : "Set ZOOM_WEBHOOK_SECRET in Vercel and redeploy BEFORE clicking Validate in Zoom.",
+  });
+}
+
 // Zoom Phone webhook receiver:
 //  - answers the one-time URL-validation challenge
 //  - verifies the signature on every event
