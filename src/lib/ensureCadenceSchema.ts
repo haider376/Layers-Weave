@@ -101,15 +101,17 @@ const COLUMN_PATCHES: string[] = [
 ];
 
 export async function ensureCadenceSchema(): Promise<void> {
+  // Column patches are cheap + idempotent (IF NOT EXISTS) — always run them so a
+  // stale in-memory `healed` flag can't skip a needed column add.
+  for (const patch of COLUMN_PATCHES) {
+    try { await prisma.$executeRawUnsafe(patch); } catch { /* already applied */ }
+  }
   if (healed) return;
   for (const stmt of DDL) {
     try { await prisma.$executeRawUnsafe(stmt); } catch { /* best-effort, idempotent */ }
   }
   for (const fk of FKS) {
     try { await prisma.$executeRawUnsafe(fk); } catch { /* already exists */ }
-  }
-  for (const patch of COLUMN_PATCHES) {
-    try { await prisma.$executeRawUnsafe(patch); } catch { /* already applied */ }
   }
   healed = true;
 }
