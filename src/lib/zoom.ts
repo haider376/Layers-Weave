@@ -40,6 +40,18 @@ async function getAccountToken(): Promise<string | null> {
   return tok.access_token;
 }
 
+// Fetch a Zoom recording download URL using the account bearer token. Zoom's
+// recording download endpoints are authenticated — they 401 ("Access token is
+// required") when opened directly — so we proxy them server-side. Returns the
+// upstream fetch Response (audio stream) or an error.
+export async function fetchZoomRecording(recordingUrl: string): Promise<{ ok: true; res: Response } | { ok: false; status: number; error: string }> {
+  const token = await getAccountToken().catch(() => null);
+  if (!token) return { ok: false, status: 503, error: "Zoom not configured" };
+  const res = await fetch(recordingUrl, { headers: { authorization: `Bearer ${token}` }, redirect: "follow" });
+  if (!res.ok) return { ok: false, status: res.status, error: `Zoom returned ${res.status}` };
+  return { ok: true, res };
+}
+
 export type ZoomConn = { connected: boolean; accountEmail: string | null };
 
 // Live token-mint probe that returns Zoom's actual error (for diagnostics).

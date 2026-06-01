@@ -124,7 +124,7 @@ export default async function CallsPage() {
                 <summary>
                   <Avatar name={t.agent ?? "—"} avatarUrl={avatarOf(t.agent ?? "—")} className="mini-av" />
                   <span style={{ flex: 1 }}>{t.agent} · <span style={{ color: SENT_COLORS[t.outcome ?? ""] ?? "var(--muted)", fontWeight: 700 }}>{t.outcome}</span></span>
-                  {t.recordingUrl && <a className="tl-rec" href={t.recordingUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>▶ Recording</a>}
+                  {t.recordingUrl && <a className="tl-rec" href={`/api/integrations/zoom/recording?call=${t.id}`} target="_blank" rel="noopener noreferrer">▶ Recording</a>}
                   <span style={{ fontSize: 10, color: "var(--faint)" }}>{Math.round((t.durationSec ?? 0) / 60)}m</span>
                 </summary>
                 {t.transcript
