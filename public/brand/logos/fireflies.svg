@@ -1,0 +1,12 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fireflies">
+  <!-- top-left block -->
+  <rect x="150" y="140" width="85" height="85" rx="8" fill="#E92E6F"/>
+  <!-- top arm, rounded top-right -->
+  <path fill="#E92E6F" d="M253 140h42a85 85 0 0 1 85 85H253z"/>
+  <!-- middle-left (stem) -->
+  <rect x="150" y="243" width="85" height="85" rx="8" fill="#E92E6F"/>
+  <!-- middle arm, rounded bottom-right -->
+  <path fill="#E92E6F" d="M253 243h85v40a42 42 0 0 1-42 42h-43z"/>
+  <!-- stem foot, rounded bottom-left -->
+  <path fill="#E92E6F" d="M150 346h85v63h-42a43 43 0 0 1-43-43z"/>
+</svg>

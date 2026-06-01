@@ -344,6 +344,10 @@ select.ed option{background:var(--panel-2);color:var(--text)}
 .itg-row:hover{background:var(--panel-2)}
 .itg-ic{width:30px;height:30px;border-radius:8px;background:var(--raise);color:var(--text);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
 .itg-ic.zoom{background:#2D8CFF;color:#fff}.itg-ic.gmail{background:#EA4335;color:#fff}.itg-ic.outlook{background:#0078D4;color:#fff}
+/* Real brand logos — kept on a uniform tile so multicolour marks pop on the dark UI */
+.itg-logo{width:30px;height:30px;border-radius:8px;background:#fff;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden}
+.itg-logo img{width:20px;height:20px;display:block}
+.itg-logo.flush img{width:30px;height:30px;border-radius:8px}
 .itg-nm{flex:1;text-align:left;font-size:12.5px;font-weight:600;color:var(--text)}
 .itg-nm small{display:block;color:var(--faint);font-size:10px;font-weight:500;margin-top:1px}
 .itg-cta{font-size:11px;font-weight:700;color:var(--neon-ink);background:var(--neon);border-radius:6px;padding:4px 10px;flex:none}

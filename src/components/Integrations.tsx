@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { showToast } from "./Toast";
 import NavPunk from "./NavPunk";
+import BrandLogo from "./BrandLogo";
 
 type Panel = "phone" | "email" | null;
 
@@ -36,7 +37,7 @@ export default function Integrations() {
         <div className="itg-pop">
           <div className="itg-h">Calling</div>
           <button className="itg-row" onClick={() => connect("Zoom Phone")}>
-            <span className="itg-ic zoom">Z</span>
+            <BrandLogo name="zoom" label="Zoom" />
             <span className="itg-nm">Zoom Phone<small>Click-to-call + call logging</small></span>
             <span className="itg-cta">Connect</span>
           </button>
@@ -51,13 +52,8 @@ export default function Integrations() {
         <div className="itg-pop">
           <div className="itg-h">Email</div>
           <button className="itg-row" onClick={() => connect("Gmail")}>
-            <span className="itg-ic gmail">G</span>
+            <BrandLogo name="google" label="Gmail" />
             <span className="itg-nm">Gmail<small>2-way sync to timelines</small></span>
-            <span className="itg-cta">Connect</span>
-          </button>
-          <button className="itg-row" onClick={() => connect("Outlook")}>
-            <span className="itg-ic outlook">O</span>
-            <span className="itg-nm">Outlook<small>2-way sync to timelines</small></span>
             <span className="itg-cta">Connect</span>
           </button>
         </div>

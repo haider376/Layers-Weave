@@ -142,7 +142,7 @@ export default function CalendarView({ events, google }: { events: CalEvent[]; g
         {/* Google Calendar connection */}
         <div className="gcal-conn">
           <div className="gcal-conn-h">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#C6F542" strokeWidth="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="#C6F542" strokeWidth="2" strokeLinecap="round"/></svg>
+            <img src="/brand/logos/google.svg" alt="Google" width={16} height={16} style={{ display: "block" }} />
             Google Calendar
           </div>
           {google.connected ? (

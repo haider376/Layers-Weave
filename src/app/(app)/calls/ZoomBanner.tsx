@@ -1,5 +1,7 @@
 "use client";
 
+import BrandLogo from "@/components/BrandLogo";
+
 type ZoomState = { connected: boolean; email: string | null; configured: boolean };
 
 // Account-level (Server-to-Server) Zoom: there's no per-user connect — the
@@ -8,7 +10,7 @@ export default function ZoomBanner({ zoom }: { zoom: ZoomState }) {
   return (
     <div className="zoom-banner">
       <div className="zoom-banner-l">
-        <span className="itg-ic" style={{ background: "#2D8CFF", color: "#fff" }}>Z</span>
+        <BrandLogo name="zoom" label="Zoom" />
         <div>
           <div className="zoom-banner-t">
             Zoom Phone {zoom.connected
