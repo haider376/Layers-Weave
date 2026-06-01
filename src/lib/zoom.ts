@@ -42,6 +42,20 @@ async function getAccountToken(): Promise<string | null> {
 
 export type ZoomConn = { connected: boolean; accountEmail: string | null };
 
+// Live token-mint probe that returns Zoom's actual error (for diagnostics).
+export async function zoomTokenProbe(): Promise<{ ok: boolean; httpStatus?: number; error?: string }> {
+  if (!zoomConfigured()) return { ok: false, error: "missing env vars" };
+  const body = new URLSearchParams({ grant_type: "account_credentials", account_id: (process.env.ZOOM_ACCOUNT_ID ?? "").trim() });
+  const res = await fetch(TOKEN_URL, {
+    method: "POST",
+    headers: { authorization: `Basic ${basicAuth()}`, "content-type": "application/x-www-form-urlencoded" },
+    body,
+  });
+  const text = await res.text();
+  if (!res.ok) return { ok: false, httpStatus: res.status, error: text.slice(0, 300) };
+  return { ok: true, httpStatus: res.status };
+}
+
 // Account-level: "connected" simply means the env credentials are present and a
 // token can be minted. Verifies live so the UI reflects reality.
 export async function zoomGetConnection(): Promise<ZoomConn> {
