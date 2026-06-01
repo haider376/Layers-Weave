@@ -1134,8 +1134,11 @@ tbody td{padding:15px 22px}
 .gcal-month { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .gcal-month-dow { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--line); }
 .gcal-month-dow div { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); padding: 8px 0; }
-.gcal-month-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; }
+.gcal-month-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(96px, 1fr); overflow-y: auto; }
 .gcal-mcell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 4px 6px; overflow: hidden; cursor: pointer; min-height: 0; display: flex; flex-direction: column; gap: 3px; transition: background .1s; }
+/* An expanded cell grows to fit all of its events (Show less collapses it). */
+.gcal-mcell.open { overflow: visible; z-index: 2; background: var(--panel-2); box-shadow: 0 8px 24px -10px rgba(0,0,0,.7); }
+.gcal-mcell.open .gcal-mcell-evs { overflow: visible; }
 .gcal-mcell:nth-child(7n) { border-right: 0; }
 .gcal-mcell:hover { background: var(--bg); }
 .gcal-mcell.out { background: color-mix(in srgb, var(--bg) 55%, transparent); }
@@ -1647,3 +1650,6 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 /* Count badge on each calendar layer (shows how many events loaded) */
 .gcal-cal-count{margin-left:auto;font-size:10px;font-weight:700;color:var(--neon-ink);background:var(--neon);border-radius:20px;min-width:18px;height:16px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
 .gcal-cal-item{position:relative}
+
+/* Holiday chips read as full-width all-day bars (like Google) */
+.gcal-cal-item input { flex: none; }

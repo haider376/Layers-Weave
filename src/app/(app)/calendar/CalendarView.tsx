@@ -7,18 +7,25 @@ import { addTaskAction } from "../tasks/actions";
 import { createCalendarEventAction, disconnectGoogleAction } from "@/app/actions/google";
 import { showToast } from "@/components/Toast";
 
-export type CalEvent = { id: string; title: string; date: string; kind: "meeting" | "task" | "google"; status: string; dealId: string | null; link?: string; allDay?: boolean };
+export type CalEvent = { id: string; title: string; date: string; kind: "meeting" | "task" | "google" | "holiday"; status: string; dealId: string | null; link?: string; allDay?: boolean };
 type GoogleState = { connected: boolean; email: string | null; configured: boolean };
 
 // Google-Calendar-style calendars/colours, mapped onto our event kinds + statuses.
-type CalKey = "meeting" | "task" | "done" | "google";
+type CalKey = "meeting" | "task" | "done" | "google" | "us-holiday" | "pk-holiday";
 const KINDS: { key: CalKey; label: string; color: string }[] = [
   { key: "meeting", label: "Meetings & SQLs", color: "#1a73e8" },
   { key: "task", label: "Tasks", color: "#f09300" },
   { key: "done", label: "Completed", color: "#0b8043" },
   { key: "google", label: "Google Calendar", color: "#C6F542" },
+  { key: "us-holiday", label: "Holidays in United States", color: "#16a765" },
+  { key: "pk-holiday", label: "Holidays in Pakistan", color: "#d06b64" },
 ];
-function calOf(e: CalEvent): CalKey { return e.kind === "google" ? "google" : e.kind === "task" ? (e.status === "Done" ? "done" : "task") : "meeting"; }
+function calOf(e: CalEvent): CalKey {
+  if (e.kind === "holiday") return e.status === "PK" ? "pk-holiday" : "us-holiday";
+  if (e.kind === "google") return "google";
+  if (e.kind === "task") return e.status === "Done" ? "done" : "task";
+  return "meeting";
+}
 const COLOR = (k: CalKey) => KINDS.find((x) => x.key === k)!.color;
 
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -215,23 +222,32 @@ function MonthGrid({ cursor, byDay, onDay }: { cursor: Date; byDay: Record<strin
   const start = addDays(new Date(y, m, 1), -new Date(y, m, 1).getDay());
   const cells = Array.from({ length: 42 }, (_, i) => addDays(start, i));
   const today = new Date();
+  // Which day-cells are expanded to show ALL their events in-place.
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const toggle = (key: string) => setExpanded((s) => { const n = new Set(s); if (n.has(key)) n.delete(key); else n.add(key); return n; });
+
   return (
     <div className="gcal-month">
       <div className="gcal-month-dow">{DOW.map((d) => <div key={d}>{d}</div>)}</div>
       <div className="gcal-month-grid">
         {cells.map((d, i) => {
           const out = d.getMonth() !== m;
-          const evs = byDay[iso(d)] ?? [];
+          const key = iso(d);
+          const evs = byDay[key] ?? [];
+          const isOpen = expanded.has(key);
+          const shown = isOpen ? evs : evs.slice(0, 3);
           return (
-            <div key={i} className={`gcal-mcell${out ? " out" : ""}`} onClick={() => onDay(d)}>
+            <div key={i} className={`gcal-mcell${out ? " out" : ""}${isOpen ? " open" : ""}`} onClick={() => onDay(d)}>
               <div className="gcal-mcell-h">
                 <span className={`gcal-mcell-num${sameDay(d, today) ? " today" : ""}`}>{d.getDate()}</span>
               </div>
               <div className="gcal-mcell-evs">
-                {evs.slice(0, 3).map((e) => (
-                  <Chip key={e.id} e={e} />
-                ))}
-                {evs.length > 3 && <button className="gcal-more" onClick={(ev) => { ev.stopPropagation(); onDay(d); }}>{evs.length - 3} more</button>}
+                {shown.map((e) => <Chip key={e.id} e={e} />)}
+                {evs.length > 3 && (
+                  <button className="gcal-more" onClick={(ev) => { ev.stopPropagation(); toggle(key); }}>
+                    {isOpen ? "Show less" : `${evs.length - 3} more`}
+                  </button>
+                )}
               </div>
             </div>
           );

@@ -213,6 +213,11 @@ export async function googleDiagnostics(userId: string): Promise<Record<string, 
     };
   }
 
+  // Run the EXACT function the calendar page uses, over the same wide window.
+  const now2 = new Date();
+  const ev = await listGoogleEvents(userId, new Date(now2.getFullYear(), now2.getMonth() - 3, 1), new Date(now2.getFullYear(), now2.getMonth() + 6, 0));
+  const sample = ev.slice(0, 5).map((e) => ({ title: e.title, start: e.start, allDay: e.allDay }));
+
   return {
     connected: true,
     accountEmail: row.accountEmail,
@@ -223,6 +228,8 @@ export async function googleDiagnostics(userId: string): Promise<Record<string, 
     accessTokenExpired: row.expiresAt ? row.expiresAt.getTime() < Date.now() : null,
     gotFreshToken: !!token,
     calendarProbe: calProbe,
+    listGoogleEvents_count: ev.length,
+    listGoogleEvents_sample: sample,
   };
 }
 
