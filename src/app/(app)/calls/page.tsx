@@ -3,7 +3,7 @@ import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
 import { zoomGetConnection, zoomConfigured } from "@/lib/zoom";
-import { initials } from "@/components/Logo";
+import Avatar from "@/components/Avatar";
 import Topbar from "@/components/Topbar";
 import Sparkline from "@/components/Sparkline";
 import Donut from "@/components/Donut";
@@ -23,10 +23,12 @@ export default async function CallsPage() {
   if (!user) redirect("/login");
   if (!canAccessSales(user.role)) redirect("/dashboard");
 
-  const [calls, zconn] = await Promise.all([
+  const [calls, zconn, allUsers] = await Promise.all([
     safe(prisma.callLog.findMany({ take: 6000, orderBy: { createdAt: "desc" } }), []),
     safe(zoomGetConnection(), { connected: false, accountEmail: null }),
+    safe(prisma.user.findMany({ select: { name: true, avatarUrl: true } }), []),
   ]);
+  const avatarOf = (name: string) => allUsers.find((u) => u.name === name)?.avatarUrl ?? null;
   const total = calls.length;
   const connected = calls.filter((c) => c.connected).length;
   const sqls = calls.filter((c) => c.outcome === "SQL Booked").length;
@@ -56,7 +58,7 @@ export default async function CallsPage() {
     return calls.filter((c) => c.createdAt >= d0 && c.createdAt < d1).length;
   });
 
-  const transcripts = calls.filter((c) => c.transcript).slice(0, 6);
+  const transcripts = calls.filter((c) => c.transcript || c.recordingUrl).slice(0, 6);
 
   const insights = agents.slice(0, 6).map((r) => {
     const cr = r.calls ? r.connected / r.calls : 0;
@@ -91,7 +93,7 @@ export default async function CallsPage() {
               <tbody>
                 {agents.map((r) => (
                   <tr className="row" key={r.agent}>
-                    <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span className="mini-av">{initials(r.agent)}</span>{r.agent}</span></td>
+                    <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Avatar name={r.agent} avatarUrl={avatarOf(r.agent)} className="mini-av" />{r.agent}</span></td>
                     <td className="tabular-nums">{r.calls.toLocaleString("en-US")}</td>
                     <td><span className="st work"><span className="d" />{r.calls ? Math.round((r.connected / r.calls) * 100) : 0}%</span></td>
                     <td className="tabular-nums">{r.sqls}</td>
@@ -107,7 +109,7 @@ export default async function CallsPage() {
           <div className="an-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {insights.map((c, i) => (
               <div className={`coach coach-${c.tone}`} key={i}>
-                <div className="coach-top"><span className="mini-av">{initials(c.agent)}</span><b>{c.agent}</b></div>
+                <div className="coach-top"><Avatar name={c.agent} avatarUrl={avatarOf(c.agent)} className="mini-av" /><b>{c.agent}</b></div>
                 <div className="coach-text">{c.text}</div>
               </div>
             ))}
@@ -120,11 +122,14 @@ export default async function CallsPage() {
             {transcripts.map((t) => (
               <details className="transcript" key={t.id}>
                 <summary>
-                  <span className="mini-av">{initials(t.agent ?? "—")}</span>
+                  <Avatar name={t.agent ?? "—"} avatarUrl={avatarOf(t.agent ?? "—")} className="mini-av" />
                   <span style={{ flex: 1 }}>{t.agent} · <span style={{ color: SENT_COLORS[t.outcome ?? ""] ?? "var(--muted)", fontWeight: 700 }}>{t.outcome}</span></span>
+                  {t.recordingUrl && <a className="tl-rec" href={t.recordingUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>▶ Recording</a>}
                   <span style={{ fontSize: 10, color: "var(--faint)" }}>{Math.round((t.durationSec ?? 0) / 60)}m</span>
                 </summary>
-                <pre className="transcript-body">{t.transcript}</pre>
+                {t.transcript
+                  ? <pre className="transcript-body">{t.transcript}</pre>
+                  : <div className="transcript-body" style={{ color: "var(--faint)" }}>No transcript — open the recording to listen.</div>}
               </details>
             ))}
             {transcripts.length === 0 && <div className="q-note" style={{ padding: 12 }}>No transcripts yet — connected calls with recordings will appear here.</div>}

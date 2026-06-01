@@ -1,6 +1,6 @@
 import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { initials } from "@/components/Logo";
+import Avatar from "@/components/Avatar";
 import Topbar from "@/components/Topbar";
 import NavPunk from "@/components/NavPunk";
 
@@ -47,10 +47,10 @@ export default async function DashboardPage() {
   const fmax = Math.max(1, ...funnel.map((f) => f.count));
 
   // Leaderboard — closed-won per owner
-  const board = new Map<string, { name: string; title: string; wins: number }>();
+  const board = new Map<string, { name: string; title: string; wins: number; avatarUrl: string | null }>();
   for (const d of won) {
     if (!d.owner) continue;
-    const cur = board.get(d.owner.id) ?? { name: d.owner.name, title: d.owner.title, wins: 0 };
+    const cur = board.get(d.owner.id) ?? { name: d.owner.name, title: d.owner.title, wins: 0, avatarUrl: d.owner.avatarUrl };
     cur.wins += 1;
     board.set(d.owner.id, cur);
   }
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
             <div className="lead">
               {leaderboard.map((p) => (
                 <div className="lrow" key={p.name}>
-                  <span className="av">{initials(p.name)}</span>
+                  <Avatar name={p.name} avatarUrl={p.avatarUrl} className="av" />
                   <span className="nm">{p.name}<small>{p.title}</small></span>
                   <span className="mt">{p.wins}</span>
                 </div>

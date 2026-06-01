@@ -40,7 +40,7 @@ export default async function LeaderboardPage() {
     const open = owned.filter((d) => !d.stage.startsWith("Closed") && d.stage !== "Disqualified");
     const closed = owned.filter((d) => d.stage.startsWith("Closed")).length;
     const winRate = closed ? Math.round((won.length / closed) * 100) : 0;
-    return { name: u.name, title: u.title, primary: revenue, primaryLabel: "won", wins: won.length,
+    return { name: u.name, title: u.title, avatarUrl: u.avatarUrl, primary: revenue, primaryLabel: "won", wins: won.length,
       secondary: `${won.length} won · ${open.length} open · ${winRate}% win rate` };
   }).sort((a, b) => b.primary - a.primary || b.wins - a.wins);
 
@@ -50,7 +50,7 @@ export default async function LeaderboardPage() {
     const made = callsByAgent.get(u.name) ?? 0;
     const conn = connectsByAgent.get(u.name) ?? 0;
     const connRate = made ? Math.round((conn / made) * 100) : 0;
-    return { name: u.name, title: u.title, primary: sqls, primaryLabel: "SQLs", wins: sqls,
+    return { name: u.name, title: u.title, avatarUrl: u.avatarUrl, primary: sqls, primaryLabel: "SQLs", wins: sqls,
       secondary: `${sqls} SQLs · ${made.toLocaleString("en-US")} calls · ${connRate}% connect` };
   }).sort((a, b) => b.primary - a.primary);
 

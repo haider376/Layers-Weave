@@ -129,19 +129,59 @@ export async function matchContactByNumber(number: string): Promise<{ id: string
 
 // Auto-log a completed Zoom call (called from the webhook).
 export async function logZoomCall(input: {
-  zoomCallId: string; number: string; direction: string; durationSec?: number; recordingUrl?: string; agentEmail?: string;
+  zoomCallId: string; number: string; direction: string; durationSec?: number; recordingUrl?: string; agentEmail?: string; agentName?: string;
 }): Promise<void> {
+  // Already logged this exact Zoom call? (idempotent — Zoom retries webhooks.)
   const exists = await prisma.callLog.findUnique({ where: { zoomCallId: input.zoomCallId } }).catch(() => null);
-  if (exists) return;
+  if (exists) {
+    // A later recording_completed event for an already-logged call: attach the URL.
+    if (input.recordingUrl && !exists.recordingUrl) {
+      await prisma.callLog.update({ where: { id: exists.id }, data: { recordingUrl: input.recordingUrl } }).catch(() => {});
+    }
+    return;
+  }
 
   const match = await matchContactByNumber(input.number);
   if (!match) return;
 
+  // Resolve the rep — by email first, then by name (Zoom phone events give name).
   let agent: string | undefined;
   if (input.agentEmail) {
     const u = await prisma.user.findUnique({ where: { email: input.agentEmail } }).catch(() => null);
     agent = u?.name;
   }
+  if (!agent && input.agentName) {
+    const u = await prisma.user.findFirst({ where: { name: input.agentName } }).catch(() => null);
+    agent = u?.name ?? input.agentName;
+  }
+
+  // If this is a recording arriving for a call the rep just logged manually,
+  // attach it to that recent entry rather than creating a duplicate.
+  if (input.recordingUrl) {
+    const recent = await prisma.callLog.findFirst({
+      where: {
+        contactId: match.id,
+        recordingUrl: null,
+        zoomCallId: null,
+        createdAt: { gte: new Date(Date.now() - 60 * 60 * 1000) },
+      },
+      orderBy: { createdAt: "desc" },
+    }).catch(() => null);
+    if (recent) {
+      await prisma.callLog.update({
+        where: { id: recent.id },
+        data: {
+          recordingUrl: input.recordingUrl,
+          zoomCallId: input.zoomCallId,
+          durationSec: recent.durationSec ?? input.durationSec,
+          agent: recent.agent ?? agent,
+        },
+      }).catch(() => {});
+      await prisma.company.update({ where: { id: match.companyId }, data: { lastContacted: new Date() } }).catch(() => {});
+      return;
+    }
+  }
+
   await prisma.callLog.create({
     data: {
       contactId: match.id,
@@ -158,4 +198,46 @@ export async function logZoomCall(input: {
     },
   });
   await prisma.company.update({ where: { id: match.companyId }, data: { lastContacted: new Date() } }).catch(() => {});
+}
+
+// Extract the meaningful fields from a Zoom Phone call/recording webhook body and
+// auto-log them. Shared by the live webhook and the debug replay endpoint.
+// Returns what it parsed so callers can surface a diagnostic.
+export async function processZoomCallEvent(body: Record<string, unknown>): Promise<{
+  handled: boolean; number?: string; direction?: string; recordingUrl?: string; agent?: string; zoomCallId?: string;
+}> {
+  const event = String(body.event ?? "");
+  if (event !== "phone.call_log_completed" && event !== "phone.recording_completed") return { handled: false };
+
+  const payloadObj = (body.payload as { object?: Record<string, unknown> } | undefined)?.object ?? {};
+  // recording_completed nests everything inside recordings[] / recording_files[].
+  const recList = ([payloadObj.recordings, payloadObj.recording_files].find(Array.isArray) as Record<string, unknown>[] | undefined) ?? [];
+  const obj: Record<string, unknown> = recList.length ? { ...payloadObj, ...recList[0] } : payloadObj;
+
+  const direction = String(obj.direction ?? "outbound");
+  const zoomCallId = String(obj.call_id ?? obj.id ?? obj.call_log_id ?? obj.call_history_id ?? obj.call_id_str ?? `${Date.now()}-${Math.random()}`);
+  const duration = Number(obj.duration ?? obj.call_duration ?? 0) || undefined;
+
+  let recordingUrl =
+    (obj.download_url as string | undefined) ?? (obj.recording_url as string | undefined) ??
+    (obj.play_url as string | undefined) ?? (obj.file_url as string | undefined);
+  for (const r of recList) {
+    recordingUrl = recordingUrl ?? (r.download_url as string | undefined) ?? (r.play_url as string | undefined) ?? (r.file_url as string | undefined);
+  }
+
+  // External party: prefer E.164 *_did_number over internal extensions.
+  const calleeDid = obj.callee_did_number as string | undefined;
+  const callerDid = obj.caller_did_number as string | undefined;
+  const callee = (obj.callee as { phone_number?: string } | undefined)?.phone_number ?? (obj.callee_number as string | undefined);
+  const caller = (obj.caller as { phone_number?: string } | undefined)?.phone_number ?? (obj.caller_number as string | undefined);
+  const number = direction === "inbound"
+    ? (callerDid ?? caller ?? calleeDid ?? callee ?? "")
+    : (calleeDid ?? callee ?? callerDid ?? caller ?? "");
+
+  const agentEmail = (obj.owner as { email?: string } | undefined)?.email ?? (obj.user_email as string | undefined) ?? (obj.email as string | undefined);
+  const agentName = (obj.owner as { name?: string } | undefined)?.name ?? (direction === "inbound" ? (obj.callee_name as string | undefined) : (obj.caller_name as string | undefined));
+
+  if (!number) return { handled: false, direction, recordingUrl, zoomCallId };
+  await logZoomCall({ zoomCallId, number, direction, durationSec: duration, recordingUrl, agentEmail, agentName });
+  return { handled: true, number, direction, recordingUrl, agent: agentName, zoomCallId };
 }

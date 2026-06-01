@@ -23,6 +23,7 @@ export type TimelineEvent = {
   actor?: string;
   at: Date;
   meta?: string;
+  link?: string; // e.g. Zoom call recording URL
 };
 
 // Unified activity timeline for a company (and optionally a single deal).
@@ -53,7 +54,7 @@ export async function getTimeline(opts: { companyId?: string; dealId?: string; c
     events.push({ id: e.id, kind: "email", title: `${e.direction === "outbound" ? "Sent" : "Received"}: ${e.subject}`, body: e.body, actor: e.direction === "outbound" ? e.fromAddr : e.fromAddr, at: e.createdAt, meta: e.direction });
   }
   for (const c of calls) {
-    events.push({ id: c.id, kind: "call", title: `Call — ${c.outcome ?? "logged"}`, body: c.notes ?? undefined, actor: c.agent ?? undefined, at: c.createdAt, meta: c.durationSec ? `${Math.round(c.durationSec / 60)}m` : undefined });
+    events.push({ id: c.id, kind: "call", title: `Call — ${c.outcome ?? "logged"}`, body: c.notes ?? undefined, actor: c.agent ?? undefined, at: c.createdAt, meta: c.durationSec ? `${Math.round(c.durationSec / 60)}m` : undefined, link: c.recordingUrl ?? undefined });
   }
   for (const m of meetings) {
     events.push({ id: m.id, kind: "meeting", title: `Meeting — ${m.status}${m.outcome ? ` · ${m.outcome}` : ""}`, at: m.meetingDate ?? m.bookedDate });

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import Avatar from "@/components/Avatar";
 import { showToast } from "@/components/Toast";
 import { celebrate } from "@/components/Celebration";
 import { bookMeetingAction, moveDealAction } from "./actions";
@@ -14,6 +15,7 @@ export type BoardDeal = {
   stage: string;
   ownerInitials: string;
   ownerName?: string;
+  ownerAvatarUrl?: string | null;
   company?: string;
   quoteId: string | null;
 };
@@ -143,7 +145,7 @@ export default function Board({ deals }: { deals: BoardDeal[] }) {
                       {d.quoteId && <span className="qid">{d.quoteId}</span>}
                     </div>
                     <div className="own">
-                      <span className="av">{d.ownerInitials}</span>
+                      <Avatar name={d.ownerName ?? d.ownerInitials} avatarUrl={d.ownerAvatarUrl} className="av" />
                       Owner
                     </div>
                   </div>

@@ -21,6 +21,7 @@ export default async function LeadsPage() {
   const leads: Lead[] = companies.map((c) => ({
     id: c.id, name: c.name, clientId: c.clientId,
     owner: c.owner?.name ?? "—", bdr: c.bdr?.name ?? "—",
+    ownerAvatarUrl: c.owner?.avatarUrl ?? null,
     leadStatus: c.leadStatus, country: c.country ?? "—", tier: c.tier ?? "—", type: c.type ?? "—",
     createdAt: c.createdAt.toISOString(),
     lastActivity: c.lastContacted ? c.lastContacted.toISOString() : null,

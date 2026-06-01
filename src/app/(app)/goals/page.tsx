@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { initials } from "@/components/Logo";
+import Avatar from "@/components/Avatar";
 import Topbar from "@/components/Topbar";
 import PeriodTabs from "../reports/PeriodTabs";
 import { getSalesGoals, teamTotals, toMonthly, kindOf, ROSTER, METRIC_LABEL, WEEKS_PER_MONTH, type Weekly } from "@/lib/goals";
@@ -33,12 +33,12 @@ export default async function GoalsPage({ searchParams }: { searchParams: Promis
   };
 
   // Build per-rep rows with actuals + goals.
-  type Row = { name: string; first: string; kind: "AE" | "BDR"; actual: RepMetrics; goal: Weekly };
+  type Row = { name: string; first: string; kind: "AE" | "BDR"; actual: RepMetrics; goal: Weekly; avatarUrl: string | null };
   const rows: Row[] = ROSTER.map(({ first, kind }) => {
     const u = users.find((x) => x.name.split(" ")[0].toLowerCase() === first);
     const actual = u ? metricsForOwner(deals, u.id, callsByAgent.get(u.name) ?? 0)
       : { revenue: 0, sql: 0, sqm: 0, sqo: 0, calls: 0 };
-    return { name: u?.name ?? first.charAt(0).toUpperCase() + first.slice(1), first, kind, actual, goal: goalFor(first) };
+    return { name: u?.name ?? first.charAt(0).toUpperCase() + first.slice(1), first, kind, actual, goal: goalFor(first), avatarUrl: u?.avatarUrl ?? null };
   });
 
   const aeRows = rows.filter((r) => r.kind === "AE");
@@ -100,7 +100,7 @@ export default async function GoalsPage({ searchParams }: { searchParams: Promis
           <tbody>
             {aeRows.map((r) => (
               <tr className="row" key={r.first}>
-                <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span className="mini-av">{initials(r.name)}</span>{r.name}</span></td>
+                <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Avatar name={r.name} avatarUrl={r.avatarUrl} />{r.name}</span></td>
                 <Cell a={r.actual.revenue} g={r.goal.revenue} fmt={money} />
                 <Cell a={r.actual.sql} g={r.goal.sql} />
                 <Cell a={r.actual.sqm} g={r.goal.sqm} />
@@ -119,7 +119,7 @@ export default async function GoalsPage({ searchParams }: { searchParams: Promis
           <tbody>
             {bdrRows.map((r) => (
               <tr className="row" key={r.first}>
-                <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span className="mini-av">{initials(r.name)}</span>{r.name}</span></td>
+                <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Avatar name={r.name} avatarUrl={r.avatarUrl} />{r.name}</span></td>
                 <Cell a={r.actual.sql} g={r.goal.sql} />
                 <Cell a={r.actual.sqm} g={r.goal.sqm} />
                 <Cell a={r.actual.calls} g={r.goal.calls} />

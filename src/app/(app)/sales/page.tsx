@@ -25,21 +25,27 @@ export default async function SalesPage() {
     stage: d.stage,
     ownerInitials: d.owner ? initials(d.owner.name) : "—",
     ownerName: d.owner?.name ?? "—",
+    ownerAvatarUrl: d.owner?.avatarUrl ?? null,
     company: d.company.name,
     quoteId: d.quotes[0]?.quoteId ?? null,
   }));
+
+  // name → avatar lookup for the rail leaderboards
+  const avatarByName = new Map<string, string | null>();
+  for (const d of deals) if (d.owner) avatarByName.set(d.owner.name, d.owner.avatarUrl);
+  for (const m of meetings) if (m.bdr) avatarByName.set(m.bdr.name, m.bdr.avatarUrl);
 
   // AE leaderboard — deals won
   const aeWins = new Map<string, number>();
   for (const d of deals.filter((x) => x.stage === "Closed Won")) {
     if (d.owner) aeWins.set(d.owner.name, (aeWins.get(d.owner.name) ?? 0) + 1);
   }
-  const aeRows = [...aeWins.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([label, n]) => ({ label, value: String(n), pct: n, sub: "deals won" }));
+  const aeRows = [...aeWins.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([label, n]) => ({ label, value: String(n), pct: n, sub: "deals won", avatarUrl: avatarByName.get(label) ?? null }));
 
   // BDR leaderboard — SQLs booked
   const bdrCount = new Map<string, number>();
   for (const m of meetings) { if (m.bdr) bdrCount.set(m.bdr.name, (bdrCount.get(m.bdr.name) ?? 0) + 1); }
-  const bdrRows = [...bdrCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([label, n]) => ({ label, value: String(n), pct: n, sub: "SQLs booked" }));
+  const bdrRows = [...bdrCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([label, n]) => ({ label, value: String(n), pct: n, sub: "SQLs booked", avatarUrl: avatarByName.get(label) ?? null }));
 
   return (
     <>

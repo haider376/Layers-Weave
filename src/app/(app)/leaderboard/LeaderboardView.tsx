@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { initials } from "@/components/Logo";
+import Avatar from "@/components/Avatar";
 
-export type LbRow = { name: string; title: string; primary: number; primaryLabel: string; wins: number; secondary: string };
+export type LbRow = { name: string; title: string; primary: number; primaryLabel: string; wins: number; secondary: string; avatarUrl?: string | null };
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
@@ -37,7 +37,7 @@ function Board({ title, rows, accent }: { title: string; rows: LbRow[]; accent: 
               transition={{ delay: 0.1 + place * 0.08, type: "spring", stiffness: 220, damping: 18 }}
             >
               <div className="lb-medal">{MEDAL[place]}</div>
-              <div className={`lb-pod-av${place === 0 ? " lead" : ""}`} style={{ borderColor: accent }}>{initials(r.name)}</div>
+              <Avatar name={r.name} avatarUrl={r.avatarUrl} className={`lb-pod-av${place === 0 ? " lead" : ""}`} style={{ borderColor: accent }} />
               <div className="lb-pod-nm">{r.name}</div>
               <div className="lb-pod-val font-display" style={{ color: accent }}>{fmt(r.primary, r.primaryLabel)}</div>
               <div className="lb-pod-sub">{r.secondary}</div>
@@ -54,7 +54,7 @@ function Board({ title, rows, accent }: { title: string; rows: LbRow[]; accent: 
           <motion.div className={`lb-row${i === 0 ? " leader" : ""}`} key={r.name}
             initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
             <span className="lb-rank">{i < 3 ? MEDAL[i] : i + 1}</span>
-            <span className="lb-av">{initials(r.name)}</span>
+            <Avatar name={r.name} avatarUrl={r.avatarUrl} className="lb-av" />
             <div className="lb-info">
               <div className="lb-nm">{r.name}<small>{r.title}</small></div>
               <div className="lb-track"><motion.i initial={{ width: 0 }} animate={{ width: `${(r.primary / max) * 100}%` }} transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1], delay: 0.1 + i * 0.05 }} style={{ background: accent }} /></div>

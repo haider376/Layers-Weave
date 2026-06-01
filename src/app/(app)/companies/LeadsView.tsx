@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
-import { initials } from "@/components/Logo";
+import Avatar from "@/components/Avatar";
 import Select from "@/components/ui/Select";
 import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
 import BulkEnroll, { type CadenceOpt } from "@/components/BulkEnroll";
@@ -15,7 +15,7 @@ const BADGE = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
 export type Lead = {
   id: string; name: string; clientId: string; owner: string; bdr: string; leadStatus: string;
   country: string; tier: string; type: string; createdAt: string; lastActivity: string | null;
-  ownerAssignedAt: string | null; deals: number; contacts: number;
+  ownerAssignedAt: string | null; deals: number; contacts: number; ownerAvatarUrl?: string | null;
 };
 
 const STATUSES = ["New", "In Progress", "Open Deal", "Cool Off", "Data Quality", "Do Not Contact"];
@@ -154,7 +154,7 @@ export default function LeadsView({ leads, cadences = [] }: { leads: Lead[]; cad
                 <tr className={`row${selected.has(l.id) ? " sel" : ""}`} key={l.id}>
                   <td className="sel-td"><input type="checkbox" className="lv-check" checked={selected.has(l.id)} onChange={() => toggleSel(l.id)} /></td>
                   <td><Link href={`?company=${l.id}`} style={{ fontWeight: 600, textDecoration: "none" }}>{l.name}<small style={{ display: "block", color: "var(--faint)", fontWeight: 500 }}>{l.clientId}</small></Link></td>
-                  <td><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span className="mini-av">{initials(l.owner)}</span>{l.owner.split(" ")[0]}</span></td>
+                  <td><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Avatar name={l.owner} avatarUrl={l.ownerAvatarUrl} className="mini-av" />{l.owner.split(" ")[0]}</span></td>
                   <td>{l.bdr.split(" ")[0]}</td>
                   <td><span className={`st ${statusCls(l.leadStatus)}`}><span className="d" />{l.leadStatus}</span></td>
                   <td>{l.country}</td><td>{fmtD(l.createdAt)}</td><td>{fmtD(l.lastActivity)}</td>
@@ -176,7 +176,7 @@ export default function LeadsView({ leads, cadences = [] }: { leads: Lead[]; cad
                   {items.map((l) => (
                     <div className="deal" key={l.id} draggable onDragStart={() => setDragId(l.id)} onDragEnd={() => setDragId(null)}>
                       <Link className="dn dn-link" href={`?company=${l.id}`} scroll={false}>{l.name}</Link>
-                      <div className="own"><span className="av">{initials(l.owner)}</span>{l.country}</div>
+                      <div className="own"><Avatar name={l.owner} avatarUrl={l.ownerAvatarUrl} className="av" />{l.country}</div>
                     </div>
                   ))}
                   {items.length === 0 && <div style={{ fontSize: 11, color: "var(--faint)", padding: 4 }}>—</div>}

@@ -13,7 +13,7 @@ import {
 import { zoomCallAction } from "@/app/actions/zoom";
 import NavPunk from "./NavPunk";
 
-export type TLEvent = { id: string; kind: string; title: string; body?: string; actor?: string; at: string; meta?: string };
+export type TLEvent = { id: string; kind: string; title: string; body?: string; actor?: string; at: string; meta?: string; link?: string };
 
 const ICONS: Record<string, React.ReactNode> = {
   note: <NavPunk name="note" size={15} />,
@@ -194,6 +194,7 @@ export default function ActivityPanel({
             <div className="tl-bd">
               <div className="tl-title">{e.title}{e.meta && <span className="tl-meta"> · {e.meta}</span>}</div>
               {e.body && <div className="tl-body">{e.body}</div>}
+              {e.link && <a className="tl-rec" href={e.link} target="_blank" rel="noopener noreferrer">▶ Play recording</a>}
               <div className="tl-when">{e.actor ? `${e.actor} · ` : ""}{timeAgo(new Date(e.at))}</div>
             </div>
           </div>
