@@ -1136,9 +1136,6 @@ tbody td{padding:15px 22px}
 .gcal-month-dow div { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); padding: 8px 0; }
 .gcal-month-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(96px, 1fr); overflow-y: auto; }
 .gcal-mcell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 4px 6px; overflow: hidden; cursor: pointer; min-height: 0; display: flex; flex-direction: column; gap: 3px; transition: background .1s; }
-/* An expanded cell grows to fit all of its events (Show less collapses it). */
-.gcal-mcell.open { overflow: visible; z-index: 2; background: var(--panel-2); box-shadow: 0 8px 24px -10px rgba(0,0,0,.7); }
-.gcal-mcell.open .gcal-mcell-evs { overflow: visible; }
 .gcal-mcell:nth-child(7n) { border-right: 0; }
 .gcal-mcell:hover { background: var(--bg); }
 .gcal-mcell.out { background: color-mix(in srgb, var(--bg) 55%, transparent); }
@@ -1653,3 +1650,12 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 
 /* Holiday chips read as full-width all-day bars (like Google) */
 .gcal-cal-item input { flex: none; }
+
+/* ── Month "X more" day popover (Google-style, no grid layout shift) ── */
+.gcal-daypop-wrap { position: fixed; inset: 0; z-index: 220; background: rgba(0,0,0,.4); display: grid; place-items: center; padding: 24px; animation: gcalFade .12s ease; }
+.gcal-daypop { width: min(360px, 92vw); max-height: 70vh; background: var(--panel); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: 0 24px 60px -18px rgba(0,0,0,.7); display: flex; flex-direction: column; overflow: hidden; animation: gcalPop .14s ease; }
+.gcal-daypop-h { display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.gcal-daypop-dow { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--faint); font-weight: 600; }
+.gcal-daypop-num { font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--text); }
+.gcal-daypop-list { padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.gcal-daypop-list .gcal-chip { white-space: normal; padding: 6px 9px; font-size: 12px; }

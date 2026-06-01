@@ -222,9 +222,10 @@ function MonthGrid({ cursor, byDay, onDay }: { cursor: Date; byDay: Record<strin
   const start = addDays(new Date(y, m, 1), -new Date(y, m, 1).getDay());
   const cells = Array.from({ length: 42 }, (_, i) => addDays(start, i));
   const today = new Date();
-  // Which day-cells are expanded to show ALL their events in-place.
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const toggle = (key: string) => setExpanded((s) => { const n = new Set(s); if (n.has(key)) n.delete(key); else n.add(key); return n; });
+  // "X more" opens a popover listing ALL of that day's events (Google-style),
+  // which never disturbs the grid layout.
+  const [popDay, setPopDay] = useState<string | null>(null);
+  const popItems = popDay ? (byDay[popDay] ?? []) : [];
 
   return (
     <div className="gcal-month">
@@ -234,18 +235,16 @@ function MonthGrid({ cursor, byDay, onDay }: { cursor: Date; byDay: Record<strin
           const out = d.getMonth() !== m;
           const key = iso(d);
           const evs = byDay[key] ?? [];
-          const isOpen = expanded.has(key);
-          const shown = isOpen ? evs : evs.slice(0, 3);
           return (
-            <div key={i} className={`gcal-mcell${out ? " out" : ""}${isOpen ? " open" : ""}`} onClick={() => onDay(d)}>
+            <div key={i} className={`gcal-mcell${out ? " out" : ""}`} onClick={() => onDay(d)}>
               <div className="gcal-mcell-h">
                 <span className={`gcal-mcell-num${sameDay(d, today) ? " today" : ""}`}>{d.getDate()}</span>
               </div>
               <div className="gcal-mcell-evs">
-                {shown.map((e) => <Chip key={e.id} e={e} />)}
+                {evs.slice(0, 3).map((e) => <Chip key={e.id} e={e} />)}
                 {evs.length > 3 && (
-                  <button className="gcal-more" onClick={(ev) => { ev.stopPropagation(); toggle(key); }}>
-                    {isOpen ? "Show less" : `${evs.length - 3} more`}
+                  <button className="gcal-more" onClick={(ev) => { ev.stopPropagation(); setPopDay(key); }}>
+                    {evs.length - 3} more
                   </button>
                 )}
               </div>
@@ -253,6 +252,24 @@ function MonthGrid({ cursor, byDay, onDay }: { cursor: Date; byDay: Record<strin
           );
         })}
       </div>
+
+      {/* Day popover — all events for the chosen day, scrollable, no layout shift */}
+      {popDay && (
+        <div className="gcal-daypop-wrap" onClick={() => setPopDay(null)}>
+          <div className="gcal-daypop" onClick={(e) => e.stopPropagation()}>
+            <div className="gcal-daypop-h">
+              <div>
+                <div className="gcal-daypop-dow">{new Date(`${popDay}T00:00:00`).toLocaleDateString("en-GB", { weekday: "long" })}</div>
+                <div className="gcal-daypop-num">{new Date(`${popDay}T00:00:00`).getDate()}</div>
+              </div>
+              <button className="gcal-modal-x" onClick={() => setPopDay(null)}>×</button>
+            </div>
+            <div className="gcal-daypop-list">
+              {popItems.map((e) => <Chip key={e.id} e={e} />)}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
