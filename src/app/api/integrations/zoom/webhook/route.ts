@@ -4,17 +4,23 @@ import { zoomVerifySignature, zoomUrlValidation, logZoomCall } from "@/lib/zoom"
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// GET — quick reachability + readiness check (visit the URL in a browser).
-// Confirms the endpoint is live and whether ZOOM_WEBHOOK_SECRET is set, so you
-// can verify everything BEFORE clicking "Validate" in the Zoom Marketplace.
+// GET — reachability + readiness + a self-test of the validation math.
+// Visiting the URL shows whether ZOOM_WEBHOOK_SECRET is set, its exact length
+// (to catch stray spaces/quotes), and a sample encryptedToken so we can confirm
+// the handshake works BEFORE clicking "Validate" in the Zoom Marketplace.
 export async function GET() {
+  const secret = process.env.ZOOM_WEBHOOK_SECRET ?? "";
+  const sample = zoomUrlValidation("sampleToken123");
   return NextResponse.json({
     ok: true,
     endpoint: "zoom webhook",
-    webhookSecretSet: !!process.env.ZOOM_WEBHOOK_SECRET,
-    hint: process.env.ZOOM_WEBHOOK_SECRET
-      ? "Ready — set this exact URL in Zoom and click Validate."
-      : "Set ZOOM_WEBHOOK_SECRET in Vercel and redeploy BEFORE clicking Validate in Zoom.",
+    webhookSecretSet: !!secret,
+    secretLength: secret.length,
+    secretHasWhitespace: secret !== secret.trim(),
+    sampleValidation: sample, // {plainToken, encryptedToken} — proves the HMAC runs
+    hint: secret
+      ? "Set this exact URL in Zoom, ensure the Secret Token matches, then Validate."
+      : "Set ZOOM_WEBHOOK_SECRET in Vercel and redeploy BEFORE clicking Validate.",
   });
 }
 

@@ -123,8 +123,14 @@ export async function zoomPlaceCall(userId: string, calleeNumber: string): Promi
 
 // ── Webhook signature verification (Zoom v2) ────────────────────────────────
 // Zoom signs: "v0:{timestamp}:{rawBody}" with HMAC-SHA256(secret) → "v0={hex}".
+// Trim the secret defensively — a stray newline/space from a Vercel paste would
+// otherwise silently break the HMAC and fail Zoom's validation.
+function webhookSecret(): string {
+  return (process.env.ZOOM_WEBHOOK_SECRET ?? "").trim();
+}
+
 export function zoomVerifySignature(rawBody: string, signature: string | null, timestamp: string | null): boolean {
-  const secret = process.env.ZOOM_WEBHOOK_SECRET;
+  const secret = webhookSecret();
   if (!secret || !signature || !timestamp) return false;
   const message = `v0:${timestamp}:${rawBody}`;
   const expected = "v0=" + crypto.createHmac("sha256", secret).update(message).digest("hex");
@@ -137,8 +143,7 @@ export function zoomVerifySignature(rawBody: string, signature: string | null, t
 
 // Zoom's URL-validation challenge response.
 export function zoomUrlValidation(plainToken: string): { plainToken: string; encryptedToken: string } {
-  const secret = process.env.ZOOM_WEBHOOK_SECRET ?? "";
-  const encryptedToken = crypto.createHmac("sha256", secret).update(plainToken).digest("hex");
+  const encryptedToken = crypto.createHmac("sha256", webhookSecret()).update(plainToken).digest("hex");
   return { plainToken, encryptedToken };
 }
 
