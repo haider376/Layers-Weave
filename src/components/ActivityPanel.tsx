@@ -12,6 +12,7 @@ import {
 } from "@/app/(app)/sales/record-actions";
 import { zoomCallAction } from "@/app/actions/zoom";
 import { sendWhatsAppAction } from "@/app/actions/whatsapp";
+import EmptyState from "./EmptyState";
 import NavPunk from "./NavPunk";
 
 export type TLEvent = { id: string; kind: string; title: string; body?: string; actor?: string; at: string; meta?: string; link?: string };
@@ -210,7 +211,7 @@ export default function ActivityPanel({
       </div>
 
       <div className="timeline">
-        {events.length === 0 && <div className="q-note" style={{ padding: 16 }}>No activity yet — log a note, email or call above.</div>}
+        {events.length === 0 && <EmptyState text="No activity yet" sub="Log a note, email or call above." />}
         {events.map((e) => (
           <div className={`tl-ev ${e.kind}`} key={e.id}>
             <div className="tl-ic">{ICONS[e.kind] ?? ICONS.system}</div>

@@ -1,6 +1,7 @@
 import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import Avatar from "@/components/Avatar";
+import EmptyState from "@/components/EmptyState";
 import Topbar from "@/components/Topbar";
 import NavPunk from "@/components/NavPunk";
 
@@ -128,7 +129,7 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               ))}
-              {activities.length === 0 && <div className="q-note" style={{ padding: 16 }}>No activity yet.</div>}
+              {activities.length === 0 && <EmptyState text="No activity yet" sub="Wins and updates will land here." />}
             </div>
           </section>
 
@@ -142,7 +143,7 @@ export default async function DashboardPage() {
                   <span className="mt">{p.wins}</span>
                 </div>
               ))}
-              {leaderboard.length === 0 && <div className="q-note" style={{ padding: 16 }}>No wins yet.</div>}
+              {leaderboard.length === 0 && <EmptyState text="No wins yet" sub="Close a deal to hit the board." />}
             </div>
           </section>
         </div>

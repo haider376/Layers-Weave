@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Avatar from "@/components/Avatar";
+import EmptyState from "@/components/EmptyState";
 
 export type LbRow = { name: string; title: string; primary: number; primaryLabel: string; wins: number; secondary: string; avatarUrl?: string | null };
 
@@ -65,7 +66,7 @@ function Board({ title, rows, accent }: { title: string; rows: LbRow[]; accent: 
             </div>
           </motion.div>
         ))}
-        {rows.length === 0 && <div className="q-note" style={{ padding: 16 }}>No reps yet.</div>}
+        {rows.length === 0 && <EmptyState text="No reps yet" sub="Logged deals & calls rank reps here." />}
       </div>
     </section>
   );

@@ -291,6 +291,42 @@ assets.check = uiSvg(35, `
   <path d="M110 270 L210 370 L410 140"/>
 `, 22);
 
+// ── Wide motifs (underlines, drip strips) ───────────────────────────────────
+// Same rough hand-drawn filter, but on a banner-shaped viewBox.
+function band(id, body, { w = 360, h = 48, sw = 9 } = {}, drips = []) {
+  const dripEls = drips.map((d) => drip(d.x, d.y, d.len, d.w)).join("\n");
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" fill="none">
+${defs(id)}
+  <g filter="url(#rough_${id})" stroke="${LIME}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+${body}
+  </g>
+  <g filter="url(#rough_${id})">
+${dripEls}
+  </g>
+</svg>`;
+}
+
+// 36) UNDERLINE — a double graffiti swipe under section headings
+assets.underline = band(36, `
+  <path d="M12 28 C72 16 152 38 212 24 C272 12 322 30 350 18"/>
+  <path d="M18 41 C96 33 184 47 252 35 C300 27 332 41 352 32"/>
+`, { w: 360, h: 48, sw: 8 });
+
+// 37) DRIPS — a top edge with paint runnels hanging down (login hero)
+assets.drips = band(37, `
+  <path d="M4 12 C120 4 240 4 356 12"/>
+`, { w: 360, h: 96, sw: 9 }, [
+  { x: 38, y: 12, len: 34, w: 8 }, { x: 92, y: 12, len: 60, w: 9 },
+  { x: 150, y: 12, len: 24, w: 7 }, { x: 212, y: 12, len: 72, w: 10 },
+  { x: 270, y: 12, len: 42, w: 8 }, { x: 324, y: 12, len: 54, w: 9 },
+]);
+
+// 38) SCRIBBLE-ARROW — a loose hand-drawn arrow for empty states
+assets["arrow-down"] = svg(38, `
+  <path d="M256 92 C198 196 332 250 258 398"/>
+  <path d="M210 344 L258 404 L304 344"/>
+`, [], { sw: 18 });
+
 // ── Write all SVGs ──────────────────────────────────────────────────────────
 for (const [name, content] of Object.entries(assets)) {
   fs.writeFileSync(path.join(OUT, `${name}.svg`), content.trim() + "\n");
