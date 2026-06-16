@@ -116,6 +116,9 @@ function FullView({ card, onClose }: { card: Card; onClose: () => void }) {
   const [topN, setTopN] = useState(0); // 0 = all
   const [minPct, setMinPct] = useState(0);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
+  // Time-series (spark) controls
+  const [window, setWindow] = useState(0); // 0 = all points
+  const [cumulative, setCumulative] = useState(false);
 
   // Cards that expose a list of rows get the rich filter rail.
   const rows: RowLike[] | null = useMemo(() => {
@@ -182,8 +185,40 @@ function FullView({ card, onClose }: { card: Card; onClose: () => void }) {
             </aside>
           )}
 
+          {card.type === "spark" && (
+            <aside className="an-filters">
+              <div className="an-filters-h">Filters</div>
+              <label className="an-f"><span>Window {window === 0 ? "all" : `last ${window}`}</span>
+                <input type="range" min={0} max={card.data.length} value={window} onChange={(e) => setWindow(+e.target.value)} />
+              </label>
+              <label className="an-f"><span>Mode</span>
+                <div className="seg an-seg">
+                  <button className={!cumulative ? "on" : ""} onClick={() => setCumulative(false)}>Per period</button>
+                  <button className={cumulative ? "on" : ""} onClick={() => setCumulative(true)}>Cumulative</button>
+                </div>
+              </label>
+              <button className="btn ghost" style={{ marginTop: 4 }} onClick={() => { setWindow(0); setCumulative(false); }}>Reset filters</button>
+            </aside>
+          )}
+
           <div className="an-full-chart">
-            {card.type === "donut" && view ? (
+            {card.type === "spark" ? (() => {
+              let series = window > 0 ? card.data.slice(-window) : card.data;
+              if (cumulative) { let a = 0; series = series.map((v) => (a += v)); }
+              const mx = Math.max(1, ...series), mn = Math.min(...series);
+              const avg = series.length ? Math.round(series.reduce((s, v) => s + v, 0) / series.length) : 0;
+              return (
+                <div style={{ width: "100%" }}>
+                  <Sparkline data={series} height={240} />
+                  <div className="an-spark-stats">
+                    <div><span>Peak</span><b>{mx.toLocaleString("en-US")}</b></div>
+                    <div><span>Low</span><b>{mn.toLocaleString("en-US")}</b></div>
+                    <div><span>Average</span><b>{avg.toLocaleString("en-US")}</b></div>
+                    <div><span>Total</span><b>{card.data.reduce((s, v) => s + v, 0).toLocaleString("en-US")}</b></div>
+                  </div>
+                </div>
+              );
+            })() : card.type === "donut" && view ? (
               <div className="an-full-donut">
                 <Donut data={card.data.filter((d) => view.some((v) => v.label === d.label))} centerLabel={card.center} size={240} />
                 <div className="an-legend">

@@ -31,6 +31,20 @@ function Toggle({ label, sub, defaultOn = true }: { label: string; sub: string; 
   );
 }
 // Persisted appearance toggle (writes to localStorage + applies immediately)
+function ThemeControl() {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  useEffect(() => { setTheme(getPrefs().theme); }, []);
+  return (
+    <div className="set-row">
+      <div><div className="set-row-t">Appearance</div><div className="set-row-s">Light or dark interface</div></div>
+      <div className="seg an-seg">
+        {(["dark", "light"] as const).map((t) => (
+          <button key={t} className={theme === t ? "on" : ""} onClick={() => { setTheme(t); setPref("theme", t); }}>{t === "dark" ? "Dark" : "Light"}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
 type BoolPref = "celebrations" | "reduceMotion" | "compact" | "grain";
 function PrefToggle({ pref, label, sub }: { pref: BoolPref; label: string; sub: string }) {
   const [on, setOn] = useState(true);
@@ -195,6 +209,7 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
           )}
           {tab === "Appearance" && (
             <div className="set-list">
+              <ThemeControl />
               <PrefToggle pref="celebrations" label="Celebrations & confetti" sub="Hype animations on wins" />
               <PrefToggle pref="reduceMotion" label="Reduced motion" sub="Minimise animations" />
               <PrefToggle pref="compact" label="Compact density" sub="Tighter rows & spacing" />
