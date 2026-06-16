@@ -23,6 +23,21 @@
   --r:10px;
   --display:var(--font-display),'Hanken Grotesk',sans-serif;
 }
+/* ── Light theme — warm paper, ink text; lime/purple deepened for contrast ── */
+:root[data-theme="light"]{
+  --bg:#F2F2EF;--panel:#FFFFFF;--panel-2:#F7F7F4;--raise:#ECECE7;
+  --line:rgba(16,16,20,.10);--line-2:rgba(16,16,20,.17);
+  --text:#15151A;--muted:#56565E;--faint:#9A9AA1;
+  --neon:#6FA00C;--neon-soft:rgba(111,160,12,.14);--neon-ink:#FFFFFF;--neon-deep:#5C840A;
+  --violet:#15151A;--violet-br:#15151A;--violet-soft:rgba(16,16,20,.05);--violet-deep:#2A2A30;
+  --amber:#B5860B;--amber-soft:rgba(181,134,11,.14);--red:#D84338;--red-soft:rgba(216,67,56,.12);
+  --purple:#7C3AED;--purple-br:#6D28D9;--purple-soft:rgba(124,58,237,.12);--purple-deep:#6D28D9;
+  --blue:#2563EB;--cyan:#0E9CB8;
+  --glow-green:0 0 0 1px rgba(111,160,12,.4),0 8px 26px -12px rgba(111,160,12,.3);
+  --glow-purple:0 0 0 1px rgba(124,58,237,.35),0 10px 30px -14px rgba(124,58,237,.3);
+  --glow-soft:0 1px 0 rgba(255,255,255,.6) inset,0 8px 24px -16px rgba(16,16,20,.28);
+  --side-bg:#FBFBF9;
+}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{font-family:var(--font-sans),system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:"ss01" on;overflow-x:hidden;letter-spacing:-0.006em}
@@ -33,7 +48,7 @@ body::after{content:'';position:fixed;bottom:-300px;left:50%;transform:translate
 .app::before{content:'';position:fixed;top:-260px;left:-180px;width:620px;height:520px;background:radial-gradient(circle,rgba(139,92,246,.07),transparent 70%);pointer-events:none;z-index:0}
 .app{display:grid;grid-template-columns:236px 1fr;min-height:100vh;position:relative;z-index:1}
 
-.side{border-right:1px solid var(--line);padding:16px 12px 10px;display:flex;flex-direction:column;gap:11px;background:rgba(11,7,23,.55);position:sticky;top:0;height:100vh;overflow:hidden}
+.side{border-right:1px solid var(--line);padding:16px 12px 10px;display:flex;flex-direction:column;gap:11px;background:var(--side-bg,rgba(11,7,23,.55));position:sticky;top:0;height:100vh;overflow:hidden}
 .side-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:11px}
 .side-scroll::-webkit-scrollbar{width:6px}
 .side-scroll::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}

@@ -31,7 +31,8 @@ function Toggle({ label, sub, defaultOn = true }: { label: string; sub: string; 
   );
 }
 // Persisted appearance toggle (writes to localStorage + applies immediately)
-function PrefToggle({ pref, label, sub }: { pref: keyof Prefs; label: string; sub: string }) {
+type BoolPref = "celebrations" | "reduceMotion" | "compact" | "grain";
+function PrefToggle({ pref, label, sub }: { pref: BoolPref; label: string; sub: string }) {
   const [on, setOn] = useState(true);
   useEffect(() => { setOn(getPrefs()[pref]); }, [pref]);
   return (

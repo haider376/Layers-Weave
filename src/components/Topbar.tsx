@@ -3,6 +3,7 @@ import Integrations from "./Integrations";
 import SearchBox from "./SearchBox";
 import NotificationBell from "./NotificationBell";
 import SignOutButton from "./SignOutButton";
+import ThemeToggle from "./ThemeToggle";
 import NavPunk from "./NavPunk";
 
 export default function Topbar({ title, sub }: { title: string; sub: string }) {
@@ -16,6 +17,7 @@ export default function Topbar({ title, sub }: { title: string; sub: string }) {
         <SearchBox />
         <Integrations />
         <NotificationBell />
+        <ThemeToggle />
         <Link href="/settings" className="itg-btn" title="Settings" aria-label="Settings">
           <NavPunk name="gear" size={19} />
         </Link>

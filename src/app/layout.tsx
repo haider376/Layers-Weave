@@ -14,8 +14,11 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Apply persisted theme/density before first paint to avoid a flash.
+  const themeScript = `(function(){try{var p=JSON.parse(localStorage.getItem('lw-prefs')||'{}');var e=document.documentElement;e.setAttribute('data-theme',p.theme==='light'?'light':'dark');if(p.compact)e.classList.add('compact');if(p.grain===false)e.classList.add('no-grain');if(p.reduceMotion)e.classList.add('reduce-motion');}catch(_){}})();`;
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`} data-theme="dark" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body>{children}</body>
     </html>
   );
