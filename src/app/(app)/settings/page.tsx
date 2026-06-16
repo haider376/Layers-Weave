@@ -10,6 +10,7 @@ import { getConnection, googleConfigured } from "@/lib/google";
 import { zoomGetConnection, zoomConfigured } from "@/lib/zoom";
 import { slackConfigured, slackChannelLabel } from "@/lib/slack";
 import { whatsappConfigured } from "@/lib/whatsapp";
+import { ensureRosterSynced } from "@/lib/roster";
 
 // Always render fresh — integration connection state must not be cached.
 export const dynamic = "force-dynamic";
@@ -18,7 +19,11 @@ export default async function SettingsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  // Team section is locked to the 10 authorized internal members (first names).
+  // Self-heal the live roster (adds Oliver/Hayaa, fixes Adan, retires Hilmand)
+  // once per deploy — so team changes apply without a manual step.
+  if (user.isAdmin) await ensureRosterSynced();
+
+  // Team section is locked to the authorized internal members (first names).
   const ALLOWED = ["oliver", "shahzaib", "haider", "zikriya", "adan", "rija", "kamila", "asjad", "fatima", "huzaifa", "hayaa"];
   const allUsers = user.isAdmin ? await prisma.user.findMany({ orderBy: { name: "asc" } }) : [];
   const team = user.isAdmin
