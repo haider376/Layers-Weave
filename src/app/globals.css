@@ -14,8 +14,12 @@
   /* "violet" kept as a token name but mapped to neutral ink/ivory so UI stays mono */
   --violet:#E7E7E4;--violet-br:#F7F6F2;--violet-soft:rgba(255,255,255,.06);--violet-deep:#C9C9C5;
   --amber:#E0B23C;--amber-soft:rgba(224,178,60,.13);--red:#F0594F;--red-soft:rgba(240,89,79,.13);
+  /* purple — the brand's second accent (graffiti/glow), used alongside lime */
+  --purple:#8B5CF6;--purple-br:#A855F7;--purple-soft:rgba(139,92,246,.14);--purple-deep:#7C3AED;
+  --blue:#3B82F6;--cyan:#22D3EE;
   --glow-green:0 0 0 1px rgba(198,245,66,.5),0 8px 30px -10px rgba(198,245,66,.35);
-  --glow-purple:0 8px 30px -12px rgba(0,0,0,.8);
+  --glow-purple:0 0 0 1px rgba(139,92,246,.45),0 10px 34px -12px rgba(139,92,246,.4);
+  --glow-soft:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px -18px rgba(0,0,0,.7);
   --r:10px;
   --display:var(--font-display),'Hanken Grotesk',sans-serif;
 }
@@ -25,6 +29,8 @@ body{font-family:var(--font-sans),system-ui,sans-serif;background:var(--bg);colo
 /* Subtle grain — barely-there texture, monochrome */
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(rgba(255,255,255,.025) 1px,transparent 1.4px);background-size:6px 6px;opacity:.7}
 body::after{content:'';position:fixed;bottom:-300px;left:50%;transform:translateX(-50%);width:680px;height:520px;background:radial-gradient(circle,rgba(198,245,66,.05),transparent 70%);pointer-events:none;z-index:0}
+/* Brand hero glow — purple up top-left, lime handled above — subtle ambient depth */
+.app::before{content:'';position:fixed;top:-260px;left:-180px;width:620px;height:520px;background:radial-gradient(circle,rgba(139,92,246,.07),transparent 70%);pointer-events:none;z-index:0}
 .app{display:grid;grid-template-columns:236px 1fr;min-height:100vh;position:relative;z-index:1}
 
 .side{border-right:1px solid var(--line);padding:16px 12px 10px;display:flex;flex-direction:column;gap:11px;background:rgba(11,7,23,.55);position:sticky;top:0;height:100vh;overflow:hidden}
@@ -81,11 +87,11 @@ body::after{content:'';position:fixed;bottom:-300px;left:50%;transform:translate
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 17px;position:relative;overflow:hidden}
 .kpi .bar{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--neon)}
-.kpi.v .bar{background:var(--violet)}.kpi.a .bar{background:var(--amber)}
+.kpi.v .bar{background:var(--purple)}.kpi.a .bar{background:var(--amber)}
 .kpi .lbl{font-size:11px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:7px}
 .kpi .lbl svg{width:14px;height:14px;stroke:currentColor}
 .kpi .val{font-family:var(--display);font-weight:900;font-size:27px;margin-top:11px}
-.kpi .val.neon{color:var(--neon)}.kpi .val.vio{color:var(--violet-br)}
+.kpi .val.neon{color:var(--neon)}.kpi .val.vio{color:var(--purple-br)}
 .kpi .delta{font-size:11px;margin-top:6px;color:var(--faint)}
 
 .grid2{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
@@ -1673,3 +1679,15 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .zoom-banner-l { display: flex; align-items: center; gap: 12px; }
 .zoom-banner-t { font-size: 13.5px; font-weight: 700; }
 .zoom-banner-s { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── Brand refinement (purple + lime) — subtle lift & accents ───────────── */
+.kpi:hover{transform:translateY(-2px);border-color:var(--line-2);box-shadow:var(--glow-soft)}
+.an-card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.an-card:hover{border-color:var(--line-2);box-shadow:var(--glow-soft)}
+/* lime hairline at the top of each analytics card for a branded edge */
+.an-card{position:relative}
+.an-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon),transparent 60%);opacity:.5;pointer-events:none}
+.an-card:hover::after{opacity:.9}
+/* KPI accent bar glow on the purple/lime variants */
+.kpi.v:hover{box-shadow:var(--glow-soft),0 0 28px -16px var(--purple)}
+.kpi:not(.v):not(.a):hover{box-shadow:var(--glow-soft),0 0 28px -16px var(--neon)}

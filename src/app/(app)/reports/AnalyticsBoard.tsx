@@ -69,7 +69,7 @@ export default function AnalyticsBoard({ kpis, cards, storageKey = "analytics-or
 
   return (
     <>
-      <div className="kpis" style={{ gridTemplateColumns: "repeat(6,1fr)" }}>
+      <div className="kpis" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))" }}>
         {kpis.map((k) => (
           <motion.div key={k.label} className={`kpi${k.accent === "vio" ? " v" : ""}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             <span className="bar" />

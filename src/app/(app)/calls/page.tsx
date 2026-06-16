@@ -8,15 +8,10 @@ import Topbar from "@/components/Topbar";
 import Sparkline from "@/components/Sparkline";
 import Donut from "@/components/Donut";
 import ZoomBanner from "./ZoomBanner";
+import { OUTCOME_COLORS as SENT_COLORS } from "@/lib/statusColors";
 
 // Always fresh — Zoom connection state must not be cached.
 export const dynamic = "force-dynamic";
-
-const SENT_COLORS: Record<string, string> = {
-  "SQL Booked": "#C6F542", "Interested / Follow up": "#A9DF1E", "Call Back Later": "#E0B23C",
-  "Not Interested": "#F0594F", "Left Voicemail": "#8A8A90", "No Answer": "#2A2A2E",
-  "Stopped at Gatekeeper": "#C9C9CC", "Wrong Number": "#F0594F",
-};
 
 export default async function CallsPage() {
   const user = await getCurrentUser();
