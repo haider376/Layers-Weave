@@ -32,11 +32,11 @@ export async function bookMeetingAction(clientName: string) {
 
   let company = await prisma.company.findFirst({ where: { name } });
   if (!company) {
-    let n = 0;
-    let clientId = `C-${1000 + Math.floor(Math.random() * 9000)}`;
-    while (await prisma.company.findUnique({ where: { clientId } })) {
-      clientId = `C-${1000 + Math.floor(Math.random() * 9000)}`;
-      if (++n > 50) break;
+    const base = 1000 + (await prisma.company.count().catch(() => 0));
+    let clientId = `C-${base}`;
+    for (let n = 0; await prisma.company.findUnique({ where: { clientId } }); n++) {
+      clientId = `C-${base + n + 1}`;
+      if (n > 200) { clientId = `C-${Date.now()}`; break; }
     }
     company = await prisma.company.create({
       data: { clientId, name, type: "Wholesaler", tier: "B", leadStatus: "Open Deal", ownerId: user.id },

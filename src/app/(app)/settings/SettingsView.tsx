@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import GoalsSettings, { type AeMeta } from "./GoalsSettings";
 import PermissionsSettings from "./PermissionsSettings";
 import ConfigSettings from "./ConfigSettings";
+import HubspotMigration from "./HubspotMigration";
 import type { SalesGoals } from "@/lib/goals";
 import type { PermissionMatrix, AppConfig } from "@/lib/appConfig";
 
@@ -182,6 +183,13 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
                 </div>
                 <button className="itg-cta" onClick={() => showToast("Fireflies integration — coming soon")}>Connect</button>
               </div>
+
+              {isAdmin && (
+                <>
+                  <div className="set-row-s" style={{ marginTop: 14, fontWeight: 700, color: "var(--text)" }}>Data migration</div>
+                  <HubspotMigration />
+                </>
+              )}
             </div>
           )}
           {tab === "Appearance" && (

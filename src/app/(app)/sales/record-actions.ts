@@ -56,8 +56,11 @@ export async function addContactAction(companyId: string, name: string) {
 }
 
 async function uniqueClientId() {
-  for (let i = 0; i < 50; i++) {
-    const id = `C-${1000 + Math.floor(Math.random() * 9000)}`;
+  // Sequence past the count so we never exhaust the namespace (the old
+  // C-1000..9999 random scheme capped at ~9k companies — too small for 15k+).
+  const base = 1000 + (await prisma.company.count().catch(() => 0));
+  for (let i = 0; i < 200; i++) {
+    const id = `C-${base + i}`;
     if (!(await prisma.company.findUnique({ where: { clientId: id } }))) return id;
   }
   return `C-${Date.now()}`;
