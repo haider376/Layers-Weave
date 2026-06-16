@@ -7,6 +7,7 @@ import { showToast } from "@/components/Toast";
 import { initials } from "@/components/Logo";
 import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
 import BulkEnroll, { type CadenceOpt } from "@/components/BulkEnroll";
+import MergeDuplicates from "@/components/MergeDuplicates";
 import { importPeopleAction } from "../sales/record-actions";
 
 export type Person = {
@@ -104,6 +105,7 @@ export default function PeopleView({ people, cadences = [] }: { people: Person[]
         <span style={{ flex: 1 }} />
         <BulkEnroll cadences={cadences} ids={[...selected]} onDone={() => setSelected(new Set())} />
         <button className="btn ghost lv-btn" onClick={() => fileRef.current?.click()}>Import</button>
+        <MergeDuplicates kind="contact" />
         <button className="btn ghost lv-btn" onClick={exportCSV}>Export</button>
         <input ref={fileRef} type="file" accept=".csv" hidden onChange={importCSV} />
       </div>

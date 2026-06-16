@@ -8,6 +8,7 @@ import Avatar from "@/components/Avatar";
 import Select from "@/components/ui/Select";
 import FilterBar, { type FilterDef, type FilterState } from "@/components/ui/FilterBar";
 import BulkEnroll, { type CadenceOpt } from "@/components/BulkEnroll";
+import MergeDuplicates from "@/components/MergeDuplicates";
 import { createLeadAction, importLeadsAction, updateCompanyAction } from "../sales/record-actions";
 
 const BADGE = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
@@ -121,6 +122,7 @@ export default function LeadsView({ leads, cadences = [] }: { leads: Lead[]; cad
         <span style={{ flex: 1 }} />
         <BulkEnroll cadences={cadences} ids={[...selected]} mode="company" onDone={() => setSelected(new Set())} />
         <button className="btn ghost lv-btn" onClick={() => fileRef.current?.click()}>Import</button>
+        <MergeDuplicates kind="company" />
         <button className="btn ghost lv-btn" onClick={exportCSV}>Export</button>
         <button className="btn primary lv-btn" onClick={() => setAdding((a) => !a)}>+ Add lead</button>
         <input ref={fileRef} type="file" accept=".csv" hidden onChange={importCSV} />

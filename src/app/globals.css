@@ -1746,3 +1746,31 @@ body{letter-spacing:-0.011em}
 .panel-h h2,.an-h h2{letter-spacing:-.005em;font-weight:700}
 h1,h2,h3{text-wrap:balance}
 .set-row-t{letter-spacing:-.01em}
+
+/* ── Merge & dedupe modal ────────────────────────────────────────────────── */
+.dedupe-ic{font-size:13px;margin-right:2px}
+.dd-wrap{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:200;animation:gcalFade .14s ease;padding:30px}
+.dd{width:min(640px,94vw);max-height:86vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line-2);border-radius:16px;overflow:hidden;box-shadow:var(--glow-soft)}
+.dd-h{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
+.dd-h h2{font-size:19px;margin-top:3px}
+.dd-count{font-size:11px;color:var(--faint);font-weight:600;margin-left:8px;font-family:var(--font-sans)}
+.dd-x{background:none;border:none;color:var(--faint);font-size:24px;line-height:1;cursor:pointer}
+.dd-x:hover{color:var(--text)}
+.dd-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.dd-clean{padding:30px;text-align:center;color:var(--neon);font-weight:600;font-size:13px}
+.dd-group{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel-2)}
+.dd-group-h{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--line)}
+.dd-reason{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--purple-br)}
+.dd-n{font-size:11px;color:var(--faint)}
+.dd-recs{display:flex;flex-direction:column}
+.dd-rec{display:flex;align-items:center;gap:11px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--line);transition:.12s}
+.dd-rec:last-child{border-bottom:none}
+.dd-rec:hover{background:var(--raise)}
+.dd-rec.master{background:var(--neon-soft)}
+.dd-rec input{accent-color:var(--neon);width:15px;height:15px;flex:none}
+.dd-rec-t{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dd-rec-s{font-size:11px;color:var(--faint);margin-top:2px}
+.dd-keep{font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--neon-ink);background:var(--neon);padding:1px 6px;border-radius:5px}
+.dd-group-f{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;border-top:1px solid var(--line)}
+.dd-hint{font-size:11px;color:var(--faint)}
+.dd-group-f .btn{flex:none;padding:7px 16px}
