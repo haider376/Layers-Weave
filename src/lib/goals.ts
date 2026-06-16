@@ -35,8 +35,8 @@ export type SalesGoals = {
   weekly: Record<string, Weekly>;
 };
 
-export const AE_FIRST = ["haider", "zikriya", "rija", "hilmand", "asjad", "adan", "kamila"];
-export const BDR_FIRST = ["fatima", "huzaifa"];
+export const AE_FIRST = ["haider", "zikriya", "rija", "asjad", "adan", "kamila"];
+export const BDR_FIRST = ["fatima", "huzaifa", "hayaa"];
 
 export const ROSTER: { first: string; kind: RepKind }[] = [
   ...AE_FIRST.map((first) => ({ first, kind: "AE" as RepKind })),

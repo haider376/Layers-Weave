@@ -15,7 +15,6 @@ const PUNK: Record<string, PunkName> = {
   dash: "diamond", analytics: "arrow", revenue: "dollar", forecast: "target",
   pipeline: "tag", companies: "globe", contacts: "smiley", cadences: "headset", tasks: "bolt",
   calendar: "clock", inbox: "chat", activity: "flame", calls: "phone", trophy: "trophy", goals: "rocket",
-  calc: "scissors", weight: "crown",
 };
 const punkIcon = (key: string): React.ReactNode => <NavPunk name={PUNK[key] ?? "star"} />;
 
@@ -91,14 +90,6 @@ export default function Sidebar({
           <Nav href="/calls" label="Coaching" icon={punkIcon("calls")} />
           <Nav href="/leaderboard" label="Leaderboard" icon={punkIcon("trophy")} />
           <Nav href="/goals" label="Goals" icon={punkIcon("goals")} />
-        </nav>
-      </div>
-
-      <div className="nav-group">
-        <div className="nav-label">Tools</div>
-        <nav className="nav">
-          <Nav href="/calculator" label="Price Calculator" icon={punkIcon("calc")} />
-          <Nav href="/weight" label="Weight Calculator" icon={punkIcon("weight")} />
         </nav>
       </div>
 

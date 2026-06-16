@@ -3,6 +3,7 @@
 // raghouse via the API — not merely hidden in the UI (acceptance criteria).
 
 export type Role =
+  | "CEO"
   | "CRO"
   | "Sales Manager"
   | "AE/QA"
@@ -15,6 +16,7 @@ export type Role =
   | "Logistics Coordinator";
 
 export const ROLE_LABEL: Record<Role, string> = {
+  CEO: "Chief Executive Officer",
   CRO: "Chief Revenue Officer",
   "Sales Manager": "Sales Manager",
   "AE/QA": "Account Executive / QA",
@@ -28,11 +30,11 @@ export const ROLE_LABEL: Record<Role, string> = {
 };
 
 // Admins — full access to all modules + margin.
-const ADMIN_ROLES: Role[] = ["CRO", "Sales Manager", "AE/QA"];
+const ADMIN_ROLES: Role[] = ["CEO", "CRO", "Sales Manager", "AE/QA"];
 
 // §6 Margin wall: Buying Price & true margin visible only to
-// CRO, Sales Manager, Head of Supply, and Rija (AE/QA).
-const MARGIN_ROLES: Role[] = ["CRO", "Sales Manager", "Head of Supply", "AE/QA"];
+// CEO, CRO, Sales Manager, Head of Supply, and Rija (AE/QA).
+const MARGIN_ROLES: Role[] = ["CEO", "CRO", "Sales Manager", "Head of Supply", "AE/QA"];
 
 // §3.5 Raghouse visibility: hidden from Sales (AEs/BDRs). Supply (Shahiq),
 // Womenswear (Myra), CRO and the AE/QA admin can see/set it. The Logistics
@@ -43,14 +45,15 @@ const RAGHOUSE_ROLES: Role[] = [
 ];
 
 // Module access for navigation / route guards.
-const SUPPLY_ROLES: Role[] = ["CRO", "Sales Manager", "AE/QA", "Head of Supply", "Womenswear"];
-const LOGISTICS_ROLES: Role[] = ["CRO", "Sales Manager", "AE/QA", "Head of Supply", "Logistics Coordinator"];
+const SUPPLY_ROLES: Role[] = ["CEO", "CRO", "Sales Manager", "AE/QA", "Head of Supply", "Womenswear"];
+const LOGISTICS_ROLES: Role[] = ["CEO", "CRO", "Sales Manager", "AE/QA", "Head of Supply", "Logistics Coordinator"];
 const SALES_ROLES: Role[] = [
-  "CRO", "Sales Manager", "AE/QA", "AE", "AE (Probation)", "BDR", "Lead Gen/CRM",
+  "CEO", "CRO", "Sales Manager", "AE/QA", "AE", "AE (Probation)", "BDR", "Lead Gen/CRM",
 ];
 
 // Roles an admin can preview via "View as" (one representative per access level).
 export const VIEWABLE_ROLES: Role[] = [
+  "CEO",
   "CRO",
   "Sales Manager",
   "AE",

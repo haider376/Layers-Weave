@@ -19,7 +19,7 @@ export default async function SettingsPage() {
   if (!user) redirect("/login");
 
   // Team section is locked to the 10 authorized internal members (first names).
-  const ALLOWED = ["shahzaib", "haider", "zikriya", "adan", "rija", "kamila", "asjad", "fatima", "huzaifa", "hilmand"];
+  const ALLOWED = ["oliver", "shahzaib", "haider", "zikriya", "adan", "rija", "kamila", "asjad", "fatima", "huzaifa", "hayaa"];
   const allUsers = user.isAdmin ? await prisma.user.findMany({ orderBy: { name: "asc" } }) : [];
   const team = user.isAdmin
     ? allUsers

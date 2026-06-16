@@ -33,7 +33,7 @@ export default function ConfigSettings({ initial }: { initial: AppConfig }) {
     <div className="cfg">
       <div className="gs-block">
         <div className="set-row-t" style={{ marginBottom: 2 }}>Pricing defaults</div>
-        <div className="set-row-s" style={{ marginBottom: 14 }}>Drives the Price Calculator and quote generation</div>
+        <div className="set-row-s" style={{ marginBottom: 14 }}>Drives quote generation &amp; pricing defaults</div>
         <div className="cfg-grid">
           <label className="gs-field"><span>Currency</span>
             <Select value={cfg.currency} options={[{ value: "GBP", label: "GBP £" }, { value: "USD", label: "USD $" }, { value: "EUR", label: "EUR €" }]} onValueChange={(v) => set("currency", v as AppConfig["currency"])} />

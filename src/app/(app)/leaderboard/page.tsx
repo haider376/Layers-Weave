@@ -6,8 +6,8 @@ import Topbar from "@/components/Topbar";
 import LeaderboardView, { type LbRow } from "./LeaderboardView";
 
 // Fixed roster (by first name) per the team spec.
-const AE_FIRST = ["haider", "zikriya", "rija", "hilmand", "asjad", "adan", "kamila"];
-const BDR_FIRST = ["fatima", "huzaifa"];
+const AE_FIRST = ["haider", "zikriya", "rija", "asjad", "adan", "kamila"];
+const BDR_FIRST = ["fatima", "huzaifa", "hayaa"];
 const first = (name: string) => name.split(" ")[0].toLowerCase();
 
 export default async function LeaderboardPage() {

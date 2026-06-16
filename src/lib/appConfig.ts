@@ -26,7 +26,7 @@ export const CAPABILITIES: { key: Capability; label: string; desc: string }[] = 
 ];
 
 export const SALES_ROLE_LIST: Role[] = [
-  "CRO", "Sales Manager", "AE/QA", "AE", "AE (Probation)", "BDR", "Lead Gen/CRM",
+  "CEO", "CRO", "Sales Manager", "AE/QA", "AE", "AE (Probation)", "BDR", "Lead Gen/CRM",
 ];
 
 export type PermissionMatrix = Record<Capability, Role[]>;

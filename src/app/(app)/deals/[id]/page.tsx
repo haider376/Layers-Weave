@@ -35,7 +35,6 @@ export default async function DealDetail({ params }: { params: Promise<{ id: str
       <div style={{ marginBottom: 14 }}>
         <Link href="/sales" className="back-link">← Pipeline</Link>
         <Link href={`/companies/${deal.companyId}`} className="back-link" style={{ marginLeft: 12 }}>↗ {deal.company.name}</Link>
-        <Link href="/calculator" className="addq" style={{ marginLeft: 12 }}>Open calculator</Link>
       </div>
 
       <div className="record-grid">

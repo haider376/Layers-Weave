@@ -5,15 +5,16 @@ const DEFAULT_PASSWORD = "password";
 
 // §6 roster — role strings match src/lib/permissions.ts Role type.
 const USERS = [
+  { email: "oliver@layerswholesale.co", name: "Oliver Bennett", role: "CEO", title: "Chief Executive Officer" },
   { email: "haider@layerswholesale.co", name: "Haider Ali Rana", role: "CRO", title: "Chief Revenue Officer" },
   { email: "zikriya@layerswholesale.co", name: "Zikriya Abbasi", role: "Sales Manager", title: "Sales Manager" },
   { email: "rija@layerswholesale.co", name: "Rija Fatima", role: "AE/QA", title: "Account Executive / QA" },
   { email: "kamila@layerswholesale.co", name: "Kamila Batool", role: "AE", title: "Account Executive" },
   { email: "asjad@layerswholesale.co", name: "Asjad Malik", role: "AE", title: "Account Executive" },
-  { email: "hilmand@layerswholesale.co", name: "Hilmand Kamal", role: "AE", title: "Account Executive" },
-  { email: "adan@layerswholesale.co", name: "Adan Khalid", role: "AE (Probation)", title: "Account Executive (Probation)" },
+  { email: "adan@layerswholesale.co", name: "Adan Khalid", role: "AE", title: "Account Executive" },
   { email: "huzaifa@layerswholesale.co", name: "Huzaifa Asad", role: "BDR", title: "Business Development Rep" },
   { email: "fatima@layerswholesale.co", name: "Fatima Khan", role: "BDR", title: "Business Development Rep" },
+  { email: "haya@layerswholesale.co", name: "Hayaa Malik", role: "BDR", title: "Business Development Rep" },
   { email: "shahzaib@layerswholesale.co", name: "Shahzaib Rana", role: "Lead Gen/CRM", title: "Lead Gen / CRM" },
 ];
 
@@ -43,18 +44,18 @@ const DEALS: Array<[string, string, number, string, string?]> = [
   ["Ailis Mcginn", "rija", 500, "Showed up"],
   ["Victor Regis", "kamila", 500, "Showed up"],
   ["Tara Awodanga", "asjad", 500, "Showed up"],
-  ["Billy Wilson", "hilmand", 500, "No Show / Reschedule"],
+  ["Billy Wilson", "adan", 500, "No Show / Reschedule"],
   ["Rachel Grady", "rija", 500, "No Show / Reschedule"],
   ["Proud Vintage", "kamila", 500, "Initiation", "LQ-71044"],
-  ["Neal · Better With Age", "hilmand", 500, "Initiation", "LQ-22581"],
+  ["Neal · Better With Age", "adan", 500, "Initiation", "LQ-22581"],
   ["Malek Aliwan", "rija", 500, "Initiation", "LQ-50431"],
   ["Livia Walled", "kamila", 500, "Initiation", "LQ-30912"],
-  ["World Vintage Wholesale", "hilmand", 2431, "Closed Won", "LQ-48217"],
+  ["World Vintage Wholesale", "adan", 2431, "Closed Won", "LQ-48217"],
   ["Menace Vintage Ltd", "rija", 9252, "Closed Won", "LQ-19880"],
   ["Aimee Campbell", "kamila", 1934, "Closed Won", "LQ-67802"],
   ["Emma Bulkeley", "asjad", 500, "Closed Lost"],
-  ["Christie Covers", "hilmand", 500, "Closed Lost"],
-  ["Kiki", "hilmand", 500, "Disqualified"],
+  ["Christie Covers", "adan", 500, "Closed Lost"],
+  ["Kiki", "adan", 500, "Disqualified"],
 ];
 
 type Item = { item: string; qty: number; target: number };
@@ -337,7 +338,7 @@ export async function seedDatabase(prisma: PrismaClient) {
     "AE: Hi, is this the buyer for the vintage line?\nGatekeeper: She's in a meeting.\nAE: When's a good time?\nGatekeeper: Try tomorrow AM.",
   ];
   const CALL_AGENTS: Array<[string, number]> = [
-    ["huzaifa", 2271], ["fatima", 1840], ["hilmand", 1690], ["asjad", 1420],
+    ["huzaifa", 2271], ["fatima", 1840], ["adan", 1690], ["asjad", 1420],
     ["kamila", 1390], ["rija", 823], ["zikriya", 238], ["haider", 6],
   ];
   const anyContact = await prisma.contact.findFirst();
@@ -371,7 +372,7 @@ export async function seedDatabase(prisma: PrismaClient) {
     ["Chase signed PO from Camden Thrift", "Follow-up", "High"], ["Qualify inbound from Leeds reseller", "Call", "Low"],
     ["Confirm grade A with buyer", "To-do", "Medium"], ["Book Q3 review with Aimee Campbell", "Meeting", "Low"],
   ] as const;
-  const aeKeys = ["rija", "kamila", "asjad", "hilmand"];
+  const aeKeys = ["rija", "kamila", "asjad", "adan"];
   const allDeals = await prisma.deal.findMany({ take: 20 });
   for (let i = 0; i < TASK_TITLES.length; i++) {
     const [title, type, priority] = TASK_TITLES[i];

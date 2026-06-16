@@ -8,7 +8,7 @@ import { CAPABILITIES, SALES_ROLE_LIST, type PermissionMatrix } from "@/lib/appC
 import { ROLE_LABEL } from "@/lib/permissions";
 
 const SHORT: Record<string, string> = {
-  CRO: "CRO", "Sales Manager": "Mgr", "AE/QA": "AE/QA", AE: "AE",
+  CEO: "CEO", CRO: "CRO", "Sales Manager": "Mgr", "AE/QA": "AE/QA", AE: "AE",
   "AE (Probation)": "AE-P", BDR: "BDR", "Lead Gen/CRM": "CRM",
 };
 

@@ -17,6 +17,5 @@ export async function saveConfigAction(config: AppConfig) {
   if (!user?.isAdmin) throw new Error("Not permitted");
   await saveAppConfig(config);
   revalidatePath("/settings");
-  revalidatePath("/calculator");
   return { ok: true };
 }
