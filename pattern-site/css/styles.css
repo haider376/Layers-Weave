@@ -837,3 +837,17 @@ body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6.5px) rota
 .lightbox__count { position: absolute; top: 1.5rem; left: 1.6rem; font-size: 0.74rem; letter-spacing: 0.18em; color: var(--ink-dim); }
 .lightbox__cap { position: absolute; bottom: 1.3rem; left: 50%; transform: translateX(-50%); max-width: 64ch; text-align: center; font-size: 0.88rem; color: var(--ink-dim); padding: 0 4.5rem; }
 @media (max-width: 600px) { .lightbox__btn { width: 44px; height: 44px; } .lightbox__cap { display: none; } }
+
+/* coming-soon featured placeholder card */
+.project-card--soon { cursor: default; }
+.project-card--soon .ratio { position: relative; }
+.project-card--soon .artframe { filter: grayscale(0.45) brightness(0.6); }
+.project-card--soon .project-card__cat,
+.project-card--soon .project-card__title { color: var(--ink-dim); }
+.soon-badge {
+  position: absolute; top: 1rem; left: 1rem; z-index: 2;
+  font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0.45rem 0.8rem; color: var(--accent);
+  background: rgba(13, 13, 12, 0.6); border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}

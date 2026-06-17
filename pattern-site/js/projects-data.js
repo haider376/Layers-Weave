@@ -49,7 +49,7 @@ window.PATTERN_PROJECTS = [
     slug: "bird-spider-mural",
     title: "Bird & Spider Mural",
     category: "Independent Projects",
-    featured: false,
+    featured: true,
     seed: 61,
     summary: "A self-initiated mural — a spider consuming a bird — exploring scale, movement and visual storytelling, documented as long-form film.",
     client: "Self-initiated — Alexander Krige",
@@ -80,10 +80,19 @@ window.PATTERN_PROJECTS = [
     gallery: [61, 29, 42, 12]
   },
   {
+    slug: "coming-soon",
+    title: "New project coming soon",
+    category: "In progress",
+    featured: true,
+    comingSoon: true,
+    seed: 70,
+    summary: "We're putting the finishing touches to the next project — check back shortly."
+  },
+  {
     slug: "john-home-installation",
     title: "John Home Installation",
     category: "Installations",
-    featured: true,
+    featured: false,
     seed: 31,
     summary: "A permanent, site-specific work scaled to a private residence — artwork composed for the architecture itself.",
     client: "Private Residence",
@@ -104,7 +113,7 @@ window.PATTERN_PROJECTS = [
     slug: "emaar-karachi-apartment",
     title: "Emaar Karachi Apartment",
     category: "Hospitality",
-    featured: true,
+    featured: false,
     seed: 47,
     summary: "Original artwork programme for a premium show apartment — distinctive pieces that make a space memorable on first sight.",
     client: "Emaar — Karachi",

@@ -265,6 +265,19 @@
 
   /* ---------- project card markup ---------- */
   function projectCard(p) {
+    if (p.comingSoon) {
+      return '' +
+        '<div class="project-card project-card--soon reveal" aria-disabled="true">' +
+        '<div class="ratio ratio--4x5">' +
+          '<div class="artframe" data-seed="' + p.seed + '" data-ratio="4x5"></div>' +
+          '<span class="soon-badge">Coming soon</span>' +
+        '</div>' +
+        '<div class="project-card__meta">' +
+          '<span class="project-card__cat">' + p.category + '</span>' +
+          '<h3 class="project-card__title">' + p.title + '</h3>' +
+          '<p class="project-card__summary">' + p.summary + '</p>' +
+        '</div></div>';
+    }
     var thumb = p.cover
       ? photoFrame("ratio--4x5", p.cover, p.title)
       : artFrame("ratio--4x5", p.seed, "4x5");
@@ -288,7 +301,7 @@
   function renderProjects() {
     var mount = $("#all-projects");
     if (!mount || !window.PATTERN_PROJECTS) return;
-    var data = window.PATTERN_PROJECTS;
+    var data = window.PATTERN_PROJECTS.filter(function (p) { return !p.comingSoon; });
     var render = function (cat) {
       var list = cat === "All" ? data : data.filter(function (p) { return p.category === cat; });
       mount.innerHTML = list.map(projectCard).join("");
@@ -314,7 +327,7 @@
     var p = data.filter(function (x) { return x.slug === slug; })[0] || data[0];
     document.title = p.title + " — Pattern";
 
-    var related = data.filter(function (x) { return x.slug !== p.slug; }).slice(0, 3);
+    var related = data.filter(function (x) { return x.slug !== p.slug && !x.comingSoon; }).slice(0, 3);
     var gallery;
     if (p.images && p.images.length) {
       gallery = p.images.map(function (im, i) {
