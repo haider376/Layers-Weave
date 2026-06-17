@@ -332,6 +332,16 @@ body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6.5px) rota
 .ratio--3x2 { aspect-ratio: 3 / 2; }
 .ratio--1x1 { aspect-ratio: 1 / 1; }
 .ratio--16x9 { aspect-ratio: 16 / 9; }
+.ratio--4x3 { aspect-ratio: 4 / 3; }
+.ratio--3x4 { aspect-ratio: 3 / 4; }
+
+/* real photography inside a ratio frame */
+.photo { overflow: hidden; background: var(--bg-2); }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 55%, rgba(13, 13, 12, 0.35) 100%);
+}
 
 /* =====================================================================
    SERVICES
