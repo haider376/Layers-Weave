@@ -537,6 +537,93 @@ body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6.5px) rota
 .field--row { grid-template-columns: 1fr 1fr; gap: 1.4rem; display: grid; }
 @media (max-width: 560px) { .field--row { grid-template-columns: 1fr; } }
 .form-note { font-size: 0.85rem; color: var(--ink-faint); }
+
+/* multi-section forms */
+.form--long { max-width: 760px; }
+.form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.form-section { display: grid; gap: 1.4rem; }
+.form-section + .form-section { border-top: 1px solid var(--line-soft); padding-top: clamp(2rem, 4vw, 3rem); margin-top: clamp(1rem, 2vw, 2rem); }
+.form-section > legend,
+.form-section__title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 380;
+  padding: 0;
+  line-height: 1.2;
+}
+.form-section__hint { color: var(--ink-faint); font-size: 0.92rem; margin-top: -0.6rem; }
+
+/* checkbox / radio groups */
+.choice-group { display: grid; gap: 0.6rem; }
+.choice-group--cols { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.choice-group > legend, .choice-label {
+  font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-dim); margin-bottom: 0.4rem; padding: 0;
+}
+.choice {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.95rem; color: var(--ink-dim);
+  transition: border-color var(--step-up), background var(--step-up), color var(--step-up);
+}
+.choice:hover { border-color: var(--ink-faint); color: var(--ink); }
+.choice input {
+  appearance: none; -webkit-appearance: none;
+  width: 18px; height: 18px; flex: none; margin-top: 1px;
+  border: 1px solid var(--ink-faint); border-radius: 3px;
+  position: relative; cursor: pointer;
+  transition: background var(--step-up), border-color var(--step-up);
+}
+.choice input[type="radio"] { border-radius: 50%; }
+.choice input:checked { background: var(--accent); border-color: var(--accent); }
+.choice input[type="checkbox"]:checked::after {
+  content: ""; position: absolute; left: 5px; top: 1px;
+  width: 5px; height: 9px; border: solid var(--accent-ink);
+  border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.choice input[type="radio"]:checked::after {
+  content: ""; position: absolute; inset: 4px; background: var(--accent-ink); border-radius: 50%;
+}
+.choice:has(input:checked) { border-color: var(--accent); color: var(--ink); background: rgba(194, 86, 44, 0.08); }
+.choice input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* file upload */
+.file-field input[type="file"] {
+  padding: 0.8rem 1rem;
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  color: var(--ink-dim);
+  font-size: 0.92rem;
+}
+.file-field input[type="file"]::file-selector-button {
+  margin-right: 1rem; padding: 0.5rem 1rem;
+  background: var(--accent); color: var(--accent-ink);
+  border: 0; border-radius: 2px; font-weight: 600; cursor: pointer;
+  font-size: 0.82rem;
+}
+.or-divider { display: flex; align-items: center; gap: 1rem; color: var(--ink-faint); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.or-divider::before, .or-divider::after { content: ""; flex: 1; height: 1px; background: var(--line-soft); }
+
+/* FAQ accordion */
+.faq { border-top: 1px solid var(--line-soft); }
+.faq details { border-bottom: 1px solid var(--line-soft); }
+.faq summary {
+  list-style: none; cursor: pointer;
+  padding: 1.5rem 0;
+  display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
+  font-family: var(--font-display); font-size: clamp(1.1rem, 2.2vw, 1.4rem); font-weight: 380;
+  transition: color var(--step-up);
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary:hover { color: var(--accent-2); }
+.faq summary .plus { color: var(--accent); flex: none; font-size: 1.5rem; line-height: 1; transition: transform 0.3s var(--ease); }
+.faq details[open] summary .plus { transform: rotate(45deg); }
+.faq details p { color: var(--ink-dim); padding-bottom: 1.5rem; max-width: 70ch; margin-top: -0.4rem; }
 .form-success {
   border: 1px solid var(--accent);
   background: rgba(194, 86, 44, 0.1);

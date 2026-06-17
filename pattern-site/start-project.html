@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start Your Project — Pattern</title>
+  <meta name="description" content="Tell us about your space and we’ll connect you with the most suitable artist for your project." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="header-mount"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow reveal in">Customer Enquiry</span>
+        <h1 class="display reveal in" data-delay="1">Start Your Project</h1>
+        <p class="lead reveal in" data-delay="2">Tell us a little about your space and we’ll connect you with the most suitable artist for your project.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <form class="form form--long reveal" data-form="start-project">
+
+          <!-- Contact Details -->
+          <fieldset class="form-section">
+            <legend>Contact Details</legend>
+            <div class="field--row">
+              <div class="field"><label for="pf-name">Full Name</label><input id="pf-name" name="full_name" type="text" required /></div>
+              <div class="field"><label for="pf-business">Business Name</label><input id="pf-business" name="business" type="text" required /></div>
+            </div>
+            <div class="field--row">
+              <div class="field"><label for="pf-email">Email Address</label><input id="pf-email" name="email" type="email" required /></div>
+              <div class="field"><label for="pf-phone">Phone Number</label><input id="pf-phone" name="phone" type="tel" /></div>
+            </div>
+            <div class="field"><label for="pf-web">Website / Instagram</label><input id="pf-web" name="web_social" type="text" /></div>
+          </fieldset>
+
+          <!-- About Your Space -->
+          <fieldset class="form-section">
+            <legend>About Your Space</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>What type of space is this?</legend>
+              <label class="choice"><input type="radio" name="space_type" value="Coffee Shop" /> Coffee Shop</label>
+              <label class="choice"><input type="radio" name="space_type" value="Restaurant" /> Restaurant</label>
+              <label class="choice"><input type="radio" name="space_type" value="Cocktail Bar" /> Cocktail Bar</label>
+              <label class="choice"><input type="radio" name="space_type" value="Hotel" /> Hotel</label>
+              <label class="choice"><input type="radio" name="space_type" value="Retail Store" /> Retail Store</label>
+              <label class="choice"><input type="radio" name="space_type" value="Office" /> Office</label>
+              <label class="choice"><input type="radio" name="space_type" value="Event Space" /> Event Space</label>
+              <label class="choice"><input type="radio" name="space_type" value="Residential" /> Residential</label>
+              <label class="choice"><input type="radio" name="space_type" value="Other" /> Other</label>
+            </fieldset>
+            <div class="field"><label for="pf-address">Address / Location</label><input id="pf-address" name="address" type="text" /></div>
+          </fieldset>
+
+          <!-- Project Details -->
+          <fieldset class="form-section">
+            <legend>Project Details</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>What are you interested in?</legend>
+              <label class="choice"><input type="checkbox" name="interest" value="Mural" /> Mural</label>
+              <label class="choice"><input type="checkbox" name="interest" value="Custom Artwork" /> Custom Artwork</label>
+              <label class="choice"><input type="checkbox" name="interest" value="Installation" /> Installation</label>
+              <label class="choice"><input type="checkbox" name="interest" value="Window Artwork" /> Window Artwork</label>
+              <label class="choice"><input type="checkbox" name="interest" value="Artist Collaboration" /> Artist Collaboration</label>
+              <label class="choice"><input type="checkbox" name="interest" value="Creative Activation" /> Creative Activation</label>
+              <label class="choice"><input type="checkbox" name="interest" value="Not Sure Yet" /> Not Sure Yet</label>
+            </fieldset>
+            <div class="field"><label for="pf-about">Tell us a little about your project.</label><textarea id="pf-about" name="about" required></textarea></div>
+          </fieldset>
+
+          <!-- Goals -->
+          <fieldset class="form-section">
+            <legend>Goals</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>What would you like this project to achieve?</legend>
+              <label class="choice"><input type="checkbox" name="goals" value="Improve the appearance of the space" /> Improve the appearance of the space</label>
+              <label class="choice"><input type="checkbox" name="goals" value="Create a memorable customer experience" /> Create a memorable customer experience</label>
+              <label class="choice"><input type="checkbox" name="goals" value="Generate social media content" /> Generate social media content</label>
+              <label class="choice"><input type="checkbox" name="goals" value="Increase brand awareness" /> Increase brand awareness</label>
+              <label class="choice"><input type="checkbox" name="goals" value="Support local artists" /> Support local artists</label>
+              <label class="choice"><input type="checkbox" name="goals" value="Launch a new venue or concept" /> Launch a new venue or concept</label>
+              <label class="choice"><input type="checkbox" name="goals" value="Other" /> Other</label>
+            </fieldset>
+          </fieldset>
+
+          <!-- Budget -->
+          <fieldset class="form-section">
+            <legend>Budget</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>Estimated budget</legend>
+              <label class="choice"><input type="radio" name="budget" value="Under £1,000" /> Under £1,000</label>
+              <label class="choice"><input type="radio" name="budget" value="£1,000–£3,000" /> £1,000–£3,000</label>
+              <label class="choice"><input type="radio" name="budget" value="£3,000–£5,000" /> £3,000–£5,000</label>
+              <label class="choice"><input type="radio" name="budget" value="£5,000–£10,000" /> £5,000–£10,000</label>
+              <label class="choice"><input type="radio" name="budget" value="£10,000+" /> £10,000+</label>
+            </fieldset>
+          </fieldset>
+
+          <!-- Timeline -->
+          <fieldset class="form-section">
+            <legend>Timeline</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>When would you like the project completed?</legend>
+              <label class="choice"><input type="radio" name="timeline" value="ASAP" /> ASAP</label>
+              <label class="choice"><input type="radio" name="timeline" value="Within 1 Month" /> Within 1 Month</label>
+              <label class="choice"><input type="radio" name="timeline" value="Within 3 Months" /> Within 3 Months</label>
+              <label class="choice"><input type="radio" name="timeline" value="Flexible" /> Flexible</label>
+            </fieldset>
+          </fieldset>
+
+          <!-- Creative Activations -->
+          <fieldset class="form-section">
+            <legend>Creative Activations</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>Would you be interested in content production or a launch event around the project?</legend>
+              <label class="choice"><input type="radio" name="activation" value="Content Production" /> Content Production</label>
+              <label class="choice"><input type="radio" name="activation" value="Launch Event" /> Launch Event</label>
+              <label class="choice"><input type="radio" name="activation" value="Both" /> Both</label>
+              <label class="choice"><input type="radio" name="activation" value="Not at this time" /> Not at this time</label>
+            </fieldset>
+          </fieldset>
+
+          <button class="btn btn--primary btn--block" type="submit" style="margin-top:2rem">Submit Enquiry <span class="arrow">→</span></button>
+          <p class="form-note">Once submitted, a member of the Pattern team will review your enquiry and arrange a consultation to discuss your project.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-mount"></div>
+  <script src="js/projects-data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

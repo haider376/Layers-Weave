@@ -139,10 +139,10 @@
       '<nav class="nav" aria-label="Primary">' +
       '<a class="brand" href="index.html">PATTERN</a>' +
       '<div class="nav-links" id="navLinks">' + links +
-      '<a class="btn btn--primary" href="contact.html">Start a Project</a>' +
+      '<a class="btn btn--primary" href="start-project.html">Start a Project</a>' +
       '</div>' +
       '<div class="nav-right">' +
-      '<a class="btn btn--primary" href="contact.html">Start a Project</a>' +
+      '<a class="btn btn--primary" href="start-project.html">Start a Project</a>' +
       '<button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '</div>' +
       '</nav></header>';
@@ -227,6 +227,12 @@
   }
 
   /* ---------- forms (no backend — graceful client-side confirmation) ---------- */
+  var FORM_MESSAGES = {
+    enquiry: ["Thank you.", "We’ve received your enquiry and will be in touch within two working days."],
+    contact: ["Thank you.", "We’ve received your message and will reply within two working days."],
+    artist: ["Thank you for applying.", "We review every application individually and will be in touch if we believe there’s a good fit."],
+    "start-project": ["Thank you.", "A member of the Pattern team will review your enquiry and arrange a consultation to discuss your project."]
+  };
   function initForms() {
     $$("form[data-form]").forEach(function (form) {
       form.addEventListener("submit", function (e) {
@@ -234,14 +240,15 @@
         if (!form.checkValidity()) { form.reportValidity(); return; }
         var kind = form.getAttribute("data-form");
         if (kind === "newsletter") {
-          var input = form.querySelector("input");
           form.innerHTML = '<p class="form-note" style="color:var(--accent)">Thank you — you\'re on the list.</p>';
           return;
         }
+        var msg = FORM_MESSAGES[kind] || ["Thank you.", "We’ve received your submission and will be in touch shortly."];
         var success = document.createElement("div");
         success.className = "form-success reveal in";
-        success.innerHTML = '<strong>Thank you.</strong><p style="margin-top:.5rem;color:var(--ink-dim)">We\'ve received your enquiry and will be in touch within two working days.</p>';
+        success.innerHTML = '<strong>' + msg[0] + '</strong><p style="margin-top:.5rem;color:var(--ink-dim)">' + msg[1] + '</p>';
         form.replaceWith(success);
+        success.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     });
   }
@@ -342,7 +349,7 @@
       '</div></section>' +
       '<section class="banner"><div class="banner__bg artframe" data-seed="' + (p.seed + 12) + '" data-ratio="21x9"></div>' +
         '<div class="container"><h2 class="display reveal">Let’s create something memorable together.</h2>' +
-        '<a class="btn btn--primary reveal" data-delay="1" href="contact.html">Start Your Project <span class="arrow">→</span></a></div>' +
+        '<a class="btn btn--primary reveal" data-delay="1" href="start-project.html">Start Your Project <span class="arrow">→</span></a></div>' +
       '</section>';
   }
 

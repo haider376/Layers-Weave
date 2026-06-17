@@ -31,18 +31,25 @@ Or open `index.html` directly in a browser.
 
 ```
 pattern-site/
-├── index.html            Home (hero, services, featured work, about, CTA)
-├── for-businesses.html   Services, 7-step process, Founding Partner Programme, enquiry form
-├── for-artists.html      What we look for / offer, application form
-├── projects.html         Filterable project grid + galleries
-├── project.html          Dynamic case study (reads ?p=<slug>)
-├── about.html            Mission, founder story, values, manifesto, founder profile
-├── contact.html          Contact form + details
-├── css/styles.css        Design system & components
+├── index.html              Home (hero, why, services, work, process, philosophy, for-artists, founding venue, CTA)
+├── for-businesses.html     Services, process, Founding Venue Programme, enquiry
+├── for-artists.html        Beliefs, who we work with, benefits, how it works, founding artist programme, FAQ
+├── artist-application.html Full artist application form (multi-section)
+├── start-project.html      Full customer enquiry form (multi-section)
+├── projects.html           Filterable project grid + galleries
+├── project.html            Dynamic case study (reads ?p=<slug>)
+├── about.html              Story, manifesto, what we do, looking forward, founder profile
+├── contact.html            Simple contact form + details
+├── css/styles.css          Design system & components
 └── js/
-    ├── projects-data.js  Single source of truth for all projects
-    └── main.js           Header/footer injection, generative artwork, interactions
+    ├── projects-data.js    Single source of truth for all projects
+    └── main.js             Header/footer injection, generative artwork, interactions, form handling
 ```
+
+### Key CTA destinations
+
+- **Start a Project / Book a Consultation / Enquire Now** → `start-project.html`
+- **Apply / Apply Now / Apply to Join** → `artist-application.html`
 
 ## Notes
 

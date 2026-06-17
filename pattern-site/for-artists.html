@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For Artists — Pattern</title>
-  <meta name="description" content="Pattern helps artists secure opportunities, grow their audience and connect with businesses that value original work." />
+  <meta name="description" content="Build your creative career without sacrificing your identity. Pattern helps artists secure opportunities, grow their audience, and connect with brands, venues, and communities that value original work." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,11 +16,11 @@
   <main>
     <section class="page-hero">
       <div class="container">
-        <span class="eyebrow reveal in">For Artists</span>
+        <span class="eyebrow reveal in">I’m an Artist</span>
         <h1 class="display reveal in" data-delay="1">Build your creative career without sacrificing your identity.</h1>
-        <p class="lead reveal in" data-delay="2">Pattern helps artists secure opportunities, grow their audience and connect with businesses that value original work.</p>
+        <p class="lead reveal in" data-delay="2">Pattern helps artists secure opportunities, grow their audience, and connect with brands, venues, and communities that value original work.</p>
         <div class="hero__actions reveal in" data-delay="3" style="margin-top:2.2rem">
-          <a class="btn btn--primary" href="#apply">Apply <span class="arrow">→</span></a>
+          <a class="btn btn--primary" href="artist-application.html">Apply to Join <span class="arrow">→</span></a>
         </div>
       </div>
     </section>
@@ -31,75 +31,126 @@
       </div>
     </section>
 
+    <!-- What We Believe -->
     <section class="section">
       <div class="container">
-        <div class="grid-2">
-          <div>
-            <span class="eyebrow reveal">What we look for</span>
-            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-top:.8rem">A point of view, and the craft to back it.</h2>
-            <ul class="checklist reveal mt-3" data-delay="2">
-              <li><strong>Distinct visual identity</strong> — work that is unmistakably yours.</li>
-              <li><strong>Strong portfolio</strong> — a body of work that holds together.</li>
-              <li><strong>Professional communication</strong> — clear, reliable, easy to work with.</li>
-              <li><strong>Ambition</strong> — you want to grow and take on more.</li>
-              <li><strong>Reliability</strong> — you deliver what you commit to.</li>
-              <li><strong>Originality</strong> — you make work the world hasn’t seen.</li>
-            </ul>
+        <div class="split">
+          <div class="split__body">
+            <span class="eyebrow reveal">What we believe</span>
+            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.9rem,4vw,3rem);margin-top:.8rem">Commercial success doesn’t mean creative compromise.</h2>
+            <p class="reveal" data-delay="2">We believe artists deserve to be paid fairly for their work without being forced into generic commercial projects that compromise their creative identity.</p>
+            <p class="reveal" data-delay="2">Pattern connects artists with opportunities that value their voice while helping them build sustainable careers.</p>
           </div>
-          <div>
-            <span class="eyebrow reveal">What we offer</span>
-            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-top:.8rem">Opportunities, support and a community.</h2>
-            <ul class="checklist reveal mt-3" data-delay="2">
-              <li><strong>Paid opportunities</strong> — commissions and projects with real budgets.</li>
-              <li><strong>Project management</strong> — we handle logistics so you can make.</li>
-              <li><strong>Content production</strong> — professional documentation of your work.</li>
-              <li><strong>Events and exhibitions</strong> — moments to show and be seen.</li>
-              <li><strong>Brand collaborations</strong> — introductions to businesses that value you.</li>
-              <li><strong>Community</strong> — a network of artists building careers together.</li>
-            </ul>
+          <div class="split__media reveal" data-delay="1">
+            <div class="ratio ratio--4x5"><div class="artframe" data-seed="57" data-ratio="4x5"></div></div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section section--tight" id="apply">
+    <!-- Who We Work With -->
+    <section class="section section--tight">
       <div class="container">
         <div class="grid-2">
           <div>
-            <span class="eyebrow reveal">Apply</span>
-            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-top:.8rem">Artist Application</h2>
-            <p class="lead reveal" data-delay="2" style="margin-top:1.2rem">We review every application personally. If your work feels like a fit, we’ll reach out to talk about upcoming opportunities.</p>
-            <div class="ratio ratio--3x2 reveal mt-3" data-delay="2"><div class="artframe" data-seed="57" data-ratio="3x2"></div></div>
+            <span class="eyebrow reveal">Who we work with</span>
+            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-top:.8rem">Artists building something uniquely their own.</h2>
+            <p class="muted reveal" data-delay="2" style="margin-top:1rem">We are not looking for artists who chase trends. We are looking for artists building something uniquely their own.</p>
           </div>
-          <form class="form reveal" data-form="artist" data-delay="1">
-            <div class="field"><label for="a-name">Name</label><input id="a-name" name="name" type="text" placeholder="Your name" required /></div>
-            <div class="field"><label for="a-email">Email</label><input id="a-email" name="email" type="email" placeholder="you@email.com" required /></div>
-            <div class="field"><label for="a-portfolio">Portfolio / Website</label><input id="a-portfolio" name="portfolio" type="url" placeholder="https://" required /></div>
-            <div class="field"><label for="a-instagram">Instagram</label><input id="a-instagram" name="instagram" type="text" placeholder="@yourhandle" /></div>
-            <div class="field"><label for="a-discipline">Primary discipline</label>
-              <select id="a-discipline" name="discipline">
-                <option>Painting</option>
-                <option>Mural</option>
-                <option>Mixed Media</option>
-                <option>Sculpture / Installation</option>
-                <option>Illustration</option>
-                <option>Photography</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div class="field"><label for="a-about">Tell us about your work</label><textarea id="a-about" name="about" placeholder="Your practice, what drives it, and what you’re looking for…" required></textarea></div>
-            <button class="btn btn--primary btn--block" type="submit">Submit Application <span class="arrow">→</span></button>
-            <p class="form-note">By applying you agree to be contacted about relevant opportunities.</p>
-          </form>
+          <ul class="checklist reveal" data-delay="1" style="align-self:center">
+            <li><strong>A distinct visual language</strong> — work that is unmistakably yours.</li>
+            <li><strong>A strong body of work</strong> — a portfolio that holds together.</li>
+            <li><strong>Professional communication</strong> — clear, reliable, easy to work with.</li>
+            <li><strong>Ambition to grow their practice</strong> — you want to go further.</li>
+          </ul>
         </div>
       </div>
     </section>
 
+    <!-- What You'll Get -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow reveal">What you’ll get</span>
+          <h2 class="reveal" data-delay="1" style="font-size:clamp(1.9rem,4vw,3rem);margin-top:.8rem">Support built around your practice.</h2>
+        </div>
+        <div class="cards reveal">
+          <div class="card"><span class="card__index">01</span><h3>Paid Opportunities</h3><p>Commissions, murals, installations, collaborations and creative projects.</p></div>
+          <div class="card"><span class="card__index">02</span><h3>Project Management</h3><p>We handle proposals, client communication and logistics so you can focus on creating.</p></div>
+          <div class="card"><span class="card__index">03</span><h3>Content &amp; Visibility</h3><p>Projects are professionally documented to help grow your audience and portfolio.</p></div>
+          <div class="card"><span class="card__index">04</span><h3>Events &amp; Community</h3><p>Access to exhibitions, launch events and opportunities to connect with collectors, brands and other artists.</p></div>
+          <div class="card"><span class="card__index">05</span><h3>Long-Term Growth</h3><p>We’re building a network designed to create sustainable opportunities for artists over time.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section section--tight">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow reveal">How it works</span>
+          <h2 class="reveal" data-delay="1" style="font-size:clamp(1.9rem,4vw,3rem);margin-top:.8rem">Three simple steps.</h2>
+        </div>
+        <div class="steps reveal">
+          <div class="step"><span class="step__num">1</span><div><h3>Apply</h3><p>Apply with your portfolio.</p></div></div>
+          <div class="step"><span class="step__num">2</span><div><h3>Review</h3><p>We’ll review your work and arrange a call if we think there’s a good fit.</p></div></div>
+          <div class="step"><span class="step__num">3</span><div><h3>Match</h3><p>We’ll begin matching you with relevant opportunities and projects.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Founding Artist Programme -->
+    <section class="section">
+      <div class="container">
+        <div class="callout reveal">
+          <span class="eyebrow">Applications open</span>
+          <h3 style="margin-top:.8rem">Founding Artist Programme</h3>
+          <p>We’re currently building a small founding group of artists. Founding artists receive:</p>
+          <ul class="checklist" style="margin-top:1.2rem">
+            <li>Priority consideration for opportunities</li>
+            <li>Reduced commission structure during launch</li>
+            <li>Featured placement on the website</li>
+            <li>Access to upcoming exhibitions and events</li>
+          </ul>
+          <div style="margin-top:1.6rem"><a class="btn btn--primary" href="artist-application.html">Apply to Join <span class="arrow">→</span></a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--tight">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow reveal">FAQ</span>
+          <h2 class="reveal" data-delay="1" style="font-size:clamp(1.9rem,4vw,3rem);margin-top:.8rem">Frequently asked questions.</h2>
+        </div>
+        <div class="faq reveal" style="max-width:860px">
+          <details>
+            <summary>Do I have to work exclusively with Pattern? <span class="plus">+</span></summary>
+            <p>No. Artists remain independent and are free to pursue their own opportunities.</p>
+          </details>
+          <details>
+            <summary>What commission does Pattern take? <span class="plus">+</span></summary>
+            <p>Commission varies depending on project scope and services provided.</p>
+          </details>
+          <details>
+            <summary>Do you guarantee work? <span class="plus">+</span></summary>
+            <p>No. We focus on building opportunities and making introductions, but we cannot guarantee project volume.</p>
+          </details>
+          <details>
+            <summary>What kind of artists do you represent? <span class="plus">+</span></summary>
+            <p>Artists with distinct visual identities across painting, murals, illustration, installation, mixed media and related disciplines.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
     <section class="banner">
       <div class="banner__bg artframe" data-seed="64" data-ratio="21x9"></div>
       <div class="container">
-        <h2 class="display reveal">Your work deserves the right rooms.</h2>
-        <a class="btn btn--primary reveal" data-delay="1" href="#apply">Apply to Pattern <span class="arrow">→</span></a>
+        <h2 class="display reveal" style="max-width:24ch">Join a network of artists building meaningful creative careers.</h2>
+        <a class="btn btn--primary reveal" data-delay="1" href="artist-application.html">Apply Now <span class="arrow">→</span></a>
       </div>
     </section>
   </main>
