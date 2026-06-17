@@ -392,7 +392,9 @@ body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6.5px) rota
 
 .project-card { display: block; }
 .project-card .ratio { overflow: hidden; }
-.project-card .artframe { transition: transform 0.7s var(--ease); }
+.project-card .artframe,
+.project-card .photo img { transition: transform 0.7s var(--ease); }
+.project-card:hover .photo img { transform: scale(1.045); }
 .project-card:hover .artframe { transform: scale(1.045); }
 .project-card__meta { padding-top: 1.1rem; }
 .project-card__cat {

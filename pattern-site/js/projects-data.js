@@ -24,6 +24,14 @@ window.PATTERN_PROJECTS = [
       "We designed the hang around a single sightline, warming the lighting as the work intensified and leaving generous space for the largest pieces to breathe. A documentary content shoot ran across install and opening night, capturing the work, the room and the audience reaction in a consistent visual language.",
     outcome:
       "The exhibition drew a sustained audience across its run and generated a complete content set — stills and film — now used across the artist's portfolio and introductions. Two works were acquired and one led directly to a commissioned installation.",
+    hero: "assets/img/projects/krige/hero-mural.jpg",
+    cover: "assets/img/projects/krige/cover-figure.jpg",
+    images: [
+      { src: "assets/img/projects/krige/opening-night.jpg", alt: "Opening night — visitors gathered in front of the work at the railway-arch venue" },
+      { src: "assets/img/projects/krige/artist-at-work.jpg", alt: "Alexander Krige working on the wall during the build" },
+      { src: "assets/img/projects/krige/painting-detail.jpg", alt: "Detail of a finished painting from the exhibition" },
+      { src: "assets/img/projects/krige/cover-figure.jpg", alt: "A central figurative painting from the show" }
+    ],
     gallery: [21, 8, 33, 5]
   },
   {

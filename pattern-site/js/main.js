@@ -253,11 +253,24 @@
     });
   }
 
+  /* ---------- media helpers (real photo, else generative artframe) ---------- */
+  function photoFrame(ratioCls, src, alt, extra) {
+    return '<div class="ratio ' + ratioCls + ' photo' + (extra || '') + '">' +
+      '<img src="' + src + '" alt="' + (alt || '').replace(/"/g, '&quot;') + '" loading="lazy" /></div>';
+  }
+  function artFrame(ratioCls, seed, ratioKey, extra) {
+    return '<div class="ratio ' + ratioCls + (extra || '') + '">' +
+      '<div class="artframe" data-seed="' + seed + '" data-ratio="' + ratioKey + '"></div></div>';
+  }
+
   /* ---------- project card markup ---------- */
   function projectCard(p) {
+    var thumb = p.cover
+      ? photoFrame("ratio--4x5", p.cover, p.title)
+      : artFrame("ratio--4x5", p.seed, "4x5");
     return '' +
       '<a class="project-card reveal" href="project.html?p=' + p.slug + '">' +
-      '<div class="ratio ratio--4x5"><div class="artframe" data-seed="' + p.seed + '" data-ratio="4x5"></div></div>' +
+      thumb +
       '<div class="project-card__meta">' +
         '<span class="project-card__cat">' + p.category + '</span>' +
         '<h3 class="project-card__title">' + p.title + '</h3>' +
@@ -302,17 +315,29 @@
     document.title = p.title + " — Pattern";
 
     var related = data.filter(function (x) { return x.slug !== p.slug; }).slice(0, 3);
-    var gallery = p.gallery.map(function (seed, i) {
-      var span = i === 0 ? " span-2" : "";
-      var ratio = i === 0 ? "16x9" : "1x1";
-      var cls = i === 0 ? "ratio--16x9" : "ratio--1x1";
-      return '<div class="ratio ' + cls + span + ' reveal"><div class="artframe" data-seed="' + seed + '" data-ratio="' + ratio + '"></div></div>';
-    }).join("");
+    var gallery;
+    if (p.images && p.images.length) {
+      gallery = p.images.map(function (im, i) {
+        var span = i === 0 ? " span-2" : "";
+        var cls = i === 0 ? "ratio--16x9" : "ratio--1x1";
+        return photoFrame(cls, im.src, im.alt, span + " reveal");
+      }).join("");
+    } else {
+      gallery = p.gallery.map(function (seed, i) {
+        var span = i === 0 ? " span-2" : "";
+        var ratio = i === 0 ? "16x9" : "1x1";
+        var cls = i === 0 ? "ratio--16x9" : "ratio--1x1";
+        return artFrame(cls, seed, ratio, span + " reveal");
+      }).join("");
+    }
+
+    var heroImg = p.hero || p.cover;
+    var heroBlock = heroImg
+      ? '<div class="ratio photo reveal in"><img src="' + heroImg + '" alt="' + p.title.replace(/"/g, "&quot;") + '" /></div>'
+      : '<div class="ratio reveal in"><div class="artframe" data-seed="' + p.seed + '" data-ratio="21x9"></div></div>';
 
     mount.innerHTML = '' +
-      '<section class="cs-hero">' +
-        '<div class="ratio reveal in"><div class="artframe" data-seed="' + p.seed + '" data-ratio="21x9"></div></div>' +
-      '</section>' +
+      '<section class="cs-hero">' + heroBlock + '</section>' +
       '<div class="container">' +
         '<div class="section--tight">' +
           '<span class="eyebrow reveal">' + p.category + '</span>' +
@@ -334,14 +359,11 @@
         '<div class="section--tight"><span class="eyebrow reveal">Gallery</span>' +
           '<div class="cs-gallery mt-2">' + gallery + '</div>' +
         '</div>' +
-        '<div class="section--tight"><span class="eyebrow reveal">Optional Video</span>' +
-          '<div class="ratio ratio--16x9 reveal mt-2" style="position:relative">' +
-            '<div class="artframe" data-seed="' + (p.seed + 5) + '" data-ratio="16x9"></div>' +
-            '<button aria-label="Play film" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">' +
-              '<span style="width:78px;height:78px;border:1px solid rgba(243,240,233,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)"><svg width="22" height="22" viewBox="0 0 24 24" fill="#f3f0e9"><path d="M8 5v14l11-7z"/></svg></span>' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
+        (p.video
+          ? '<div class="section--tight"><span class="eyebrow reveal">Film</span>' +
+              '<div class="ratio ratio--16x9 reveal mt-2"><iframe src="' + p.video + '" title="' + p.title.replace(/"/g, "&quot;") + ' — film" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border:0;width:100%;height:100%"></iframe></div>' +
+            '</div>'
+          : '') +
       '</div>' +
       '<section class="section"><div class="container">' +
         '<div class="section-head reveal"><span class="eyebrow">Keep exploring</span><h2 style="font-size:clamp(1.8rem,4vw,2.8rem);margin-top:.8rem">Related projects</h2></div>' +
