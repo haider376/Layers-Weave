@@ -46,6 +46,40 @@ window.PATTERN_PROJECTS = [
     gallery: [21, 8, 33, 5]
   },
   {
+    slug: "bird-spider-mural",
+    title: "Bird & Spider Mural",
+    category: "Independent Projects",
+    featured: false,
+    seed: 61,
+    summary: "A self-initiated mural — a spider consuming a bird — exploring scale, movement and visual storytelling, documented as long-form film.",
+    client: "Self-initiated — Alexander Krige",
+    services: ["Mural", "Independent Project", "Content Production"],
+    location: "London",
+    year: "2024",
+    overview:
+      "The Bird & Spider Mural was a self initiated mural project created by artist and Pattern founder Alexander Krige. The piece was developed as an exploration of scale, movement and visual storytelling, while also serving as a demonstration of how artwork can be transformed into engaging digital content.",
+    brief:
+      "As an independent project, the goal was to create a visually striking mural without the constraints of a commercial brief. The project was designed to showcase creative freedom, technical execution and the potential for documenting artwork through long-form content.",
+    solution:
+      "The mural depicts a spider consuming a bird, creating a dramatic composition that explores themes of power, vulnerability and transformation. Alongside the mural, the entire process was professionally documented and edited into a long-form YouTube video, demonstrating how creative projects can generate valuable content long after the artwork is complete.",
+    outcome:
+      "The completed mural became one of Alexander's most ambitious independent works and serves as an example of the type of artist-led projects Pattern aims to support. The project also demonstrated how artwork, storytelling and content production can work together to extend the reach and impact of a creative project beyond the wall itself.",
+    hero: "assets/img/projects/bird-spider/finished-day.jpg",
+    cover: "assets/img/projects/bird-spider/finished-night.jpg",
+    images: [
+      { src: "assets/img/projects/bird-spider/process-underpaint.jpg", alt: "Alexander Krige spraying the blue underpainting, spray cans in the foreground" },
+      { src: "assets/img/projects/bird-spider/process-artist.jpg", alt: "The artist working on the mid-stage mural by day" },
+      { src: "assets/img/projects/bird-spider/in-progress-night.jpg", alt: "The mural at a colourful mid-stage, lit at night" },
+      { src: "assets/img/projects/bird-spider/finished-night.jpg", alt: "The finished spider-and-bird mural photographed at night" },
+      { src: "assets/img/projects/bird-spider/finished-day.jpg", alt: "The completed mural in daylight — a spider consuming a bird" },
+      { src: "assets/img/projects/bird-spider/detail-eye.jpg", alt: "Detail of the bird's eye and the spider's legs" },
+      { src: "assets/img/projects/bird-spider/detail-wing.jpg", alt: "Detail of the bird's wing feathers" },
+      { src: "assets/img/projects/bird-spider/detail-body.jpg", alt: "Detail of the bird's body and the spider" },
+      { src: "assets/img/projects/bird-spider/signature.jpg", alt: "The artist's signature within the mural" }
+    ],
+    gallery: [61, 29, 42, 12]
+  },
+  {
     slug: "john-home-installation",
     title: "John Home Installation",
     category: "Installations",
