@@ -28,12 +28,19 @@ window.PATTERN_PROJECTS = [
     cover: "assets/img/projects/krige/cover-figure.jpg",
     images: [
       { src: "assets/img/projects/krige/opening-night.jpg", alt: "Opening night — visitors gathered in front of the work at the railway-arch venue" },
+      { src: "assets/img/projects/krige/venue-night.jpg", alt: "The artist painting the long wall under spotlight at the night event" },
+      { src: "assets/img/projects/krige/night-live.jpg", alt: "Live painting at night under projected light during the show" },
       { src: "assets/img/projects/krige/krige-spraying.jpg", alt: "Alexander Krige spray-painting one of the exhibition panels live" },
       { src: "assets/img/projects/krige/artist-at-work.jpg", alt: "Alexander Krige working on the wall during the build" },
       { src: "assets/img/projects/krige/spray-workshop.jpg", alt: "An attendee taking part in the spray-paint workshop" },
-      { src: "assets/img/projects/krige/night-live.jpg", alt: "Live painting at night under projected light during the show" },
-      { src: "assets/img/projects/krige/painting-detail.jpg", alt: "Detail of a finished painting from the exhibition" },
+      { src: "assets/img/projects/krige/workshop-participant.jpg", alt: "Alexander Krige helping a young participant create a piece during the workshop" },
       { src: "assets/img/projects/krige/community-piece.jpg", alt: "A community spray-paint piece created during the workshop" },
+      { src: "assets/img/projects/krige/krige-candid.jpg", alt: "Alexander Krige at the venue during the show" },
+      { src: "assets/img/projects/krige/mural-figures.jpg", alt: "Figurative scene from the 5 × 25 metre mural" },
+      { src: "assets/img/projects/krige/mural-detail.jpg", alt: "A robed figure rising from flame — detail from the mural" },
+      { src: "assets/img/projects/krige/mural-figure.jpg", alt: "A figure in motion detailed within the large-scale mural" },
+      { src: "assets/img/projects/krige/painting-detail.jpg", alt: "Detail of a finished painting from the exhibition" },
+      { src: "assets/img/projects/krige/mural-abstract.jpg", alt: "Close-up of the mural's colour and mark-making" },
       { src: "assets/img/projects/krige/cover-figure.jpg", alt: "A central figurative painting from the show" }
     ],
     gallery: [21, 8, 33, 5]
