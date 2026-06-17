@@ -25,7 +25,21 @@
         </div>
       </div>
       <div class="hero__media">
-        <div class="artframe" data-seed="88" data-ratio="4x5"></div>
+        <div class="ba-slider" id="hero-ba" data-hint="1">
+          <div class="ba-slider__img ba-slider__img--before">
+            <img src="assets/img/hero-before.jpg" alt="A plain, bare wall before the commission" />
+            <span class="ba-tag ba-tag--before">Before</span>
+          </div>
+          <div class="ba-slider__img ba-slider__img--after">
+            <img src="assets/img/hero-after.jpg" alt="The same wall transformed by an original Pattern mural" />
+            <span class="ba-tag ba-tag--after">After</span>
+          </div>
+          <button class="ba-handle" type="button" role="slider" aria-label="Drag to compare before and after" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-orientation="horizontal">
+            <span class="ba-handle__grip" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7l-5 5 5 5"/><path d="M15 7l5 5-5 5"/></svg>
+            </span>
+          </button>
+        </div>
         <span class="hero__scroll">Scroll</span>
       </div>
     </section>

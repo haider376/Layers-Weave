@@ -353,6 +353,65 @@
       '</section>';
   }
 
+  /* ---------- before / after compare slider (drag to reveal) ---------- */
+  function initCompare() {
+    $$(".ba-slider").forEach(function (slider) {
+      var after = slider.querySelector(".ba-slider__img--after");
+      var handle = slider.querySelector(".ba-handle");
+      if (!after || !handle) return;
+      var dragging = false;
+
+      function set(pct) {
+        pct = Math.max(0, Math.min(100, pct));
+        slider.style.setProperty("--pos", pct + "%");
+        handle.setAttribute("aria-valuenow", Math.round(pct));
+      }
+      function pctFromEvent(e) {
+        var rect = slider.getBoundingClientRect();
+        var x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        return (x / rect.width) * 100;
+      }
+      function start(e) {
+        dragging = true;
+        slider.removeAttribute("data-hint");
+        set(pctFromEvent(e));
+        if (e.pointerId != null && slider.setPointerCapture) {
+          try { slider.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+        e.preventDefault();
+      }
+      function move(e) { if (dragging) set(pctFromEvent(e)); }
+      function end() { dragging = false; }
+
+      // Pointer events cover mouse + touch + pen
+      if (window.PointerEvent) {
+        slider.addEventListener("pointerdown", start);
+        slider.addEventListener("pointermove", move);
+        window.addEventListener("pointerup", end);
+        slider.addEventListener("pointercancel", end);
+      } else {
+        slider.addEventListener("mousedown", start);
+        window.addEventListener("mousemove", move);
+        window.addEventListener("mouseup", end);
+        slider.addEventListener("touchstart", start, { passive: false });
+        slider.addEventListener("touchmove", function (e) { move(e); e.preventDefault(); }, { passive: false });
+        window.addEventListener("touchend", end);
+      }
+
+      // Keyboard accessibility
+      handle.addEventListener("keydown", function (e) {
+        var cur = parseFloat(slider.style.getPropertyValue("--pos")) || 50;
+        var step = e.shiftKey ? 10 : 2;
+        if (e.key === "ArrowLeft") { set(cur - step); e.preventDefault(); }
+        else if (e.key === "ArrowRight") { set(cur + step); e.preventDefault(); }
+        else if (e.key === "Home") { set(0); e.preventDefault(); }
+        else if (e.key === "End") { set(100); e.preventDefault(); }
+      });
+
+      set(50);
+    });
+  }
+
   /* ---------- boot ---------- */
   function boot() {
     injectChrome();
@@ -363,6 +422,7 @@
     initHeader();
     initReveal();
     initForms();
+    initCompare();
   }
 
   if (document.readyState === "loading") {
