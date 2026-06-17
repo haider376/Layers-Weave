@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects — Pattern</title>
+  <meta name="description" content="Selected exhibitions, installations, hospitality artwork, live painting and education projects by Pattern artists." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="header-mount"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow reveal in">Projects</span>
+        <h1 class="display reveal in" data-delay="1">Work that makes spaces unforgettable.</h1>
+        <p class="lead reveal in" data-delay="2">A selection of exhibitions, installations, hospitality artwork, live painting and education projects — created with our artists for businesses that wanted something original.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="filters reveal" id="project-filters">
+          <button class="filter active" data-cat="All">All</button>
+          <button class="filter" data-cat="Exhibitions">Exhibitions</button>
+          <button class="filter" data-cat="Installations">Installations</button>
+          <button class="filter" data-cat="Hospitality">Hospitality</button>
+          <button class="filter" data-cat="Live Painting">Live Painting</button>
+          <button class="filter" data-cat="Education">Education</button>
+          <button class="filter" data-cat="Independent Projects">Independent Projects</button>
+        </div>
+        <div class="project-grid" id="all-projects"></div>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="grid-2 stack-lg">
+          <div>
+            <span class="eyebrow reveal">Galleries</span>
+            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.6rem,3.5vw,2.4rem);margin-top:.7rem">Commercial Projects</h2>
+            <p class="muted reveal" data-delay="2" style="margin-top:.8rem">Commissioned work for hospitality, retail and developer clients.</p>
+            <div class="cs-gallery mt-2">
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="40" data-ratio="1x1"></div></div>
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="51" data-ratio="1x1"></div></div>
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="62" data-ratio="1x1"></div></div>
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="17" data-ratio="1x1"></div></div>
+            </div>
+          </div>
+          <div>
+            <span class="eyebrow reveal">Galleries</span>
+            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.6rem,3.5vw,2.4rem);margin-top:.7rem">Independent Projects</h2>
+            <p class="muted reveal" data-delay="2" style="margin-top:.8rem">Self-initiated and exhibition work from across our artist community.</p>
+            <div class="cs-gallery mt-2">
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="28" data-ratio="1x1"></div></div>
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="35" data-ratio="1x1"></div></div>
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="49" data-ratio="1x1"></div></div>
+              <div class="ratio ratio--1x1 reveal"><div class="artframe" data-seed="10" data-ratio="1x1"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="banner">
+      <div class="banner__bg artframe" data-seed="55" data-ratio="21x9"></div>
+      <div class="container">
+        <h2 class="display reveal">Have a space in mind?</h2>
+        <a class="btn btn--primary reveal" data-delay="1" href="contact.html">Start Your Project <span class="arrow">→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-mount"></div>
+  <script src="js/projects-data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

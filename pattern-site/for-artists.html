@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Artists — Pattern</title>
+  <meta name="description" content="Pattern helps artists secure opportunities, grow their audience and connect with businesses that value original work." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="header-mount"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow reveal in">For Artists</span>
+        <h1 class="display reveal in" data-delay="1">Build your creative career without sacrificing your identity.</h1>
+        <p class="lead reveal in" data-delay="2">Pattern helps artists secure opportunities, grow their audience and connect with businesses that value original work.</p>
+        <div class="hero__actions reveal in" data-delay="3" style="margin-top:2.2rem">
+          <a class="btn btn--primary" href="#apply">Apply <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section--tight">
+      <div class="container">
+        <div class="ratio ratio--16x9 reveal"><div class="artframe" data-seed="42" data-ratio="16x9"></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="grid-2">
+          <div>
+            <span class="eyebrow reveal">What we look for</span>
+            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-top:.8rem">A point of view, and the craft to back it.</h2>
+            <ul class="checklist reveal mt-3" data-delay="2">
+              <li><strong>Distinct visual identity</strong> — work that is unmistakably yours.</li>
+              <li><strong>Strong portfolio</strong> — a body of work that holds together.</li>
+              <li><strong>Professional communication</strong> — clear, reliable, easy to work with.</li>
+              <li><strong>Ambition</strong> — you want to grow and take on more.</li>
+              <li><strong>Reliability</strong> — you deliver what you commit to.</li>
+              <li><strong>Originality</strong> — you make work the world hasn’t seen.</li>
+            </ul>
+          </div>
+          <div>
+            <span class="eyebrow reveal">What we offer</span>
+            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-top:.8rem">Opportunities, support and a community.</h2>
+            <ul class="checklist reveal mt-3" data-delay="2">
+              <li><strong>Paid opportunities</strong> — commissions and projects with real budgets.</li>
+              <li><strong>Project management</strong> — we handle logistics so you can make.</li>
+              <li><strong>Content production</strong> — professional documentation of your work.</li>
+              <li><strong>Events and exhibitions</strong> — moments to show and be seen.</li>
+              <li><strong>Brand collaborations</strong> — introductions to businesses that value you.</li>
+              <li><strong>Community</strong> — a network of artists building careers together.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tight" id="apply">
+      <div class="container">
+        <div class="grid-2">
+          <div>
+            <span class="eyebrow reveal">Apply</span>
+            <h2 class="reveal" data-delay="1" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-top:.8rem">Artist Application</h2>
+            <p class="lead reveal" data-delay="2" style="margin-top:1.2rem">We review every application personally. If your work feels like a fit, we’ll reach out to talk about upcoming opportunities.</p>
+            <div class="ratio ratio--3x2 reveal mt-3" data-delay="2"><div class="artframe" data-seed="57" data-ratio="3x2"></div></div>
+          </div>
+          <form class="form reveal" data-form="artist" data-delay="1">
+            <div class="field"><label for="a-name">Name</label><input id="a-name" name="name" type="text" placeholder="Your name" required /></div>
+            <div class="field"><label for="a-email">Email</label><input id="a-email" name="email" type="email" placeholder="you@email.com" required /></div>
+            <div class="field"><label for="a-portfolio">Portfolio / Website</label><input id="a-portfolio" name="portfolio" type="url" placeholder="https://" required /></div>
+            <div class="field"><label for="a-instagram">Instagram</label><input id="a-instagram" name="instagram" type="text" placeholder="@yourhandle" /></div>
+            <div class="field"><label for="a-discipline">Primary discipline</label>
+              <select id="a-discipline" name="discipline">
+                <option>Painting</option>
+                <option>Mural</option>
+                <option>Mixed Media</option>
+                <option>Sculpture / Installation</option>
+                <option>Illustration</option>
+                <option>Photography</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field"><label for="a-about">Tell us about your work</label><textarea id="a-about" name="about" placeholder="Your practice, what drives it, and what you’re looking for…" required></textarea></div>
+            <button class="btn btn--primary btn--block" type="submit">Submit Application <span class="arrow">→</span></button>
+            <p class="form-note">By applying you agree to be contacted about relevant opportunities.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="banner">
+      <div class="banner__bg artframe" data-seed="64" data-ratio="21x9"></div>
+      <div class="container">
+        <h2 class="display reveal">Your work deserves the right rooms.</h2>
+        <a class="btn btn--primary reveal" data-delay="1" href="#apply">Apply to Pattern <span class="arrow">→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-mount"></div>
+  <script src="js/projects-data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
