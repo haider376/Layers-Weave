@@ -434,6 +434,55 @@
     });
   }
 
+  /* ---------- lightbox (enlarge gallery photos) ---------- */
+  function initLightbox() {
+    var imgs = $$(".cs-gallery .photo img");
+    if (!imgs.length) return;
+    var idx = 0;
+    var X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    var L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+    var R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+
+    var lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.innerHTML =
+      '<button class="lightbox__btn lightbox__close" aria-label="Close">' + X + '</button>' +
+      '<button class="lightbox__btn lightbox__prev" aria-label="Previous image">' + L + '</button>' +
+      '<button class="lightbox__btn lightbox__next" aria-label="Next image">' + R + '</button>' +
+      '<img class="lightbox__img" alt="" />' +
+      '<span class="lightbox__count"></span>' +
+      '<p class="lightbox__cap"></p>';
+    document.body.appendChild(lb);
+
+    var imgEl = lb.querySelector(".lightbox__img");
+    var capEl = lb.querySelector(".lightbox__cap");
+    var countEl = lb.querySelector(".lightbox__count");
+
+    function show(i) {
+      idx = (i + imgs.length) % imgs.length;
+      imgEl.src = imgs[idx].getAttribute("src");
+      var alt = imgs[idx].getAttribute("alt") || "";
+      imgEl.alt = alt; capEl.textContent = alt;
+      countEl.textContent = (idx + 1) + " / " + imgs.length;
+    }
+    function open(i) { show(i); lb.classList.add("open"); document.body.style.overflow = "hidden"; }
+    function close() { lb.classList.remove("open"); document.body.style.overflow = ""; }
+
+    imgs.forEach(function (im, i) { im.addEventListener("click", function () { open(i); }); });
+    lb.querySelector(".lightbox__close").addEventListener("click", close);
+    lb.querySelector(".lightbox__prev").addEventListener("click", function (e) { e.stopPropagation(); show(idx - 1); });
+    lb.querySelector(".lightbox__next").addEventListener("click", function (e) { e.stopPropagation(); show(idx + 1); });
+    lb.addEventListener("click", function (e) { if (e.target === lb) close(); });
+    document.addEventListener("keydown", function (e) {
+      if (!lb.classList.contains("open")) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") show(idx - 1);
+      else if (e.key === "ArrowRight") show(idx + 1);
+    });
+  }
+
   /* ---------- boot ---------- */
   function boot() {
     injectChrome();
@@ -445,6 +494,7 @@
     initReveal();
     initForms();
     initCompare();
+    initLightbox();
   }
 
   if (document.readyState === "loading") {

@@ -804,3 +804,36 @@ body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6.5px) rota
   .ba-slider__img--after { will-change: auto; }
   .ba-slider[data-hint="1"] .ba-handle__grip { animation: none; }
 }
+
+/* ===========================================================
+   Lightbox (click gallery photo to enlarge)
+   =========================================================== */
+.cs-gallery .photo { cursor: zoom-in; }
+.lightbox {
+  position: fixed; inset: 0; z-index: 200;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(8, 8, 7, 0.94);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.lightbox.open { display: flex; }
+.lightbox__img {
+  max-width: 92vw; max-height: 84vh; object-fit: contain;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  animation: lb-in 0.25s var(--ease);
+}
+@keyframes lb-in { from { opacity: 0; transform: scale(0.985); } to { opacity: 1; transform: none; } }
+.lightbox__btn {
+  position: absolute; width: 54px; height: 54px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink); background: rgba(243, 240, 233, 0.06);
+  border: 1px solid var(--line);
+  transition: background var(--step-up), color var(--step-up), border-color var(--step-up);
+}
+.lightbox__btn:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.lightbox__btn svg { width: 24px; height: 24px; }
+.lightbox__close { top: 1.2rem; right: 1.2rem; }
+.lightbox__prev { left: clamp(0.5rem, 3vw, 2rem); top: 50%; transform: translateY(-50%); }
+.lightbox__next { right: clamp(0.5rem, 3vw, 2rem); top: 50%; transform: translateY(-50%); }
+.lightbox__count { position: absolute; top: 1.5rem; left: 1.6rem; font-size: 0.74rem; letter-spacing: 0.18em; color: var(--ink-dim); }
+.lightbox__cap { position: absolute; bottom: 1.3rem; left: 50%; transform: translateX(-50%); max-width: 64ch; text-align: center; font-size: 0.88rem; color: var(--ink-dim); padding: 0 4.5rem; }
+@media (max-width: 600px) { .lightbox__btn { width: 44px; height: 44px; } .lightbox__cap { display: none; } }

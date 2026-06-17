@@ -11,25 +11,29 @@ window.PATTERN_PROJECTS = [
     category: "Exhibitions",
     featured: true,
     seed: 14,
-    summary: "A solo exhibition staged as a single immersive environment — paintings, light and sound composed as one room.",
-    client: "Independent / Pattern",
-    services: ["Curation", "Exhibition Design", "Content Production"],
+    summary: "Alexander Krige's debut solo show in London — a 5 × 25 metre mural unveiled across two days of live painting, talks and a community spray-paint workshop.",
+    client: "Alexander Krige / Pattern",
+    services: ["Curation", "Live Painting", "Exhibition Design", "Content Production"],
     location: "London",
-    year: "2024",
+    year: "2025",
     overview:
-      "Krige Exhibition brought together two years of new work into a single, deliberately paced room. Rather than hanging paintings as isolated objects, Pattern treated the gallery as one continuous composition — sequencing scale, colour temperature and negative space so visitors moved through the work like a piece of music.",
+      "In September 2025, artist and Pattern founder Alexander Krige delivered his debut solo show in London. The exhibition centred around the unveiling of a 5 x 25 metre mural and brought together collectors, artists and members of the public across two days.",
     brief:
-      "Present a substantial body of new painting in a way that felt like an experience rather than a display, while producing a content archive the artist could carry into future opportunities and representation conversations.",
+      "Create an immersive exhibition that showcased original artwork while introducing audiences to Alexander's wider creative practice.",
     solution:
-      "We designed the hang around a single sightline, warming the lighting as the work intensified and leaving generous space for the largest pieces to breathe. A documentary content shoot ran across install and opening night, capturing the work, the room and the audience reaction in a consistent visual language.",
+      "The exhibition featured a private opening with live painting, artist talks and a spray-paint workshop, followed by a second event focused on live art and community engagement. Throughout the weekend, attendees experienced original artworks, large-scale murals and the creation of a new artwork in real time.",
     outcome:
-      "The exhibition drew a sustained audience across its run and generated a complete content set — stills and film — now used across the artist's portfolio and introductions. Two works were acquired and one led directly to a commissioned installation.",
+      "The exhibition attracted collectors, artists and members of the public, resulting in artwork sales, new creative opportunities and significant content creation. The event demonstrated the value of combining artwork, community and live experiences.",
     hero: "assets/img/projects/krige/hero-mural.jpg",
     cover: "assets/img/projects/krige/cover-figure.jpg",
     images: [
       { src: "assets/img/projects/krige/opening-night.jpg", alt: "Opening night — visitors gathered in front of the work at the railway-arch venue" },
+      { src: "assets/img/projects/krige/krige-spraying.jpg", alt: "Alexander Krige spray-painting one of the exhibition panels live" },
       { src: "assets/img/projects/krige/artist-at-work.jpg", alt: "Alexander Krige working on the wall during the build" },
+      { src: "assets/img/projects/krige/spray-workshop.jpg", alt: "An attendee taking part in the spray-paint workshop" },
+      { src: "assets/img/projects/krige/night-live.jpg", alt: "Live painting at night under projected light during the show" },
       { src: "assets/img/projects/krige/painting-detail.jpg", alt: "Detail of a finished painting from the exhibition" },
+      { src: "assets/img/projects/krige/community-piece.jpg", alt: "A community spray-paint piece created during the workshop" },
       { src: "assets/img/projects/krige/cover-figure.jpg", alt: "A central figurative painting from the show" }
     ],
     gallery: [21, 8, 33, 5]
