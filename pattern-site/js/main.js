@@ -496,6 +496,34 @@
     });
   }
 
+  /* ---------- scroll-reveal parallax ---------- */
+  function initParallax() {
+    var els = $$("[data-parallax]");
+    if (!els.length) return;
+    var imgs = els.map(function (el) { return el.querySelector("img"); });
+    function update() {
+      var vh = window.innerHeight;
+      els.forEach(function (el, i) {
+        var img = imgs[i];
+        if (!img) return;
+        var r = el.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > vh + 200) return; // skip off-screen
+        var prog = (vh - r.top) / (vh + r.height); // 0 entering, 1 leaving
+        prog = Math.max(0, Math.min(1, prog));
+        var py = (0.5 - prog) * 16; // image drifts up as you scroll down → reveals lower part
+        img.style.transform = "translateY(" + py.toFixed(2) + "%)";
+      });
+    }
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(function () { update(); ticking = false; });
+    }
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", update);
+  }
+
   /* ---------- boot ---------- */
   function boot() {
     injectChrome();
@@ -508,6 +536,7 @@
     initForms();
     initCompare();
     initLightbox();
+    initParallax();
   }
 
   if (document.readyState === "loading") {

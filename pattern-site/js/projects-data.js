@@ -203,10 +203,13 @@ window.PATTERN_PROJECTS = [
       "Students were introduced to Alexander Krige's journey as an artist, the history of graffiti culture and the development of murals as a professional creative practice. The workshop included a practical graffiti lettering exercise followed by an open Q&A session.",
     outcome:
       "Students gained hands-on experience with graffiti lettering techniques while developing a broader understanding of street art, public art and creative career pathways.",
-    hero: "assets/img/projects/pegasus/demo.jpg",
+    hero: "assets/img/projects/pegasus/classroom.jpg",
     cover: "assets/img/projects/pegasus/artwork-flatlay.jpg",
     images: [
-      { src: "assets/img/projects/pegasus/demo.jpg", alt: "Alexander Krige demonstrating graffiti lettering with students during the workshop" },
+      { src: "assets/img/projects/pegasus/classroom.jpg", alt: "Alexander Krige leading the graffiti workshop with the class" },
+      { src: "assets/img/projects/pegasus/demo.jpg", alt: "Demonstrating graffiti lettering with students during the workshop" },
+      { src: "assets/img/projects/pegasus/desks.jpg", alt: "Students working on their own lettering at their desks" },
+      { src: "assets/img/projects/pegasus/collab.jpg", alt: "Students developing a collaborative graffiti piece" },
       { src: "assets/img/projects/pegasus/spray-can.jpg", alt: "Students engaging with the workshop" },
       { src: "assets/img/projects/pegasus/student-artwork.jpg", alt: "A student presenting their finished graffiti name piece" },
       { src: "assets/img/projects/pegasus/artwork-flatlay.jpg", alt: "A selection of the students' finished graffiti lettering pieces" }
