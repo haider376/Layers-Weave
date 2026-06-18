@@ -150,7 +150,7 @@ window.PATTERN_PROJECTS = [
     outcome:
       "The project transformed a blank space into an engaging visual feature while giving visitors the opportunity to witness the creative process unfold in real time. The live nature of the project generated audience engagement throughout the installation period and demonstrated the potential of art as a live experience.",
     hero: "assets/img/projects/babylon/finished-green.jpg",
-    cover: "assets/img/projects/babylon/finished-uv.jpg",
+    cover: "assets/img/projects/babylon/finished-green.jpg",
     images: [
       { src: "assets/img/projects/babylon/wall-build.jpg", alt: "Building the custom wall, assembled and installed before painting began" },
       { src: "assets/img/projects/babylon/live-painting.jpg", alt: "The mural painted live under UV light at Babylon Park" },
@@ -203,6 +203,14 @@ window.PATTERN_PROJECTS = [
       "Students were introduced to Alexander Krige's journey as an artist, the history of graffiti culture and the development of murals as a professional creative practice. The workshop included a practical graffiti lettering exercise followed by an open Q&A session.",
     outcome:
       "Students gained hands-on experience with graffiti lettering techniques while developing a broader understanding of street art, public art and creative career pathways.",
+    hero: "assets/img/projects/pegasus/demo.jpg",
+    cover: "assets/img/projects/pegasus/artwork-flatlay.jpg",
+    images: [
+      { src: "assets/img/projects/pegasus/demo.jpg", alt: "Alexander Krige demonstrating graffiti lettering with students during the workshop" },
+      { src: "assets/img/projects/pegasus/spray-can.jpg", alt: "Students engaging with the workshop" },
+      { src: "assets/img/projects/pegasus/student-artwork.jpg", alt: "A student presenting their finished graffiti name piece" },
+      { src: "assets/img/projects/pegasus/artwork-flatlay.jpg", alt: "A selection of the students' finished graffiti lettering pieces" }
+    ],
     gallery: [38, 1, 26, 13]
   }
 ];
