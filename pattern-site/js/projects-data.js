@@ -154,7 +154,7 @@ window.PATTERN_PROJECTS = [
   {
     slug: "imargo",
     title: "Imargo Backdrop Mural",
-    category: "Live Painting",
+    category: "Brand",
     featured: false,
     seed: 52,
     summary: "A live backdrop mural of the brand's hummingbird, painted during an Imargo clothing-collection launch shoot.",
