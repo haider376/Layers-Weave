@@ -149,6 +149,18 @@ window.PATTERN_PROJECTS = [
       "A custom wall was designed, constructed and installed specifically for the project before painting began. The artwork was created live in front of visitors using water-based paints and hand-painted details to ensure the process remained safe within the indoor environment.",
     outcome:
       "The project transformed a blank space into an engaging visual feature while giving visitors the opportunity to witness the creative process unfold in real time. The live nature of the project generated audience engagement throughout the installation period and demonstrated the potential of art as a live experience.",
+    hero: "assets/img/projects/babylon/finished-green.jpg",
+    cover: "assets/img/projects/babylon/finished-uv.jpg",
+    images: [
+      { src: "assets/img/projects/babylon/wall-build.jpg", alt: "Building the custom wall, assembled and installed before painting began" },
+      { src: "assets/img/projects/babylon/live-painting.jpg", alt: "The mural painted live under UV light at Babylon Park" },
+      { src: "assets/img/projects/babylon/uv-floor.jpg", alt: "The UV underdrawing extending onto the floor of the set" },
+      { src: "assets/img/projects/babylon/floor-reach.jpg", alt: "Hand-painting the lower section of the artwork during the build" },
+      { src: "assets/img/projects/babylon/participant.jpg", alt: "Adding fine detail to the artwork under coloured light" },
+      { src: "assets/img/projects/babylon/finished-uv.jpg", alt: "The finished alien mural glowing under UV light" },
+      { src: "assets/img/projects/babylon/finished-green.jpg", alt: "The completed 'Welcome' mural lit in green" },
+      { src: "assets/img/projects/babylon/venue-wide.jpg", alt: "The finished artwork installed as the backdrop to the venue's Winner Station" }
+    ],
     gallery: [2, 19, 36, 11]
   },
   {
