@@ -120,8 +120,7 @@
     ["For Businesses", "for-businesses.html"],
     ["For Artists", "for-artists.html"],
     ["Projects", "projects.html"],
-    ["About", "about.html"],
-    ["Contact", "contact.html"]
+    ["About", "about.html"]
   ];
 
   function igIcon() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>'; }
@@ -295,13 +294,13 @@
   function renderFeatured() {
     var mount = $("#featured-projects");
     if (!mount || !window.PATTERN_PROJECTS) return;
-    mount.innerHTML = window.PATTERN_PROJECTS.filter(function (p) { return p.featured; }).map(projectCard).join("");
+    mount.innerHTML = window.PATTERN_PROJECTS.filter(function (p) { return p.featured && p.published; }).map(projectCard).join("");
   }
 
   function renderProjects() {
     var mount = $("#all-projects");
     if (!mount || !window.PATTERN_PROJECTS) return;
-    var data = window.PATTERN_PROJECTS.filter(function (p) { return !p.comingSoon; });
+    var data = window.PATTERN_PROJECTS.filter(function (p) { return p.published; });
     var render = function (cat) {
       var list = cat === "All" ? data : data.filter(function (p) { return p.category === cat; });
       mount.innerHTML = list.map(projectCard).join("");
@@ -327,7 +326,7 @@
     var p = data.filter(function (x) { return x.slug === slug; })[0] || data[0];
     document.title = p.title + " — Pattern";
 
-    var related = data.filter(function (x) { return x.slug !== p.slug && !x.comingSoon; }).slice(0, 3);
+    var related = data.filter(function (x) { return x.slug !== p.slug && x.published; }).slice(0, 3);
     var gallery;
     if (p.images && p.images.length) {
       gallery = p.images.map(function (im, i) {

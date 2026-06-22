@@ -10,6 +10,7 @@ window.PATTERN_PROJECTS = [
     title: "Krige Exhibition",
     category: "Exhibitions",
     featured: true,
+    published: true,
     seed: 14,
     summary: "Alexander Krige's debut solo show in London — a 5 × 25 metre mural unveiled across two days of live painting, talks and a community spray-paint workshop.",
     client: "Alexander Krige / Pattern",
@@ -50,6 +51,7 @@ window.PATTERN_PROJECTS = [
     title: "Bird & Spider Mural",
     category: "Independent Projects",
     featured: true,
+    published: true,
     seed: 61,
     summary: "A self-initiated mural — a spider consuming a bird — exploring scale, movement and visual storytelling, documented as long-form film.",
     client: "Self-initiated — Alexander Krige",
@@ -80,13 +82,32 @@ window.PATTERN_PROJECTS = [
     gallery: [61, 29, 42, 12]
   },
   {
-    slug: "coming-soon",
-    title: "New project coming soon",
-    category: "In progress",
+    slug: "bull-mural",
+    title: "Bull Mural",
+    category: "Independent Projects",
     featured: true,
-    comingSoon: true,
+    published: true,
     seed: 70,
-    summary: "We're putting the finishing touches to the next project — check back shortly."
+    summary: "A self-initiated mural — an abstracted bull built from gestural line and bold colour, made with complete creative freedom.",
+    client: "Self-initiated — Alexander Krige",
+    services: ["Mural", "Independent Project"],
+    location: "London",
+    year: "2024",
+    overview:
+      "The Bull Mural is a self-initiated piece by Pattern founder Alexander Krige — an exercise in pure expression, built from gestural line and layered colour with no commercial brief or constraints.",
+    brief:
+      "An independent work made for its own sake: to push scale, movement and an instinctive, expressive mark, and to explore a single subject from raw line to finished colour.",
+    solution:
+      "Beginning with a loose two-tone line drawing mapped directly onto the wall, the piece was developed into a full-colour mural — an abstracted bull caught mid-movement, energetic and deliberately unpolished.",
+    outcome:
+      "A personal, expressive mural that captures exactly the kind of original, artist-led work Pattern exists to champion — proof that the most memorable pieces come from genuine creative freedom.",
+    hero: "assets/img/projects/bull/bull-finished.jpg",
+    cover: "assets/img/projects/bull/bull-finished.jpg",
+    images: [
+      { src: "assets/img/projects/bull/bull-outline.jpg", alt: "The bull mapped onto the wall as a two-tone line drawing" },
+      { src: "assets/img/projects/bull/bull-finished.jpg", alt: "The finished abstracted bull mural in full colour" }
+    ],
+    gallery: [70, 33, 9, 21]
   },
   {
     slug: "john-home-installation",
