@@ -427,9 +427,12 @@
           '<div class="cs-gallery mt-2">' + gallery + '</div>' +
         '</div>' +
         (p.video
-          ? '<div class="section--tight"><span class="eyebrow reveal">Film</span>' +
-              '<div class="ratio ratio--16x9 reveal mt-2"><iframe src="' + p.video + '" title="' + p.title.replace(/"/g, "&quot;") + ' — film" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border:0;width:100%;height:100%"></iframe></div>' +
-            '</div>'
+          ? '<div class="section--tight"><span class="eyebrow reveal">Watch the process</span>' +
+              '<div class="video-embed reveal mt-2">' +
+                '<iframe id="yt-' + p.video.id + '" data-yt-id="' + p.video.id + '" data-yt-start="' + (p.video.start || 0) + '" ' +
+                'src="https://www.youtube.com/embed/' + p.video.id + '?enablejsapi=1&autoplay=1&mute=1&controls=0&start=' + (p.video.start || 0) + '&playsinline=1&modestbranding=1&rel=0&disablekb=1&fs=0" ' +
+                'title="' + p.title.replace(/"/g, "&quot;") + ' — process film" frameborder="0" allow="autoplay; encrypted-media"></iframe>' +
+              '</div></div>'
           : '') +
       '</div>' +
       '<section class="section"><div class="container">' +
@@ -598,6 +601,32 @@
     window.addEventListener("resize", update);
   }
 
+  /* ---------- silent, looping YouTube (no controls, segment loop) ---------- */
+  function initYouTube() {
+    var frames = $$("iframe[data-yt-id]");
+    if (!frames.length) return;
+    function setup() {
+      frames.forEach(function (f) {
+        var start = parseInt(f.getAttribute("data-yt-start") || "0", 10);
+        new YT.Player(f.id, {
+          events: {
+            onReady: function (e) { e.target.mute(); if (start) e.target.seekTo(start); e.target.playVideo(); },
+            onStateChange: function (e) {
+              if (e.data === YT.PlayerState.ENDED) { e.target.seekTo(start); e.target.playVideo(); }
+              if (e.data === YT.PlayerState.PLAYING) { e.target.mute(); }
+            }
+          }
+        });
+      });
+    }
+    if (window.YT && window.YT.Player) { setup(); return; }
+    var prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function () { if (prev) prev(); setup(); };
+    var tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  }
+
   /* ---------- boot ---------- */
   function boot() {
     injectChrome();
@@ -612,6 +641,7 @@
     initLightbox();
     initParallax();
     initBlurReveal();
+    initYouTube();
   }
 
   if (document.readyState === "loading") {

@@ -68,6 +68,7 @@ window.PATTERN_PROJECTS = [
       "The completed mural became one of Alexander's most ambitious independent works and serves as an example of the type of artist-led projects Pattern aims to support. The project also demonstrated how artwork, storytelling and content production can work together to extend the reach and impact of a creative project beyond the wall itself.",
     hero: "assets/img/projects/bird-spider/finished-day.jpg",
     cover: "assets/img/projects/bird-spider/finished-night.jpg",
+    video: { id: "Yb-3YHQBEVc", start: 240 },
     images: [
       { src: "assets/img/projects/bird-spider/process-underpaint.jpg", alt: "Alexander Krige spraying the blue underpainting, spray cans in the foreground" },
       { src: "assets/img/projects/bird-spider/process-artist.jpg", alt: "The artist working on the mid-stage mural by day" },
