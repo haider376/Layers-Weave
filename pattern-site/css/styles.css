@@ -983,3 +983,29 @@ body::before {
 .split__media .photo, .parallax-media { box-shadow: 0 26px 60px rgba(0, 0, 0, 0.45); }
 
 @media (prefers-reduced-motion: reduce) { body::before { background-attachment: scroll; } }
+
+/* =====================================================================
+   Stronger secondary (teal) presence
+   ===================================================================== */
+:root { --glow-warm: rgba(194, 86, 44, 0.18); --glow-cool: rgba(58, 165, 172, 0.24); }
+
+body::before {
+  background:
+    radial-gradient(1000px 700px at 5% -8%, var(--glow-warm), transparent 55%),
+    radial-gradient(1150px 880px at 103% 20%, var(--glow-cool), transparent 58%),
+    radial-gradient(900px 760px at 48% 52%, rgba(58, 165, 172, 0.11), transparent 62%),
+    radial-gradient(1200px 900px at 50% 120%, rgba(194, 86, 44, 0.13), transparent 60%);
+}
+
+/* Process steps take teal as their accent (What We Do cards stay orange) */
+.step__num { background: rgba(58, 165, 172, 0.18); color: var(--secondary); }
+.step::before { background: var(--secondary); }
+.step:hover {
+  border-color: rgba(58, 165, 172, 0.55);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(58, 165, 172, 0.40), 0 0 46px rgba(58, 165, 172, 0.14);
+}
+.steps::before {
+  background:
+    radial-gradient(45% 60% at 18% 10%, rgba(58, 165, 172, 0.22), transparent 70%),
+    radial-gradient(48% 60% at 86% 92%, rgba(58, 165, 172, 0.16), transparent 72%);
+}
