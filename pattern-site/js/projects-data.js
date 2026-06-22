@@ -105,6 +105,10 @@ window.PATTERN_PROJECTS = [
     cover: "assets/img/projects/bull/bull-finished.jpg",
     images: [
       { src: "assets/img/projects/bull/bull-outline.jpg", alt: "The bull mapped onto the wall as a two-tone line drawing" },
+      { src: "assets/img/projects/bull/bull-stage1.jpg", alt: "First colour — green washes laid over the line drawing" },
+      { src: "assets/img/projects/bull/bull-stage2.jpg", alt: "Blocking in the red and green forms of the bull" },
+      { src: "assets/img/projects/bull/bull-stage3.jpg", alt: "Building density and movement with layered colour" },
+      { src: "assets/img/projects/bull/bull-stage4.jpg", alt: "The mural nearing completion" },
       { src: "assets/img/projects/bull/bull-finished.jpg", alt: "The finished abstracted bull mural in full colour" }
     ],
     gallery: [70, 33, 9, 21]
