@@ -225,29 +225,84 @@
     els.forEach(function (e) { io.observe(e); });
   }
 
-  /* ---------- forms (no backend — graceful client-side confirmation) ---------- */
+  /* ---------- forms (Web3Forms → email) ---------- */
+  // ▼▼▼ PASTE YOUR WEB3FORMS ACCESS KEY BETWEEN THE QUOTES ▼▼▼
+  var WEB3FORMS_KEY = "YOUR-WEB3FORMS-ACCESS-KEY";
+  // ▲▲▲ get it free at web3forms.com (it routes submissions to your email) ▲▲▲
+
   var FORM_MESSAGES = {
     enquiry: ["Thank you.", "We’ve received your enquiry and will be in touch within two working days."],
     contact: ["Thank you.", "We’ve received your message and will reply within two working days."],
     artist: ["Thank you for applying.", "We review every application individually and will be in touch if we believe there’s a good fit."],
-    "start-project": ["Thank you.", "A member of the Pattern team will review your enquiry and arrange a consultation to discuss your project."]
+    "start-project": ["Thank you.", "A member of the Pattern team will review your enquiry and arrange a consultation to discuss your project."],
+    newsletter: ["Thank you.", "You’re on the list."]
   };
+  var FORM_SUBJECTS = {
+    artist: "New Artist Application — Pattern",
+    "start-project": "New Project Enquiry — Pattern",
+    enquiry: "New Project Enquiry — Pattern",
+    contact: "New Contact Message — Pattern",
+    newsletter: "New Newsletter Signup — Pattern"
+  };
+
+  function showSuccess(form, kind) {
+    var msg = FORM_MESSAGES[kind] || ["Thank you.", "We’ve received your submission and will be in touch shortly."];
+    var success = document.createElement("div");
+    success.className = "form-success reveal in";
+    success.innerHTML = '<strong>' + msg[0] + '</strong><p style="margin-top:.5rem;color:var(--ink-dim)">' + msg[1] + '</p>';
+    form.replaceWith(success);
+    success.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   function initForms() {
+    var keyed = WEB3FORMS_KEY && WEB3FORMS_KEY.indexOf("YOUR-") !== 0;
     $$("form[data-form]").forEach(function (form) {
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (!form.checkValidity()) { form.reportValidity(); return; }
         var kind = form.getAttribute("data-form");
-        if (kind === "newsletter") {
-          form.innerHTML = '<p class="form-note" style="color:var(--accent)">Thank you — you\'re on the list.</p>';
+
+        // No key configured yet → keep the graceful visual confirmation.
+        if (!keyed) {
+          if (kind === "newsletter") { form.innerHTML = '<p class="form-note" style="color:var(--accent)">Thank you — you\'re on the list.</p>'; return; }
+          showSuccess(form, kind);
           return;
         }
-        var msg = FORM_MESSAGES[kind] || ["Thank you.", "We’ve received your submission and will be in touch shortly."];
-        var success = document.createElement("div");
-        success.className = "form-success reveal in";
-        success.innerHTML = '<strong>' + msg[0] + '</strong><p style="margin-top:.5rem;color:var(--ink-dim)">' + msg[1] + '</p>';
-        form.replaceWith(success);
-        success.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        var btn = form.querySelector('button[type="submit"], button:not([type])');
+        var btnHtml = btn ? btn.innerHTML : null;
+        if (btn) { btn.disabled = true; btn.innerHTML = "Sending…"; }
+
+        var fd = new FormData();
+        fd.append("access_key", WEB3FORMS_KEY);
+        fd.append("subject", FORM_SUBJECTS[kind] || "New submission — Pattern");
+        fd.append("from_name", "Pattern Website");
+        fd.append("botcheck", "");
+        $$("input, textarea, select", form).forEach(function (el) {
+          if (!el.name || el.type === "file") return;
+          if ((el.type === "checkbox" || el.type === "radio") && !el.checked) return;
+          fd.append(el.name, el.value);
+        });
+
+        fetch("https://api.web3forms.com/submit", { method: "POST", body: fd })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data && data.success) {
+              if (kind === "newsletter") { form.innerHTML = '<p class="form-note" style="color:var(--accent)">Thank you — you\'re on the list.</p>'; }
+              else { showSuccess(form, kind); }
+            } else { throw new Error("submit failed"); }
+          })
+          .catch(function () {
+            if (btn) { btn.disabled = false; btn.innerHTML = btnHtml; }
+            var note = form.querySelector(".form-error");
+            if (!note) {
+              note = document.createElement("p");
+              note.className = "form-note form-error";
+              note.style.color = "var(--red, #d2693f)";
+              form.appendChild(note);
+            }
+            note.textContent = "Sorry — something went wrong sending that. Please try again, or email us directly.";
+          });
       });
     });
   }
