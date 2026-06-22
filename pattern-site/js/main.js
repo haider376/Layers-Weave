@@ -578,6 +578,26 @@
     window.addEventListener("resize", update);
   }
 
+  /* ---------- blurred image hero: sharpens as you scroll ---------- */
+  function initBlurReveal() {
+    var els = $$("[data-blur-reveal]");
+    if (!els.length) return;
+    var MAX = 16;
+    function update() {
+      var vh = window.innerHeight;
+      els.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        var p = Math.max(0, Math.min(1, -r.top / (vh * 0.7)));
+        el.style.setProperty("--reveal-blur", (MAX * (1 - p)).toFixed(2));
+      });
+    }
+    var ticking = false;
+    function onScroll() { if (ticking) return; ticking = true; requestAnimationFrame(function () { update(); ticking = false; }); }
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", update);
+  }
+
   /* ---------- boot ---------- */
   function boot() {
     injectChrome();
@@ -591,6 +611,7 @@
     initCompare();
     initLightbox();
     initParallax();
+    initBlurReveal();
   }
 
   if (document.readyState === "loading") {

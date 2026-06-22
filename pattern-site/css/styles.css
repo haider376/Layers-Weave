@@ -1009,3 +1009,41 @@ body::before {
     radial-gradient(45% 60% at 18% 10%, rgba(58, 165, 172, 0.22), transparent 70%),
     radial-gradient(48% 60% at 86% 92%, rgba(58, 165, 172, 0.16), transparent 72%);
 }
+
+/* =====================================================================
+   Image hero: blurred photo, text over, sharpens as you scroll
+   ===================================================================== */
+.image-hero {
+  position: relative; display: flex; align-items: flex-end;
+  min-height: min(90vh, 820px); overflow: hidden;
+  padding-block: clamp(5rem, 12vw, 9rem); margin-top: calc(-1 * var(--header-h));
+  padding-top: calc(var(--header-h) + clamp(4rem, 10vw, 8rem));
+}
+.image-hero__bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transform: scale(1.08);
+  filter: blur(calc(var(--reveal-blur, 16) * 1px)) brightness(0.58) saturate(1.05);
+  will-change: filter;
+}
+.image-hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(13,13,12,0.45) 0%, rgba(13,13,12,0.5) 55%, rgba(13,13,12,0.82) 100%);
+}
+.image-hero .container { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .image-hero__bg { filter: blur(4px) brightness(0.58); } }
+
+/* =====================================================================
+   Swap ambient: TEAL on the left, ORANGE on the right
+   ===================================================================== */
+body::before {
+  background:
+    radial-gradient(1000px 720px at 3% -8%, var(--glow-cool), transparent 55%),
+    radial-gradient(1150px 880px at 105% 20%, var(--glow-warm), transparent 58%),
+    radial-gradient(900px 760px at 50% 122%, rgba(58, 165, 172, 0.10), transparent 62%),
+    radial-gradient(1100px 850px at 52% 50%, rgba(194, 86, 44, 0.07), transparent 66%);
+}
+.cards::before, .steps::before, .project-grid::before, .values::before {
+  background:
+    radial-gradient(44% 58% at 15% 12%, var(--glow-cool), transparent 70%),
+    radial-gradient(46% 58% at 87% 92%, var(--glow-warm), transparent 70%);
+}
