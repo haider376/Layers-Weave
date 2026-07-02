@@ -27,9 +27,18 @@ export default async function SettingsPage() {
   const ALLOWED = ["oliver", "shahzaib", "haider", "zikriya", "adan", "rija", "kamila", "asjad", "fatima", "huzaifa", "hayaa"];
   const allUsers = user.isAdmin ? await prisma.user.findMany({ orderBy: { name: "asc" } }) : [];
   const team = user.isAdmin
-    ? allUsers
-        .filter((u) => ALLOWED.includes(u.name.split(" ")[0].toLowerCase()))
-        .map((u) => ({ name: u.name, email: u.email, role: ROLE_LABEL[u.role as Role] ?? u.role, active: u.active }))
+    ? allUsers.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        roleLabel: ROLE_LABEL[u.role as Role] ?? u.role,
+        title: u.title,
+        phone: (u as { phone?: string | null }).phone ?? null,
+        avatarUrl: u.avatarUrl,
+        active: u.active,
+        managedPassword: (u as { managedPassword?: string | null }).managedPassword ?? null,
+      }))
     : [];
 
   // Full sales roster (AEs + BDRs) ordered canonically for the goals editor.
@@ -49,9 +58,10 @@ export default async function SettingsPage() {
     <>
       <Topbar title="Settings" sub="Profile, goals, permissions, workspace & team" />
       <SettingsView
-        me={{ name: user.name, email: user.email, role: ROLE_LABEL[user.role as Role] ?? user.role }}
+        me={{ id: user.id, name: user.name, email: user.email, role: ROLE_LABEL[user.role as Role] ?? user.role }}
         isAdmin={user.isAdmin}
         team={team}
+        assignableRoles={Object.keys(ROLE_LABEL)}
         goals={goals}
         reps={reps}
         permissions={permissions}

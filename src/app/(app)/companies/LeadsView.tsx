@@ -19,9 +19,10 @@ export type Lead = {
   ownerAssignedAt: string | null; deals: number; contacts: number; ownerAvatarUrl?: string | null;
 };
 
-const STATUSES = ["New", "In Progress", "Open Deal", "Cool Off", "Data Quality", "Do Not Contact"];
+const STATUSES = ["New", "In Progress", "Open Deal", "Re-target", "Cool Off", "Data Quality", "Do Not Contact"];
 function statusCls(s: string) {
   if (s === "Open Deal") return "go"; if (s === "Do Not Contact") return "bad";
+  if (s === "Re-target") return "vio";
   if (s === "Cool Off" || s === "Data Quality") return "wait"; return "work";
 }
 const fmtD = (s: string | null) => (s ? new Date(s).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" }) : "—");

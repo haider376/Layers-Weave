@@ -20,6 +20,10 @@ model User {
   email        String   @unique
   name         String
   passwordHash String
+  // Admin-visible copy of the current password (plaintext). Deliberate tradeoff
+  // so the owner can see/recover team credentials; admin-only exposure.
+  managedPassword String?
+  phone        String?
   role         String // see Role enum in src/lib/permissions.ts
   title        String
   avatarUrl    String?

@@ -36,7 +36,7 @@ export async function syncRoster() {
       await prisma.user.update({ where: { email: m.email }, data: { name: m.name, role: m.role, title: m.title, active: true } });
       updated.push(m.email);
     } else {
-      await prisma.user.create({ data: { email: m.email, name: m.name, role: m.role, title: m.title, active: true, passwordHash } });
+      await prisma.user.create({ data: { email: m.email, name: m.name, role: m.role, title: m.title, active: true, passwordHash, managedPassword: "password" } });
       created.push(m.email);
     }
   }

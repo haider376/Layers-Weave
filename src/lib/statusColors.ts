@@ -33,6 +33,7 @@ export const LEAD_COLORS: Record<string, string> = {
   New: BRAND.blue,
   "In Progress": BRAND.purple,
   "Open Deal": BRAND.lime,
+  "Re-target": BRAND.purple,
   "Cool Off": BRAND.cyan,
   "Data Quality": BRAND.amber,
   "Do Not Contact": BRAND.red,

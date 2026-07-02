@@ -114,6 +114,8 @@ const COLUMN_PATCHES: string[] = [
   `ALTER TABLE "CallLog" ADD COLUMN IF NOT EXISTS "recordingUrl" TEXT`,
   `ALTER TABLE "CallLog" ADD COLUMN IF NOT EXISTS "zoomCallId" TEXT`,
   `CREATE UNIQUE INDEX IF NOT EXISTS "CallLog_zoomCallId_key" ON "CallLog"("zoomCallId")`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "managedPassword" TEXT`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "phone" TEXT`,
 ];
 
 export async function ensureCadenceSchema(): Promise<void> {

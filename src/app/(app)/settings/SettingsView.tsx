@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { showToast } from "@/components/Toast";
 import BrandLogo from "@/components/BrandLogo";
 import { updateProfileAction } from "@/app/actions/session";
+import { changeMyPasswordAction } from "@/app/actions/admin-users";
+import TeamManager, { type TeamUser } from "./TeamManager";
 import { disconnectGoogleAction } from "@/app/actions/google";
 import { getPrefs, setPref, type Prefs } from "@/lib/prefs";
 import { useEffect } from "react";
@@ -16,7 +18,7 @@ import HubspotMigration from "./HubspotMigration";
 import type { SalesGoals } from "@/lib/goals";
 import type { PermissionMatrix, AppConfig } from "@/lib/appConfig";
 
-type Team = { name: string; email: string; role: string; active: boolean }[];
+type Team = TeamUser[];
 const TABS = ["Profile", "Account", "Goals", "Permissions", "Workspace", "Notifications", "Pipeline", "Integrations", "Appearance", "Team"] as const;
 type Tab = (typeof TABS)[number];
 const STAGES = ["Appointment Scheduled", "Showed up", "No Show / Reschedule", "Initiation", "Closed Won", "Closed Lost", "Disqualified"];
@@ -45,6 +47,35 @@ function ThemeControl() {
     </div>
   );
 }
+// Self-service password change (any signed-in user changes their own password).
+function ChangePassword() {
+  const router = useRouter();
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [pending, start] = useTransition();
+  const canSave = current.length > 0 && next.length >= 6 && next === confirm;
+  function save() {
+    start(async () => {
+      try {
+        await changeMyPasswordAction({ current, next });
+        showToast("Password updated ✓");
+        setCurrent(""); setNext(""); setConfirm("");
+        router.refresh();
+      } catch (e) { showToast(e instanceof Error ? e.message : "Couldn't update password"); }
+    });
+  }
+  return (
+    <div className="detail-grid" style={{ maxWidth: 460, marginBottom: 8 }}>
+      <div className="dg-row"><span className="dg-label">Current password</span><input className="dg-input" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} autoComplete="current-password" /></div>
+      <div className="dg-row"><span className="dg-label">New password</span><input className="dg-input" type="password" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" placeholder="min 6 characters" /></div>
+      <div className="dg-row"><span className="dg-label">Confirm new</span><input className="dg-input" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" /></div>
+      {next.length > 0 && next.length < 6 && <div className="set-row-s" style={{ color: "var(--amber)" }}>At least 6 characters.</div>}
+      {confirm.length > 0 && next !== confirm && <div className="set-row-s" style={{ color: "var(--red)" }}>Passwords don’t match.</div>}
+      <div style={{ marginTop: 6 }}><button className="btn primary" style={{ flex: "none", padding: "10px 20px" }} disabled={pending || !canSave} onClick={save}>Update password</button></div>
+    </div>
+  );
+}
 type BoolPref = "celebrations" | "reduceMotion" | "compact" | "grain";
 function PrefToggle({ pref, label, sub }: { pref: BoolPref; label: string; sub: string }) {
   const [on, setOn] = useState(true);
@@ -65,7 +96,7 @@ type GoogleState = { connected: boolean; email: string | null; configured: boole
 type SlackState = { configured: boolean; channel: string | null };
 type WhatsAppState = { configured: boolean };
 
-export default function SettingsView({ me, isAdmin, team, goals, reps, permissions, config, google, zoom, slack, whatsapp }: { me: { name: string; email: string; role: string }; isAdmin: boolean; team: Team; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig; google: GoogleState; zoom: GoogleState; slack: SlackState; whatsapp: WhatsAppState }) {
+export default function SettingsView({ me, isAdmin, team, assignableRoles, goals, reps, permissions, config, google, zoom, slack, whatsapp }: { me: { id: string; name: string; email: string; role: string }; isAdmin: boolean; team: Team; assignableRoles: string[]; goals: SalesGoals; reps: AeMeta[]; permissions: PermissionMatrix; config: AppConfig; google: GoogleState; zoom: GoogleState; slack: SlackState; whatsapp: WhatsAppState }) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Profile");
   const [name, setName] = useState(me.name);
@@ -97,10 +128,7 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
           )}
           {tab === "Account" && (
             <div className="set-list">
-              <div className="detail-grid" style={{ maxWidth: 460, marginBottom: 8 }}>
-                <Field label="Current password" value="" type="password" />
-                <Field label="New password" value="" type="password" />
-              </div>
+              <ChangePassword />
               <Toggle label="Two-factor authentication" sub="Require a code at sign-in" defaultOn={false} />
               <Toggle label="Active sessions alert" sub="Email me about new device sign-ins" />
               <div className="set-row" style={{ borderColor: "rgba(226,87,78,.4)" }}><div><div className="set-row-t" style={{ color: "var(--red)" }}>Sign out everywhere</div><div className="set-row-s">End all other sessions</div></div><button className="btn ghost" style={{ flex: "none", padding: "8px 14px" }} onClick={() => showToast("Other sessions ended")}>Sign out all</button></div>
@@ -222,10 +250,7 @@ export default function SettingsView({ me, isAdmin, team, goals, reps, permissio
             </div>
           )}
           {tab === "Team" && (
-            <table>
-              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
-              <tbody>{team.map((u) => <tr className="row" key={u.email}><td style={{ fontWeight: 600 }}>{u.name}</td><td>{u.email}</td><td>{u.role}</td><td><span className={`st ${u.active ? "go" : "bad"}`}><span className="d" />{u.active ? "Active" : "Disabled"}</span></td></tr>)}</tbody>
-            </table>
+            <TeamManager users={team} roles={assignableRoles} myId={me.id} />
           )}
         </div>
       </motion.section>

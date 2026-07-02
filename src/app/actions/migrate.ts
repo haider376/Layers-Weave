@@ -24,6 +24,7 @@ const pick = (r: Record<string, string>, ...keys: string[]) => {
 function mapLeadStatus(raw: string): string {
   const s = raw.toLowerCase();
   if (!s) return "New";
+  if (s.includes("re-target") || s.includes("retarget") || s.includes("re target")) return "Re-target";
   if (s.includes("customer") || s.includes("won")) return "Open Deal";
   if (s.includes("opportunity") || s.includes("deal")) return "Open Deal";
   if (s.includes("lead") || s.includes("subscriber") || s.includes("new")) return "New";

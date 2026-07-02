@@ -123,7 +123,7 @@ export async function seedDatabase(prisma: PrismaClient) {
   const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
   const userByKey: Record<string, string> = {};
   for (const u of USERS) {
-    const created = await prisma.user.create({ data: { ...u, passwordHash } });
+    const created = await prisma.user.create({ data: { ...u, passwordHash, managedPassword: DEFAULT_PASSWORD } });
     userByKey[u.email.split("@")[0]] = created.id;
   }
 
