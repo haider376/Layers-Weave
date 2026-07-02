@@ -1720,15 +1720,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .kpi.v:hover{box-shadow:var(--glow-soft),0 0 28px -16px var(--purple)}
 .kpi:not(.v):not(.a):hover{box-shadow:var(--glow-soft),0 0 28px -16px var(--neon)}
 
-/* ── Brand motifs: graffiti underlines, drips, scribble empty-states ────── */
-/* Section-heading underlines — a hand-drawn lime swipe beneath the title */
-.panel-h h2,.an-h h2{position:relative;display:inline-block}
-.panel-h h2::after,.an-h h2::after{content:'';position:absolute;left:-2px;right:-9px;bottom:-7px;height:8px;background:url(/brand/underline.svg) center/100% 100% no-repeat;opacity:.42;pointer-events:none}
-.an-h h2::after{opacity:.5}
-.lb-h h2{position:relative;display:inline-block}
-.lb-h h2::after{content:'';position:absolute;left:0;right:-16px;bottom:-10px;height:20px;background:url(/brand/underline.svg) center/100% 100% no-repeat;opacity:.9;pointer-events:none}
-.topbar h1{position:relative;display:inline-block}
-.topbar h1::after{content:'';position:absolute;left:0;right:-12px;bottom:-7px;height:11px;background:url(/brand/underline.svg) center/100% 100% no-repeat;opacity:.55;pointer-events:none}
+/* ── Brand motifs: drips, scribble empty-states (heading underlines removed) ── */
 
 /* Login hero — a single soft paint drip accent off the card's top corner.
    (Subtle, not a full band — reads as a brand mark, not noise.) */
@@ -1813,8 +1805,6 @@ body::after{display:none}
 .panel,.an-card{border-color:var(--line)}
 .kpi:hover,.an-card:hover{transform:translateY(-2px);box-shadow:var(--elev-2)}
 .an-card::after{height:1px;opacity:.3}
-.panel-h h2::after,.an-h h2::after{display:none} /* minimal: underline lives on page titles only */
-.topbar h1::after{opacity:.38;height:9px;bottom:-6px}
 
 /* 2 · Chrome — floating glass rail + sticky glass topbar */
 .app{grid-template-columns:250px 1fr;column-gap:6px}
