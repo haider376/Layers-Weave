@@ -78,7 +78,7 @@ export default function LoginForm() {
           <div className="lerr">{error}</div>
         </form>
         <div className="lhint">
-          Use your @layerswholesale.co address · demo password: <b>password</b>
+          Sign in with your @layerswholesale.co account.
         </div>
       </div>
     </div>

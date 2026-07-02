@@ -54,11 +54,13 @@ export default function ActivityPanel({
   dealId,
   events,
   contact,
+  whatsappOn = false,
 }: {
   companyId: string;
   dealId?: string;
   events: TLEvent[];
   contact?: { id: string; name: string; email?: string | null; phone?: string | null } | null;
+  whatsappOn?: boolean;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"note" | "email" | "call" | "meeting" | "whatsapp">("note");
@@ -104,7 +106,7 @@ export default function ActivityPanel({
       <div className="panel-h">
         <h2>Activity</h2>
         <div className="compose-tabs">
-          {(["note", "email", "call", "whatsapp", "meeting"] as const).map((t) => (
+          {(["note", "email", "call", "whatsapp", "meeting"] as const).filter((t) => t !== "whatsapp" || whatsappOn).map((t) => (
             <button key={t} className={`ct-tab${tab === t ? " on" : ""}`} onClick={() => setTab(t)}>
               {t === "note" ? "Note" : t === "email" ? "Email" : t === "call" ? "Call" : t === "whatsapp" ? "WhatsApp" : "Meeting"}
             </button>

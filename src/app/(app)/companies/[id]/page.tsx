@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales, canReassignOwner } from "@/lib/permissions";
+import { whatsappConfigured } from "@/lib/whatsapp";
 import { getTimeline } from "@/lib/sales";
 import Topbar from "@/components/Topbar";
 import ActivityPanel from "@/components/ActivityPanel";
@@ -93,7 +94,7 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
 
         {/* CENTER — activity */}
         <div className="rec-col">
-          <ActivityPanel companyId={company.id} events={events.map((e) => ({ ...e, at: e.at.toISOString() }))} contact={primary} />
+          <ActivityPanel companyId={company.id} events={events.map((e) => ({ ...e, at: e.at.toISOString() }))} contact={primary} whatsappOn={whatsappConfigured()} />
         </div>
 
         {/* RIGHT — associations */}

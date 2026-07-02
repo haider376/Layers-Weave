@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
+import { whatsappConfigured } from "@/lib/whatsapp";
 import { getTimeline } from "@/lib/sales";
 import Topbar from "@/components/Topbar";
 import ActivityPanel from "@/components/ActivityPanel";
@@ -89,6 +90,7 @@ export default async function DealDetail({ params }: { params: Promise<{ id: str
           dealId={deal.id}
           events={events.map((e) => ({ ...e, at: e.at.toISOString() }))}
           contact={deal.contact ? { id: deal.contact.id, name: deal.contact.name, email: deal.contact.email, phone: deal.contact.phone } : null}
+          whatsappOn={whatsappConfigured()}
         />
       </div>
     </>

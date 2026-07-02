@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma, safe } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessSales } from "@/lib/permissions";
+import { whatsappConfigured } from "@/lib/whatsapp";
 import { getTimeline } from "@/lib/sales";
 import { initials } from "@/components/Logo";
 import Topbar from "@/components/Topbar";
@@ -67,7 +68,7 @@ export default async function ContactDetail({ params }: { params: Promise<{ id: 
         </div>
 
         <div className="rec-col">
-          <ActivityPanel companyId={contact.companyId} events={events.map((e) => ({ ...e, at: e.at.toISOString() }))} contact={{ id: contact.id, name: contact.name, email: contact.email, phone: contact.phone }} />
+          <ActivityPanel companyId={contact.companyId} events={events.map((e) => ({ ...e, at: e.at.toISOString() }))} contact={{ id: contact.id, name: contact.name, email: contact.email, phone: contact.phone }} whatsappOn={whatsappConfigured()} />
         </div>
 
         <div className="rec-col">
