@@ -267,9 +267,13 @@ tr.detail.open .tl-wrap{max-height:320px}
 
 @media(max-width:980px){.app{grid-template-columns:1fr}.side{display:none}.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.main{padding:18px 14px 50px}}
 
-.login{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
-.login::before{content:'';position:absolute;top:-160px;right:-120px;width:520px;height:520px;background:radial-gradient(circle,rgba(198,245,66,.13),transparent 62%)}
-.login::after{content:'';position:absolute;bottom:-200px;left:0;width:480px;height:480px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 65%)}
+.login{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+/* Abstract graffiti wall backdrop — full-bleed, dimmed */
+.login::before{content:'';position:absolute;inset:-4%;background:url(/brand/graffiti-wall.svg) center/cover no-repeat;opacity:.5;filter:saturate(1.1)}
+/* Readable scrim: darken toward the centre so the card pops */
+.login::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 640px 520px at 50% 48%,rgba(10,10,11,.86),rgba(10,10,11,.55) 60%,rgba(10,10,11,.2) 100%)}
+:root[data-theme="light"] .login::before{opacity:.42}
+:root[data-theme="light"] .login::after{background:radial-gradient(ellipse 640px 520px at 50% 48%,rgba(242,242,239,.9),rgba(242,242,239,.62) 60%,rgba(242,242,239,.25) 100%)}
 .lcard{position:relative;z-index:1;width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:34px 30px}
 .lcard .lg{margin-bottom:24px;text-align:center}.lcard .lg svg{height:24px;width:auto}
 .lcard h2{font-family:var(--display);font-weight:900;font-size:15px;letter-spacing:.05em;text-transform:uppercase;text-align:center;margin-bottom:6px}
