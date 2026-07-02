@@ -6,8 +6,9 @@ const fs = require("fs");
 const path = require("path");
 
 const W = 1600, H = 1000;
-const LIME = "#6FE01A", PURPLE = "#8B5CF6", MAGENTA = "#EC2C71", INK = "#F7F6F2";
-const COLORS = [LIME, PURPLE, LIME, PURPLE, MAGENTA, INK];
+// Lime-only palette (two lime tones for depth).
+const LIME = "#6FE01A", LIME2 = "#A9DF1E";
+const COLORS = [LIME, LIME2, LIME, LIME2];
 
 // mulberry32 seeded PRNG
 function rng(seed) {
@@ -32,13 +33,13 @@ function drip(x, y, len, w) {
 }
 
 // 1) Big soft colour clouds (sprayed base washes)
-for (let i = 0; i < 7; i++) {
+for (let i = 0; i < 4; i++) {
   const col = pick(COLORS), x = rand(0, W), y = rand(0, H), rr = rand(180, 340);
   parts.push(`<circle cx="${c(x)}" cy="${c(y)}" r="${c(rr)}" fill="${col}" opacity="${(rand(6, 13) / 100).toFixed(2)}" filter="url(#soft)"/>`);
 }
 
 // 2) Sweeping spray strokes (thick wobbly beziers) with drips
-for (let i = 0; i < 14; i++) {
+for (let i = 0; i < 6; i++) {
   const col = pick(COLORS), sw = rand(10, 34);
   const x1 = rand(-100, W), y1 = rand(0, H);
   const x2 = x1 + rand(-380, 380), y2 = y1 + rand(-160, 160);
@@ -51,14 +52,14 @@ for (let i = 0; i < 14; i++) {
 }
 
 // 3) Throw-up bubbles (rounded blob outlines)
-for (let i = 0; i < 8; i++) {
-  const col = pick([LIME, PURPLE, MAGENTA]), x = rand(120, W - 120), y = rand(120, H - 120);
+for (let i = 0; i < 3; i++) {
+  const col = pick(COLORS), x = rand(120, W - 120), y = rand(120, H - 120);
   const w = rand(90, 220), h = rand(70, 150), sw = rand(8, 18);
   parts.push(`<g filter="url(#rough)" opacity="${(rand(35, 65) / 100).toFixed(2)}"><path d="M${c(x - w)},${c(y)} q0,${c(-h)} ${c(w)},${c(-h)} q${c(w)},0 ${c(w)},${c(h)} q0,${c(h)} ${c(-w)},${c(h)} q${c(-w)},0 ${c(-w)},${c(-h)} Z" fill="none" stroke="${col}" stroke-width="${c(sw)}" stroke-linejoin="round"/></g>`);
 }
 
 // 4) Scribble scrawls (dense zigzag tags — abstract, no letters)
-for (let i = 0; i < 12; i++) {
+for (let i = 0; i < 5; i++) {
   const col = pick(COLORS), x = rand(0, W - 260), y = rand(0, H), sw = rand(4, 11);
   let d = `M${c(x)},${c(y)}`;
   const n = Math.floor(rand(5, 11)); let px = x, py = y;
@@ -67,20 +68,20 @@ for (let i = 0; i < 12; i++) {
 }
 
 // 5) Graffiti arrows
-for (let i = 0; i < 7; i++) {
-  const col = pick([LIME, PURPLE, INK]), x = rand(0, W - 200), y = rand(40, H - 40), len = rand(90, 220), sw = rand(6, 14);
+for (let i = 0; i < 3; i++) {
+  const col = pick(COLORS), x = rand(0, W - 200), y = rand(40, H - 40), len = rand(90, 220), sw = rand(6, 14);
   const ang = rand(-0.5, 0.5), ex = x + len * Math.cos(ang), ey = y + len * Math.sin(ang);
   const head = 26;
   parts.push(`<g filter="url(#rough)" opacity="${(rand(40, 75) / 100).toFixed(2)}" stroke="${col}" stroke-width="${c(sw)}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M${c(x)},${c(y)} L${c(ex)},${c(ey)}"/><path d="M${c(ex - head)},${c(ey - head)} L${c(ex)},${c(ey)} L${c(ex - head)},${c(ey + head)}"/></g>`);
 }
 
 // 6) Splatter dots + stars
-for (let i = 0; i < 90; i++) {
+for (let i = 0; i < 34; i++) {
   const col = pick(COLORS), x = rand(0, W), y = rand(0, H), rr = rand(2, 9);
   parts.push(`<circle cx="${c(x)}" cy="${c(y)}" r="${c(rr)}" fill="${col}" opacity="${(rand(20, 60) / 100).toFixed(2)}"/>`);
 }
-for (let i = 0; i < 10; i++) {
-  const col = pick([LIME, INK, MAGENTA]), x = rand(0, W), y = rand(0, H), s = rand(10, 26);
+for (let i = 0; i < 4; i++) {
+  const col = pick(COLORS), x = rand(0, W), y = rand(0, H), s = rand(10, 26);
   parts.push(`<g filter="url(#rough)" stroke="${col}" stroke-width="${c(rand(4, 8))}" stroke-linecap="round" opacity="${(rand(40, 80) / 100).toFixed(2)}"><path d="M${c(x - s)},${c(y)} L${c(x + s)},${c(y)} M${c(x)},${c(y - s)} L${c(x)},${c(y + s)} M${c(x - s * 0.7)},${c(y - s * 0.7)} L${c(x + s * 0.7)},${c(y + s * 0.7)} M${c(x - s * 0.7)},${c(y + s * 0.7)} L${c(x + s * 0.7)},${c(y - s * 0.7)}"/></g>`);
 }
 

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import PunkMark from "@/components/PunkMark";
-import LoginDecor from "./LoginDecor";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -39,7 +38,6 @@ export default function LoginForm() {
 
   return (
     <div className="login">
-      <LoginDecor />
       <div className="lcard">
         <span className="lcard-mark"><PunkMark name="globe" size={52} anim="float" /></span>
         <div className="lg lg-row">
