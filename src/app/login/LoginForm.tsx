@@ -39,10 +39,8 @@ export default function LoginForm() {
 
   return (
     <div className="login">
-      <span className="login-drips" aria-hidden="true" />
       <LoginDecor />
       <div className="lcard">
-        <span className="lcard-drips" aria-hidden="true" />
         <span className="lcard-mark"><PunkMark name="globe" size={52} anim="float" /></span>
         <div className="lg lg-row">
           <Logo />

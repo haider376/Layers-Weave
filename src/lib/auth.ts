@@ -3,6 +3,28 @@ import { cookies } from "next/headers";
 import crypto from "crypto";
 import { prisma } from "./db";
 import { isAdmin } from "./permissions";
+import { ensureCadenceSchema } from "./ensureCadenceSchema";
+
+// The User table gained managedPassword/phone columns. On a lagging deploy those
+// columns may not exist yet, which would make the FIRST user query (login /
+// getCurrentUser) throw before anything can heal. So heal-and-retry here — this
+// is the app's entry point, so patching the schema here unblocks everything.
+function isMissingColumn(e: unknown): boolean {
+  const code = (e as { code?: string })?.code;
+  const msg = (e instanceof Error ? e.message : String(e)).toLowerCase();
+  return code === "42703" || (msg.includes("column") && msg.includes("does not exist")) || msg.includes("managedpassword") || msg.includes("phone");
+}
+async function findUser(where: { id: string } | { email: string }) {
+  try {
+    return await prisma.user.findUnique({ where: where as { id: string } });
+  } catch (e) {
+    if (isMissingColumn(e)) {
+      await ensureCadenceSchema().catch(() => {});
+      return await prisma.user.findUnique({ where: where as { id: string } });
+    }
+    throw e;
+  }
+}
 
 const COOKIE = "lw_session";
 const VIEWAS_COOKIE = "lw_viewas";
@@ -94,7 +116,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   if (!raw) return null;
   const userId = verify(raw);
   if (!userId) return null;
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await findUser({ id: userId });
   if (!user || !user.active) return null;
 
   const admin = isAdmin(user.role);
@@ -121,7 +143,7 @@ export async function setViewAs(role: string | null) {
   const raw = store.get(COOKIE)?.value;
   const userId = raw ? verify(raw) : null;
   if (!userId) throw new Error("UNAUTHENTICATED");
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await findUser({ id: userId });
   if (!user || !isAdmin(user.role)) throw new Error("FORBIDDEN");
   if (!role || role === user.role) {
     store.delete(VIEWAS_COOKIE);

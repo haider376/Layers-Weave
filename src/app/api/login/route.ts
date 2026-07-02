@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { createSession, emailDomainAllowed } from "@/lib/auth";
+import { ensureCadenceSchema } from "@/lib/ensureCadenceSchema";
+
+// Heal-and-retry: on a lagging deploy the User table may be missing newer
+// columns (managedPassword/phone), which would make this first query throw.
+async function findByEmail(email: string) {
+  try { return await prisma.user.findUnique({ where: { email } }); }
+  catch (e) {
+    const msg = (e instanceof Error ? e.message : String(e)).toLowerCase();
+    if (msg.includes("column") || msg.includes("managedpassword") || msg.includes("phone") || (e as { code?: string }).code === "42703") {
+      await ensureCadenceSchema().catch(() => {});
+      return await prisma.user.findUnique({ where: { email } });
+    }
+    throw e;
+  }
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,7 +48,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Sign-in is restricted to your company email domain." }, { status: 403 });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await findByEmail(email);
   if (!user || !user.active) {
     return NextResponse.json(
       { error: "No account for that email. (Has the database been seeded?)" },

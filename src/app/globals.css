@@ -1725,8 +1725,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 
 /* Login hero — a single soft paint drip accent off the card's top corner.
    (Subtle, not a full band — reads as a brand mark, not noise.) */
-.login-drips{display:none}
-.lcard-drips{position:absolute;top:-26px;right:30px;width:120px;height:54px;background:url(/brand/drips.svg) center top/contain no-repeat;opacity:.32;pointer-events:none;filter:blur(.2px)}
+.login-drips,.lcard-drips{display:none}
 
 /* Empty-state scribble arrow — points to where content will appear */
 .empty-st{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:22px 16px;color:var(--faint)}
