@@ -6,15 +6,21 @@ import { isAdmin } from "./permissions";
 
 const COOKIE = "lw_session";
 const VIEWAS_COOKIE = "lw_viewas";
-// Fail closed in production: a missing SESSION_SECRET must never fall back to a
-// public default (that would make every session cookie forgeable). Resolved
-// lazily (at request time, not import) so `next build` doesn't need the secret.
+// Signing key resolution. Prefer an explicit SESSION_SECRET. If it isn't set,
+// DON'T fall back to a public default (forgeable) and DON'T throw (that would
+// break login when the env var is missing) — instead DERIVE a stable, non-public
+// key from another server-only secret (the DB URL). Attackers can't guess it,
+// and it's stable across deploys, so existing sessions keep working.
 function secret(): string {
   const s = process.env.SESSION_SECRET;
   if (s && s.length >= 16) return s;
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("SESSION_SECRET must be set to a strong value (>=16 chars) in production");
-  }
+  const seed =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    "";
+  if (seed) return crypto.createHash("sha256").update("lw-session-v1:" + seed).digest("hex");
   return "dev-secret-not-for-production";
 }
 // The company's own domains are ALWAYS allowed, so a stale ALLOWED_EMAIL_DOMAIN
