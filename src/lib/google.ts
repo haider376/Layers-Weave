@@ -278,9 +278,16 @@ function b64url(s: string): string {
 }
 
 // Encode a header value that may contain non-ASCII (RFC 2047).
-function encodeHeader(v: string): string {
+// Strip CR/LF so a crafted subject/recipient can't inject extra headers
+// (e.g. a hidden Bcc) — header injection defense.
+function stripCrlf(v: string): string {
   // eslint-disable-next-line no-control-regex
-  return /^[\x00-\x7F]*$/.test(v) ? v : `=?UTF-8?B?${Buffer.from(v, "utf8").toString("base64")}?=`;
+  return v.replace(/[\r\n\x00]/g, " ").trim();
+}
+function encodeHeader(v: string): string {
+  const s = stripCrlf(v);
+  // eslint-disable-next-line no-control-regex
+  return /^[\x00-\x7F]*$/.test(s) ? s : `=?UTF-8?B?${Buffer.from(s, "utf8").toString("base64")}?=`;
 }
 
 // Send an email as the connected Gmail account. Returns ok + the gmail thread id.
@@ -299,7 +306,7 @@ export async function sendGmail(userId: string, input: {
   // which deleted that blank separator, so Gmail treated the body as a header
   // and recipients saw only the subject.
   const headers = [
-    `To: ${input.to}`,
+    `To: ${stripCrlf(input.to)}`,
     `Subject: ${encodeHeader(input.subject)}`,
     "MIME-Version: 1.0",
     'Content-Type: text/html; charset="UTF-8"',

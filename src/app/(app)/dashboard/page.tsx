@@ -4,6 +4,7 @@ import Avatar from "@/components/Avatar";
 import EmptyState from "@/components/EmptyState";
 import Topbar from "@/components/Topbar";
 import NavPunk from "@/components/NavPunk";
+import { STAGE_COLORS } from "@/lib/statusColors";
 
 const STAGES = [
   "Appointment Scheduled",
@@ -107,7 +108,7 @@ export default async function DashboardPage() {
             {funnel.map((f) => (
               <div className="frow" key={f.name}>
                 <span className="nm">{f.name}</span>
-                <div className="ftrack"><i style={{ width: `${Math.round((f.count / fmax) * 100)}%` }} /></div>
+                <div className="ftrack"><i style={{ width: `${Math.round((f.count / fmax) * 100)}%`, background: STAGE_COLORS[f.name] ?? "var(--neon)" }} /></div>
                 <span className="ct">{f.count}</span>
               </div>
             ))}

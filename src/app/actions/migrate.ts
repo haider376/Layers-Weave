@@ -89,8 +89,11 @@ export async function wipeCrmAction(confirm: string): Promise<{ ok: boolean; cle
 }
 
 // ── Companies import ─────────────────────────────────────────────────────────
+const MAX_CHUNK = 1000; // server-side cap — the client sends 500, don't trust it
+
 export async function importCompaniesChunk(rows: Record<string, string>[]): Promise<{ created: number; skipped: number }> {
   await guardAdmin();
+  rows = rows.slice(0, MAX_CHUNK);
   const owners = await buildOwnerMap();
 
   const mapped = rows.map((r) => {
@@ -143,6 +146,7 @@ async function getUnassignedCompany(ownerId: string): Promise<string> {
 
 export async function importContactsChunk(rows: Record<string, string>[]): Promise<{ created: number; skipped: number }> {
   const user = await guardAdmin();
+  rows = rows.slice(0, MAX_CHUNK);
 
   const mapped = rows.map((r) => {
     const name = (pick(r, "name", "contact name") || `${pick(r, "first name")} ${pick(r, "last name")}`).trim();

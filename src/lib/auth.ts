@@ -6,7 +6,17 @@ import { isAdmin } from "./permissions";
 
 const COOKIE = "lw_session";
 const VIEWAS_COOKIE = "lw_viewas";
-const SECRET = process.env.SESSION_SECRET || "dev-secret";
+// Fail closed in production: a missing SESSION_SECRET must never fall back to a
+// public default (that would make every session cookie forgeable). Resolved
+// lazily (at request time, not import) so `next build` doesn't need the secret.
+function secret(): string {
+  const s = process.env.SESSION_SECRET;
+  if (s && s.length >= 16) return s;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET must be set to a strong value (>=16 chars) in production");
+  }
+  return "dev-secret-not-for-production";
+}
 // The company's own domains are ALWAYS allowed, so a stale ALLOWED_EMAIL_DOMAIN
 // env var can never lock the real team out. Extra domains can be added via the
 // env var (comma-separated).
@@ -27,7 +37,7 @@ export function emailDomainAllowed(email: string): boolean {
 }
 
 function sign(value: string): string {
-  const mac = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
+  const mac = crypto.createHmac("sha256", secret()).update(value).digest("hex");
   return `${value}.${mac}`;
 }
 
@@ -36,7 +46,7 @@ function verify(signed: string): string | null {
   if (idx < 0) return null;
   const value = signed.slice(0, idx);
   const mac = signed.slice(idx + 1);
-  const expected = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
+  const expected = crypto.createHmac("sha256", secret()).update(value).digest("hex");
   if (mac.length !== expected.length) return null;
   if (!crypto.timingSafeEqual(Buffer.from(mac), Buffer.from(expected))) return null;
   return value;

@@ -44,10 +44,29 @@ async function getAccountToken(): Promise<string | null> {
 // recording download endpoints are authenticated — they 401 ("Access token is
 // required") when opened directly — so we proxy them server-side. Returns the
 // upstream fetch Response (audio stream) or an error.
+// Only ever attach the Zoom bearer token to a genuine Zoom host — the
+// recordingUrl originates from a webhook payload, so it must be treated as
+// untrusted (SSRF / token-exfil defense).
+function isZoomHost(u: string): boolean {
+  try {
+    const h = new URL(u);
+    return h.protocol === "https:" && (h.hostname === "zoom.us" || h.hostname.endsWith(".zoom.us"));
+  } catch { return false; }
+}
+
 export async function fetchZoomRecording(recordingUrl: string): Promise<{ ok: true; res: Response } | { ok: false; status: number; error: string }> {
+  if (!isZoomHost(recordingUrl)) return { ok: false, status: 400, error: "recording host not allowed" };
   const token = await getAccountToken().catch(() => null);
   if (!token) return { ok: false, status: 503, error: "Zoom not configured" };
-  const res = await fetch(recordingUrl, { headers: { authorization: `Bearer ${token}` }, redirect: "follow" });
+  // redirect: "manual" — never forward the bearer token to a redirected host.
+  const res = await fetch(recordingUrl, { headers: { authorization: `Bearer ${token}` }, redirect: "manual" });
+  if (res.status >= 300 && res.status < 400) {
+    const loc = res.headers.get("location");
+    if (!loc || !isZoomHost(new URL(loc, recordingUrl).href)) return { ok: false, status: 502, error: "recording redirected off-host" };
+    const res2 = await fetch(new URL(loc, recordingUrl).href, { headers: { authorization: `Bearer ${token}` }, redirect: "manual" });
+    if (!res2.ok) return { ok: false, status: res2.status, error: `Zoom returned ${res2.status}` };
+    return { ok: true, res: res2 };
+  }
   if (!res.ok) return { ok: false, status: res.status, error: `Zoom returned ${res.status}` };
   return { ok: true, res };
 }

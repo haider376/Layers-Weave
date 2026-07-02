@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { zoomVerifySignature, zoomUrlValidation, processZoomCallEvent } from "@/lib/zoom";
+import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -22,15 +23,16 @@ async function capture(event: string, body: unknown) {
 // (to catch stray spaces/quotes), and a sample encryptedToken so we can confirm
 // the handshake works BEFORE clicking "Validate" in the Zoom Marketplace.
 export async function GET() {
+  // Admin-only: this reports secret length and (previously) an HMAC sample —
+  // both are secret-recovery aids, so never expose them unauthenticated.
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return NextResponse.json({ error: "admins only" }, { status: 403 });
   const secret = process.env.ZOOM_WEBHOOK_SECRET ?? "";
-  const sample = zoomUrlValidation("sampleToken123");
   return NextResponse.json({
     ok: true,
     endpoint: "zoom webhook",
     webhookSecretSet: !!secret,
-    secretLength: secret.length,
     secretHasWhitespace: secret !== secret.trim(),
-    sampleValidation: sample, // {plainToken, encryptedToken} — proves the HMAC runs
     hint: secret
       ? "Set this exact URL in Zoom, ensure the Secret Token matches, then Validate."
       : "Set ZOOM_WEBHOOK_SECRET in Vercel and redeploy BEFORE clicking Validate.",

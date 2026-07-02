@@ -69,9 +69,11 @@ export function whatsappVerifyChallenge(params: URLSearchParams): { ok: boolean;
 }
 
 // POST signature: Meta signs the raw body with the app secret (sha256).
+// Fails CLOSED — with no app secret configured we reject every webhook rather
+// than accept forged inbound messages. Set WHATSAPP_APP_SECRET to enable.
 export function whatsappVerifySignature(rawBody: string, signature: string | null): boolean {
   const secret = appSecret();
-  if (!secret) return true; // no app secret configured → skip (less secure, documented)
+  if (!secret) return false; // no app secret → reject (was: accept — fail-open)
   if (!signature) return false;
   const expected = "sha256=" + crypto.createHmac("sha256", secret).update(rawBody, "utf8").digest("hex");
   try { return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected)); }
