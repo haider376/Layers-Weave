@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Pattern</title>
+  <meta name="description" content="Tell us about your project. Pattern connects businesses with contemporary artists to create memorable spaces." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=20250617y" />
+</head>
+<body>
+  <div id="header-mount"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow reveal in">Contact</span>
+        <h1 class="display reveal in" data-delay="1">Tell us about your project.</h1>
+        <p class="lead reveal in" data-delay="2">Whether you’re a business looking to commission original work or an artist who wants in — we’d love to hear from you.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="grid-2">
+          <form class="form reveal" data-form="contact">
+            <div class="field"><label for="c-name">Name</label><input id="c-name" name="name" type="text" placeholder="Your name" required /></div>
+            <div class="field"><label for="c-business">Business</label><input id="c-business" name="business" type="text" placeholder="Company or venue (optional)" /></div>
+            <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" placeholder="you@email.com" required /></div>
+            <div class="field"><label for="c-message">Message</label><textarea id="c-message" name="message" placeholder="Tell us what you have in mind…" required></textarea></div>
+            <button class="btn btn--primary btn--block" type="submit">Send Message <span class="arrow">→</span></button>
+          </form>
+
+          <aside class="reveal" data-delay="1">
+            <div class="callout">
+              <span class="eyebrow">Direct</span>
+              <h3 style="margin-top:.7rem">Reach us</h3>
+              <p style="margin-top:.8rem"><a class="link" href="mailto:hello@pattern.studio">hello@pattern.studio</a></p>
+              <p><a class="link" href="https://instagram.com" target="_blank" rel="noopener">@pattern on Instagram</a></p>
+            </div>
+            <div class="ratio ratio--3x2 reveal mt-3 photo"><img src="assets/img/projects/bird-spider/detail-wing.jpg" alt="Detail of a Pattern artist's mural" loading="lazy" /></div>
+            <p class="muted mt-2" style="font-size:.95rem">We typically reply within two working days. For commissions, the more you can tell us about the space, timeline and budget, the faster we can help.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="banner">
+      <img class="banner__bg" src="assets/img/projects/krige/mural-figure.jpg" alt="" loading="lazy" />
+      <div class="container">
+        <h2 class="display reveal">Distinctive spaces start here.</h2>
+        <a class="btn btn--primary reveal" data-delay="1" href="for-businesses.html">For Businesses <span class="arrow">→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-mount"></div>
+  <script src="js/projects-data.js?v=20250617y"></script>
+  <script src="js/main.js?v=20250617y"></script>
+</body>
+</html>

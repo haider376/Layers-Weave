@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Artist Application — Pattern</title>
+  <meta name="description" content="Join the Pattern artist network. Apply for commissions, murals, installations, exhibitions, brand collaborations and creative opportunities." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=20250617y" />
+</head>
+<body>
+  <div id="header-mount"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow reveal in">Artist Application</span>
+        <h1 class="display reveal in" data-delay="1">Join the Pattern Artist Network</h1>
+        <p class="lead reveal in" data-delay="2">We’re building a curated network of artists for commissions, murals, installations, exhibitions, brand collaborations, and creative opportunities. If you’re interested in working with Pattern, tell us a bit about yourself and your practice below.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <form class="form form--long reveal" data-form="artist">
+
+          <!-- Personal Information -->
+          <fieldset class="form-section">
+            <legend>Personal Information</legend>
+            <div class="field--row">
+              <div class="field"><label for="af-name">Full Name</label><input id="af-name" name="full_name" type="text" required /></div>
+              <div class="field"><label for="af-email">Email Address</label><input id="af-email" name="email" type="email" required /></div>
+            </div>
+            <div class="field--row">
+              <div class="field"><label for="af-phone">Phone Number</label><input id="af-phone" name="phone" type="tel" /></div>
+              <div class="field"><label for="af-city">City / Location</label><input id="af-city" name="city" type="text" required /></div>
+            </div>
+            <div class="field--row">
+              <div class="field"><label for="af-website">Website <span class="faint">(Optional)</span></label><input id="af-website" name="website" type="url" placeholder="https://" /></div>
+              <div class="field"><label for="af-instagram">Instagram</label><input id="af-instagram" name="instagram" type="text" placeholder="@handle" /></div>
+            </div>
+            <div class="field"><label for="af-social">Other Social Media <span class="faint">(Optional)</span></label><input id="af-social" name="other_social" type="text" /></div>
+          </fieldset>
+
+          <!-- About Your Practice -->
+          <fieldset class="form-section">
+            <legend>About Your Practice</legend>
+            <div class="field"><label for="af-describe">How would you describe your work in a few sentences?</label><textarea id="af-describe" name="describe" required></textarea></div>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>What mediums do you work in?</legend>
+              <label class="choice"><input type="checkbox" name="mediums" value="Painting" /> Painting</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Murals" /> Murals</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Illustration" /> Illustration</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Sculpture" /> Sculpture</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Installation" /> Installation</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Mixed Media" /> Mixed Media</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Photography" /> Photography</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Digital Art" /> Digital Art</label>
+              <label class="choice"><input type="checkbox" name="mediums" value="Other" /> Other</label>
+            </fieldset>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>How long have you been practicing professionally?</legend>
+              <label class="choice"><input type="radio" name="experience_years" value="<1" /> Less than 1 year</label>
+              <label class="choice"><input type="radio" name="experience_years" value="1-3" /> 1–3 years</label>
+              <label class="choice"><input type="radio" name="experience_years" value="3-5" /> 3–5 years</label>
+              <label class="choice"><input type="radio" name="experience_years" value="5+" /> 5+ years</label>
+            </fieldset>
+          </fieldset>
+
+          <!-- Portfolio -->
+          <fieldset class="form-section">
+            <legend>Portfolio</legend>
+            <p class="form-section__hint">Please include examples of your strongest work.</p>
+            <div class="field"><label for="af-portfolio">Portfolio Website</label><input id="af-portfolio" name="portfolio_url" type="url" placeholder="https://" /></div>
+            <div class="or-divider">or</div>
+            <div class="field file-field"><label for="af-pdf">Upload Portfolio PDF</label><input id="af-pdf" name="portfolio_pdf" type="file" accept="application/pdf" /></div>
+          </fieldset>
+
+          <!-- Experience -->
+          <fieldset class="form-section">
+            <legend>Experience</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>Have you completed commissioned work before?</legend>
+              <label class="choice"><input type="radio" name="commissioned" value="Yes" /> Yes</label>
+              <label class="choice"><input type="radio" name="commissioned" value="No" /> No</label>
+            </fieldset>
+            <div class="field"><label for="af-recent">If yes, please tell us about a few recent projects.</label><textarea id="af-recent" name="recent_projects"></textarea></div>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>Have you exhibited your work before?</legend>
+              <label class="choice"><input type="radio" name="exhibited" value="Yes" /> Yes</label>
+              <label class="choice"><input type="radio" name="exhibited" value="No" /> No</label>
+            </fieldset>
+            <div class="field"><label for="af-where">If yes, where?</label><input id="af-where" name="exhibited_where" type="text" /></div>
+          </fieldset>
+
+          <!-- Opportunities -->
+          <fieldset class="form-section">
+            <legend>Opportunities</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>Which opportunities are you interested in?</legend>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Murals" /> Murals</label>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Custom Artwork" /> Custom Artwork</label>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Hospitality Projects" /> Hospitality Projects</label>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Brand Collaborations" /> Brand Collaborations</label>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Installations" /> Installations</label>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Group Exhibitions" /> Group Exhibitions</label>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Live Painting Events" /> Live Painting Events</label>
+              <label class="choice"><input type="checkbox" name="opportunities" value="Content Collaborations" /> Content Collaborations</label>
+            </fieldset>
+          </fieldset>
+
+          <!-- Availability -->
+          <fieldset class="form-section">
+            <legend>Availability</legend>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>Are you currently available for commissions?</legend>
+              <label class="choice"><input type="radio" name="availability" value="Immediately" /> Immediately</label>
+              <label class="choice"><input type="radio" name="availability" value="Within 1 Month" /> Within 1 Month</label>
+              <label class="choice"><input type="radio" name="availability" value="Within 3 Months" /> Within 3 Months</label>
+              <label class="choice"><input type="radio" name="availability" value="Not Currently" /> Not Currently</label>
+            </fieldset>
+            <fieldset class="choice-group choice-group--cols">
+              <legend>Are you willing to travel for projects?</legend>
+              <label class="choice"><input type="radio" name="travel" value="Yes" /> Yes</label>
+              <label class="choice"><input type="radio" name="travel" value="No" /> No</label>
+              <label class="choice"><input type="radio" name="travel" value="Depends on Project" /> Depends on Project</label>
+            </fieldset>
+          </fieldset>
+
+          <!-- Final Question -->
+          <fieldset class="form-section">
+            <legend>Final Question</legend>
+            <div class="field"><label for="af-goals">What are you currently working towards as an artist?</label><textarea id="af-goals" name="goals" required></textarea></div>
+          </fieldset>
+
+          <button class="btn btn--primary btn--block" type="submit" style="margin-top:2rem">Submit Application <span class="arrow">→</span></button>
+          <p class="form-note">We review every application individually and will be in touch if we believe there’s a good fit.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-mount"></div>
+  <script src="js/projects-data.js?v=20250617y"></script>
+  <script src="js/main.js?v=20250617y"></script>
+</body>
+</html>
